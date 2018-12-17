@@ -1,3 +1,6 @@
+pandas
+matplotlib
 sqlalchemy
 argparse
 biopython
+configparser

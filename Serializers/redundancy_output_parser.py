@@ -8,22 +8,22 @@ class RedundancyParser:
     def __init__(self, file_name):
         """ Class parses redundancy_checker.__main__ output into dictionary
 
-		File is in format:
-			Best_Match:Completeness,Contamination\t[Next_Match:Completeness,Contamination\t]
+        File is in format:
+            Best_Match:Completeness,Contamination\t[Next_Match:Completeness,Contamination\t]
 
-		:param file_name: (str)	Redundancy checker results
-		"""
+        :param file_name: (str)	Redundancy checker results
+        """
         self.file_contents = RedundancyParser._read_contents(file_name)
 
     @staticmethod
     def _read_contents(file_name):
         """ Protected method to read file and return set of matches from file
 
-		File is in format:
-			Best_Match:Completeness,Contamination\t[Next_Match:Completeness,Contamination\t]
+        File is in format:
+            Best_Match:Completeness,Contamination\t[Next_Match:Completeness,Contamination\t]
 
-		:param file_name: Redundancy checker results
-		"""
+        :param file_name: Redundancy checker results
+        """
         contents_in_file = []
         with open(file_name, "r") as R:
             # Skip first line
@@ -42,6 +42,11 @@ class RedundancyParser:
         return contents_in_file
 
     def get_match(self, genome_id):
+        """ Returns highest quality genome from set of best and redundant
+
+        :param genome_id: (str) ID to grab
+        :return str:
+        """
         for match_set, best_match in self.file_contents:
             if genome_id in [match.match_id for match in match_set]:
                 return best_match

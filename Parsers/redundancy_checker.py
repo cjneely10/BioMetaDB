@@ -15,16 +15,17 @@ class RedundancyChecker:
     @staticmethod
     def parse_fastANI_with_checkm_results(file_, checkm_reads, cutoff_criteria, output_prefix):
         """ Combines parse_fastANI.py output with serialized checkm data per cutoff criteria
-		
-		:param file_: (str)	parse_fastANI.py output file
-		:param checkm_reads: (Dict[str, CheckMResult])	output from read_checkm_analysis
-		:param cutoff_criteria: (float)	Inclusive cutoff value
-		:return Tuple[Set[CheckMResult], Set[str]]:
-		"""
+
+        :param output_prefix: (str) Prefix for output files
+        :param file_: (str)	parse_fastANI.py output file
+        :param checkm_reads: (Dict[str, CheckMResult])	output from read_checkm_analysis
+        :param cutoff_criteria: (float)	Inclusive cutoff value
+        :return Tuple[Set[CheckMResult], Set[str]]:
+        """
         match_dict = defaultdict(list)
         # Read by line
         with open(file_, "r") as R:
-            line = next(R)
+            next(R)
             for line in R:
                 line = line.strip("\n").split("\t")
                 A = line[0].strip(".fna")
@@ -67,26 +68,27 @@ class RedundancyChecker:
     def _write_to_output_file(W, max_match, non_max_match):
         """ Protected member writes data to summary file
 
-		:param W: (object)	file object that is writing
-		:param max_match: (CheckMResult)	best matching result
-		:param non_max_match: (List[CheckMResult])	other results in list
-		:return None:
-		"""
-        W.write("{}:{},{}".format(max_match._id, max_match.completeness, max_match.contamination))
+        :param W: (object)	file object that is writing
+        :param max_match: (CheckMResult)	best matching result
+        :param non_max_match: (List[CheckMResult])	other results in list
+        :return None:
+        """
+        W.write_class("{}:{},{}".format(max_match._id, max_match.completeness, max_match.contamination))
         for non_match in non_max_match:
-            W.write("\t{}:{},{}".format(non_match._id, non_match.completeness, non_match.contamination))
-        W.write("\n")
+            W.write_class("\t{}:{},{}".format(non_match._id, non_match.completeness, non_match.contamination))
+        W.write_class("\n")
 
     @staticmethod
     def summary_and_copy_genomes_to_folders(checkm_reads, duplicate_genomes, genomes_dir, output_prefix):
         """ Creates printed summary based on files in folder and copies files
 
-		:param checkm_reads: (List[CheckMResult])	list of CheckM reads
-		:param duplicate_genomes: (List[str])	list of duplicate genome IDs
-		:param genomes_dir: (str)	directory containing all genomes to filter
-		:param output_prefix: (str)	output prefix for directory
-		:return None:
-		"""
+
+        :param checkm_reads: (List[CheckMResult])	list of CheckM reads
+        :param duplicate_genomes: (List[str])	list of duplicate genome IDs
+        :param genomes_dir: (str)	directory containing all genomes to filter
+        :param output_prefix: (str)	output prefix for directory
+        :return None:
+        """
         # Directory names
         nonred = str(output_prefix) + "/{}.nonredundant".format(output_prefix)
         refine = str(output_prefix) + "/{}.refine".format(output_prefix)

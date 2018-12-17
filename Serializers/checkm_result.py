@@ -6,11 +6,11 @@ class CheckMResult:
     def __init__(self, _id, completeness, contamination, heterogeneity):
         """ Class for serializing the CheckM output file
 
-		:param _id: (str)	genome id, typically the base of the filename
-		:param completeness: (float)	CheckM completeness percent
-		:param contamination: (float)	CheckM contamination percent
-		:param heterogeneity: (float)	CheckM heterogeneity score
-		"""
+        :param _id: (str)	genome id, typically the base of the filename
+        :param completeness: (float)	CheckM completeness percent
+        :param contamination: (float)	CheckM contamination percent
+        :param heterogeneity: (float)	CheckM heterogeneity score
+        """
         self._id = _id
         self.completeness = float(completeness)
         self.contamination = float(contamination)
@@ -23,9 +23,9 @@ class CheckMResult:
     def read_checkm_analysis(file_):
         """ Parse checkm qa output file
 
-		:param file_: (str)	checkm output
-		:return Dict[str, CheckMResult]:
-		"""
+        :param file_: (str)	checkm output
+        :return Dict[str, CheckMResult]:
+        """
         # Load checkm qa analysis output into csv
         checkm = list(csv.reader(open(file_, 'r')))
         # Gather rows and remove whitespace characters
