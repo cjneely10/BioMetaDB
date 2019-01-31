@@ -25,10 +25,11 @@ class RedundancyParser:
         :param file_name: Redundancy checker results
         """
         contents_in_file = []
-        with open(file_name, "r") as R:
+        with open(file_name, "rb") as R:
             # Skip first line
             next(R)
             for line in R:
+                line = line.decode()
                 matches = []
                 # Remove newline character and split by tab
                 line = line.rstrip("\r\n").split("\t")
@@ -48,5 +49,16 @@ class RedundancyParser:
         :return str:
         """
         for match_set, best_match in self.file_contents:
-            if genome_id in [match.match_id for match in match_set]:
+            if genome_id in set(match.match_id for match in match_set):
                 return best_match
+
+    def get_match_id(self, genome_id):
+        """ Returns highest quality genome id from set of best and redundant
+
+        :param genome_id: (str) ID to grab
+        :return str:
+        """
+        for match_set, best_match in self.file_contents:
+            if genome_id in set(match.match_id for match in match_set):
+                return best_match.match_id
+        return genome_id

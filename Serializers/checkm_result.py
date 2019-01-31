@@ -19,6 +19,18 @@ class CheckMResult:
     def __eq__(self, other):
         return self._id == other._id
 
+    def __lt__(self, other):
+        return self.completeness < other.completeness
+
+    def __gt__(self, other):
+        return self.completeness > other.completeness
+
+    def __ge__(self, other):
+        return self.completeness >= other.completeness
+
+    def __le__(self, other):
+        return self.completeness <= other.completeness
+
     @staticmethod
     def read_checkm_analysis(file_):
         """ Parse checkm qa output file

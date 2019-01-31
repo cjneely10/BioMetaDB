@@ -1,8 +1,9 @@
+import random
 from sqlalchemy import Float, Integer, String, VARCHAR
 
 
 """
-Script holds dictionaries to map types to each other and to string representations
+Class holds dictionaries to map types to each other and to string representations
 
 """
 
@@ -43,3 +44,13 @@ class TypeMapper:
         Integer:    int,
         String:     str,
     }
+
+    @staticmethod
+    def get_translated_types(counttable_object, dict_to_reference):
+        return {
+            counttable_object.header[i]:
+                dict_to_reference[
+                    type(counttable_object.get_at(random.sample(counttable_object.file_contents.keys(), 1)[0], i - 1))
+                ]
+            for i in range(1, len(counttable_object.header))
+        }

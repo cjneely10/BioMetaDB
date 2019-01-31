@@ -19,7 +19,7 @@ class CountTable:
             self.header = R.readline().decode().rstrip("\r\n").split("\t")
             for line in R:
                 # ID/key is first item on line
-                line = line.decode().rstrip("\n").split("\t")
+                line = line.decode().rstrip("\r\n").split("\t")
                 contents_in_file[line[0]] = line[1:]
         return contents_in_file
 
@@ -48,6 +48,8 @@ class CountTable:
 
     def get_at(self, genome_id, location):
         """ Returns value from count table based on genome id and location
+        Note that, if header indices are [0,1,2,3,...],
+        then the locations are gathered by [1,2,3,4,...] indices
         
         :param genome_id: (str) ID of genome
         :param location: (int)      Location in line (first column is location 0)

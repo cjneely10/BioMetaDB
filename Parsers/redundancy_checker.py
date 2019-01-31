@@ -44,11 +44,11 @@ class RedundancyChecker:
         for q, match_list in match_dict.items():
             # Combine query with matches
             match_list.append(checkm_reads[q])
-            # Set max match as first in list
-            max_match = match_list[0]
+            # Set max match
+            max_match = match_list[match_list.index(max([m for m in match_list]))]
             for match in match_list:
                 # Replace with more complete and less contaminated genomes
-                if match.completeness > max_match.completeness and match.contamination < max_match.contamination:
+                if match.completeness >= max_match.completeness and match.contamination <= max_match.contamination:
                     max_match = match
             # Separate max from others
             match_data[max_match._id] = [match for match in match_list if match != max_match]
@@ -73,10 +73,10 @@ class RedundancyChecker:
         :param non_max_match: (List[CheckMResult])	other results in list
         :return None:
         """
-        W.write_class("{}:{},{}".format(max_match._id, max_match.completeness, max_match.contamination))
+        W.write("{}:{},{}".format(max_match._id, max_match.completeness, max_match.contamination))
         for non_match in non_max_match:
-            W.write_class("\t{}:{},{}".format(non_match._id, non_match.completeness, non_match.contamination))
-        W.write_class("\n")
+            W.write("\t{}:{},{}".format(non_match._id, non_match.completeness, non_match.contamination))
+        W.write("\n")
 
     @staticmethod
     def summary_and_copy_genomes_to_folders(checkm_reads, duplicate_genomes, genomes_dir, output_prefix):
@@ -100,6 +100,7 @@ class RedundancyChecker:
             os.makedirs(nonred)
             os.makedirs(red)
             os.makedirs(refine)
+            os.makedirs(rem)
         num_rem = 0
         num_non_red = 0
         num_refine = 0
@@ -130,7 +131,7 @@ class RedundancyChecker:
                 num_red += 1
             # Other genomes
             else:
-                shutil.copyfile(name, red + "/" + _name + ".fna")
+                shutil.copyfile(name, rem + "/" + _name + ".fna")
                 results_str += "remaining"
                 num_rem += 1
             # Output results string

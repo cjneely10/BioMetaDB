@@ -8,7 +8,7 @@ Carries dictionary for parsing indexed fasta files
 class IndexExtensions:
     IDX_FILE = ".imidx"
     IDX_FA_FILE = ".imfadx"
-    IDX_FQ_FILE = ".imfqbx"
+    IDX_FQ_FILE = ".imfqdx"
     IDX_TSV_FILE = ".imtbx"
     match = {
         IDX_FA_FILE:    "fasta",

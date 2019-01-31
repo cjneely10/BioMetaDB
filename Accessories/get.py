@@ -10,10 +10,12 @@ from collections import Counter
 from Accessories.bio_ops import BioOps
 from Accessories.ops import read_until
 from Accessories.arg_parse import ArgParse
+from Indexers.index_mapper import IndexMapper
+from Indexers.index_mapper import IndexCreator
+from Indexers.index_mapper import IndexExtensions
 from Accessories.program_caller import ProgramCaller
 from Exceptions.get_exceptions import SequenceIdNotFoundError
 from Exceptions.get_exceptions import ImproperFormatIndexFileError
-from Indexers.index_mapper import IndexMapper, IndexCreator, IndexExtensions
 
 """
 Script handles file IO operations
@@ -28,7 +30,7 @@ def get_seq_from_file(file_name, seq_id):
     :param seq_id: (str)	User-passed sequence id to get from file
     """
     file_type = BioOps.get_type(file_name)
-    value_to_return = []
+    value_to_return = set()
     seq_num = None
     data = {}
     try:
@@ -44,18 +46,19 @@ def get_seq_from_file(file_name, seq_id):
         for seq in possible_seqs:
             found = re.search(seq_id, seq)
             if found:
-                value_to_return.append(data[seq])
+                value_to_return.add(data[seq])
                 is_found = True
                 seq_num += 1
         # Also check description to see for regex matches
         for _id, desc in possible_descriptions.items():
             found = re.search(seq_id, desc)
             if found:
-                value_to_return.append(data[_id])
+                value_to_return.add(data[_id])
                 is_found = True
                 seq_num += 1
         if not is_found:
-            raise KeyError
+            print("Could not locate %s in %s" % (seq_id, file_name))
+            raise SequenceIdNotFoundError(seq_id)
     file_name = os.path.splitext(file_name)[0]
     # Write found sequence to file
     out_file = "{}.{}".format(seq_id, file_name)
@@ -74,7 +77,7 @@ def get_seqs_from_file(file_name, number):
     :param file_name: (str)	Name of file to parse
     :param number: (str)	User-passed number, list or numbers, or range to get
     """
-    indices_to_get = _create_seq_index_list(number)
+    indices_to_get = _translate_number_string_to_interval(number)
     to_return = []
     data_type = BioOps.get_type(file_name)
     data = BioOps.parse_large(file_name, data_type)
@@ -89,7 +92,7 @@ def get_seqs_from_file(file_name, number):
     print(" {} sequences copied from file {} to {}".format(len(indices_to_get), file_name, out_file))
 
 
-def _create_seq_index_list(number):
+def _translate_number_string_to_interval(number):
     """ Parses user-passed string for indices to get.
     Supported:
         0-4		Returns indices [0,1,2,3,4]
@@ -145,7 +148,6 @@ def get_by_file(file_name):
     """ Renames sequences in file based on file name
 
     :param file_name: (str)	Name of file to rename
-    :param data_type: (str)	Data type in file (fasta or fastq)
     """
     # Location to write data
     new_location = file_name + ".tmp"
@@ -363,6 +365,33 @@ def make_file_index(file_name):
     IndexCreator.create_from_fastx(file_name)
 
 
+def make_list_index(file_name):
+    """ Creates simple index using simple list
+
+    :param file_name: (str) Name of file
+    :return:
+    """
+    IndexCreator.create_from_file(file_name)
+
+
+def make_dir_index(directory):
+    """ Creates an index mapping for all files in a directory
+
+    :param directory: (str) Name of directory
+    :return:
+    """
+    IndexCreator.make_idx_for_directory_file_names(directory)
+
+
+def rename_files_in_dir_using_index(directory):
+    """ Renames all files in directory with index file
+
+    :param directory:
+    :return:
+    """
+    IndexCreator.rename_directory_contents_using_index(directory)
+
+
 def make_fastx_indexed(file_name):
     """ Rename ids in fastx file based on index file
 
@@ -414,18 +443,18 @@ if __name__ == '__main__':
         [["program"],
          {"help": "Select program"}],
         [["-f", "--file_name"],
-         {"help": "Data file containing fastx sequences"}],
-        [["-i", "--index_file"],
+         {"help": "Data file for reading/editing"}],
+        [["-x", "--index_file"],
          {"help": "Index file with complete and short ids"}],
         [["-d", "--directory"],
-         {"help": "Name of directory with files to rename"}],
-        [["-s", "--seq_id"],
+         {"help": "Name of directory"}],
+        [["-i", "--seq_id"],
          {"help": "Sequence ID to grab (regex)"}],
         [["-v", "--view"],
          {"help": "See in (l)ong or (s)hort format"}],
         [["-n", "--number"],
          {"help": "Number of sequences, inclusive range (index 0), or comma-separated list"}],
-        [["-x", "--skip"],
+        [["-s", "--skip"],
          {"help": "Number of lines for which to skip indexing operation (default 0)", "default": "0"}],
         [["-c", "--comment"],
          {"help": "Comma-separated comment values indicating lines to retain but not parse", "default": "#"}],
@@ -441,8 +470,11 @@ if __name__ == '__main__':
         "REMOVEAMB": remove_ambiguity_from_file,
         "SUMMARIZE": summarize_file,
         "MAKEIDX": make_file_index,
+        "MAKEDIRIDX": make_dir_index,
+        "MAKELISTIDX": make_list_index,
         "IDXTOFX": make_fastx_indexed,
         "IDXTOTSV": make_tsv_indexed,
+        "IDXTODIR": rename_files_in_dir_using_index,
     }
     flags = {
         "ID": ("file_name", "seq_id"),
@@ -455,8 +487,11 @@ if __name__ == '__main__':
         "REMOVEAMB": ("file_name",),
         "SUMMARIZE": ("file_name", "view"),
         "MAKEIDX": ("file_name",),
+        "MAKEDIRIDX": ("directory",),
+        "MAKELISTIDX": ("file_name",),
         "IDXTOFX": ("file_name",),
         "IDXTOTSV": ("file_name", "index_file", "comment", "skip"),
+        "IDXTODIR": ("directory",)
     }
     errors = {
         FileNotFoundError: "Provided filename does not exist",
@@ -480,10 +515,14 @@ if __name__ == '__main__':
         "MAKEIDX": "Program creates index of fastx file",
         "IDXTOFX": "Program converts fasta file to indexed version (or back!)",
         "IDXTOTSV": "Program converts tsv file to indexed version (or back!)",
+        "IDXTODIR": "Program renames contents of directory using index values",
+        "MAKEDIRIDX": "Create index for names of file in a directory",
+        "MAKELISTIDX": "Create index for list file",
     }
 
-    ap = ArgParse(args_list, description=ArgParse.description_builder("get:\tProgram for basic biological file get operations.",
-                                                          _help, flags))
+    ap = ArgParse(args_list,
+                  description=ArgParse.description_builder("get:\tProgram for basic biological file get operations.",
+                                                           _help, flags))
 
     pc = ProgramCaller(programs=programs, flags=flags, errors=errors, _help=_help)
 

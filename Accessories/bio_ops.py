@@ -8,6 +8,7 @@ class BioOps:
     @staticmethod
     def get_type(file_name):
         """ Method for parsing file extension to determine data type
+        Uses dictionary of valid extensions to return "fasta" or "fastq"
 
         :param file_name: (str)	User-passed name of file
         """
@@ -23,6 +24,7 @@ class BioOps:
         """
         is_phred_33 = True
         for score in scores:
+            # Determines phred based on presence of lowercase characters
             if score.islower():
                 is_phred_33 = False
                 break
@@ -45,12 +47,15 @@ class BioOps:
             "faa": "fasta",
             "fa": "fasta",
             "fq": "fastq",
+            "protein": "fasta",
         }
+        # Attempt simple return
         try:
             return avail_types[dt]
         except KeyError as e:
+            # See if is an indexed file
             try:
-                return IndexExtensions.match("." + dt)
+                return IndexExtensions.match["." + dt]
             except KeyError:
                 print("Invalid data type: {}\nConfirm correct file extension".format(e))
                 exit(1)
@@ -63,11 +68,7 @@ class BioOps:
         :param data_type:	(str)	Fasta or fastq
         :param batch_size:	(int)	Size of batch for reading in, default 10000
         """
-        records = []
         # Create iterator
         record_iter = SeqIO.parse(open(file_name), data_type)
-        # Read in by batch
-        for batch in chunk(record_iter, batch_size):
-            records += batch
         # Return complete records
-        return records
+        return [list(batch) for batch in chunk(record_iter, batch_size)][0]

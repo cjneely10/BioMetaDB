@@ -3,22 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, create_session
 from sqlalchemy.ext.declarative import declarative_base
 
-""" Typical usage:
+""" Class for handling Bsse schema requests, gathering metadata and session info, etc.
 
-First time:
-    from models import *
-    BaseData.create_all()
 
-Querying and performing operations:
-    from models import *
-    sess = BaseData.get_session(DBNames.Genomic)
-
-    sess.query(Sequence).all()	# Get all values
-    sess.query(Sequence).filter(Sequence.location == Sequence.FileLocations.GEN).all()	# Get genome folder values
-    sess.query(Sequence).filter(Sequence.data_type == Sequence.DataTypes.AA).all()	# Get all amino acids
-
-    record = sess.query(Sequence).first()	# Query first value in database
-    record_as_bio_record = record.get_records()	# Return file contents as SeqRecord objects
 
 """
 
@@ -66,8 +53,7 @@ class BaseData:
     def get_session_from_engine(e):
         """ Returns session variable
 
-        :param basedir: (str) Base directory of database folder
-        :param db_name: (str) Name of database for which to create session
+        :param e: (Engine)  Engine object
         :return Object:
         """
         # Returns session for CRUD operations on database

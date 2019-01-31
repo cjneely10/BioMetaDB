@@ -1,11 +1,17 @@
 <component name="ProjectDictionaryState">
   <dictionary name="cjnee">
     <words>
+      <w>bamm</w>
+      <w>bowtie</w>
+      <w>coords</w>
       <w>fasta</w>
       <w>fastq</w>
       <w>fastx</w>
       <w>imidx</w>
       <w>phred</w>
+      <w>proc</w>
+      <w>sambamba</w>
+      <w>subprocesses</w>
     </words>
   </dictionary>
 </component>

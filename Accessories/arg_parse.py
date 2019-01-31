@@ -9,19 +9,25 @@ class ArgParse:
     def __init__(self, arguments_list, description, *args, **kwargs):
         """ Class for handling parsing of arguments and error handling
 
-        Example arguments_list:
-        [
+        Example:
+
+        args_list = [
             [["required_argument"],
                 {"help": "Help string for argument"}],
             [["-o", "--optional"],
-                {"help": "Optional argument"}],
+                {"help": "Optional argument", "default": "None"}],
             [["-r", "--required"],
                 {"help": "Required argument", "require": "True"}]
         ]
 
+        ap = ArgParse(args_list, description="Sample:\tSample program")
+
+        ## Now you can access as ap.args.required_argument, ap.args.optional, and ap.args.required
+        ## Note that you CANNOT use '-' in the names of arguments!
+        ## Note that any other constructor argument that argparse.ArgumentParser() takes will also be used
+
         Ensure that the final value in the inner list does not have '-' characters
         Include "require": True in inner dictionary to treat arg as required
-
 
         :param arguments_list: List[List[List[str], Dict[str, str]]]
         """
@@ -47,7 +53,7 @@ class ArgParse:
         """
         for args in self.arguments_list:
             # Store requirement for option by popping from args dictionary
-            # Be default names argument by last value passed in innter list
+            # Be default names argument by last value passed in inner list
             self.required_options[args[0][-1]] = bool(args[1].pop('require', False))
             self.parser.add_argument(*args[0], **args[1])
 
@@ -70,7 +76,7 @@ class ArgParse:
     def description_builder(header_line, help_dict, flag_dict):
         assert set(help_dict.keys()) == set(flag_dict.keys()), "Program names do not match in key/help dictionaries"
         to_return = header_line + "\n\nAvailable Programs:\n\n"
-        programs = flag_dict.keys()
+        programs = sorted(flag_dict.keys())
         for program in programs:
             to_return += program + ": " + help_dict[program] + "\n\t" + \
                          "\t(Req: {})".format(" --" + " --".join(flag_dict[program])) + "\n"
@@ -84,4 +90,4 @@ if __name__ == '__main__':
         [["-o", "--optional"], {"help": "Optional argument"}],
         [["-r", "--required"], {"help": "Required argument", "require": "True"}]
     ]
-    ap = ArgParse(args_list)
+    ap = ArgParse(args_list, description="Sample ArgParse program!")

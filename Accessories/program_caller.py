@@ -1,3 +1,5 @@
+import traceback
+
 """
 Script handles program calls and minimizes the amount of code that needs to be written
 
@@ -10,31 +12,44 @@ class ProgramCaller:
             Wrapper functionality is available to ensure database or file system integrity
 
             Example:
-                from models import *
-                from ArgParse import ArgParse
-                from program_caller import ProgramCaller, db_validate
+                from arg_parse import ArgParse
+                from program_caller import ProgramCaller
 
-                @db_validate
-                def add_file(file, data_type):
+                def add_file(fasta_file, data_type):
                     ...
 
-                    classes = { 	"Plancto":		Planctomycetes}
-                    programs = {	"ADD":			add_file}
-                    flags = {		"ADD":			("file", "data_type")}
-                    errors = {		"INCORRECT_DB_TYPE":		"Incorrect database called"}
-                    _help = {	"ADD":		"Program for adding files to database"}
+                def remove_file(fasta_file):
+                    ...
+
+                if __name__ == "__main__":
+                    programs = {	"ADD":			add_file,
+                                    "REMOVE":       remove_file
+                    }
+                    flags = {		"ADD":			("fasta_file", "data_type"),
+                                    "REMOVE":       ("fasta_file",),
+                    }
+                    errors = {		FileNotFoundError:		"Incorrect database called",
+                    }
+                    _help = {	    "ADD":		"Program for adding files to database",
+                                    "REMOVE":   "Program for removing files from db"
+                    }
 
                     args_list = [
-                        [["-f", "--file"],
-                            {"help": "File to pass"}],
+                        [["-f", "--fasta_file"],
+                            {"help": "File to pass", "default": "None"}],
                         [["-d", "--data_type"],
-                            {"help": "Type of data (fasta or fastq)"}],
+                            {"help": "Type of data (fasta or fastq)", "require": True}],
                     ]
 
-                ap = ArgParse(args_list, description="Program to add file to database by type")
-                pc = ProgramCaller(classes=classes, programs=programs, flags=flags, errors=errors, _help=_help)
+                    ap = ArgParse(args_list,
+                                description=ArgParse.description_builder("dbdm:\tManaging database operations.",
+                                    _help, flags))
+                    pc = ProgramCaller(classes=classes, programs=programs, flags=flags, errors=errors, _help=_help)
 
-                pc.run(ap.args)
+                    pc.run(ap.args)
+
+                ## Note that the names of the arguments that each function takes are THE SAME as
+                ## the arguments that are passed from ArgParse
 
         :param classes: (Dict[str, class])		Class mappings
         :param programs: (Dict[str, callable])	Program name: function mapping
@@ -62,35 +77,41 @@ class ProgramCaller:
         else:
             print()
             print(" ERROR " + self.errors[error_type] + ":\t" + str(message))
+            exit(1)
         if program in self._help.keys():
             print()
             print(" " + program + ": " + self._help[program])
+            print(traceback.print_exc())
         print()
         exit(1)
 
-    def mapper(self, program):
+    def mapper(self, program, debug=False):
         """ Function maps the name of a program with its given function and returns function call
             Catches errors that may arise and returns user-defined response
 
+        :param debug: (bool)    Set debug options to display full error Traceback
         :param program: (str)	Name of program to use in programs dict to call function
         :return function:
         """
-        try:
-            return self.programs[program](**self.flags_dict)
-        except AssertionError as e:
-            print(e)
-            exit(1)
-        except Exception as e:
+        if not debug:
             try:
-                print(self.error(type(e), program, e))
-            except KeyError:
-                print("An untracked exception has occurred\n Class: {}\n {}".format(type(e), e))
+                return self.programs[program](**self.flags_dict)
+            except AssertionError as e:
+                print(e)
+                exit(1)
+            except Exception as e:
+                try:
+                    print(self.error(type(e), program, e))
+                except KeyError:
+                    print("An untracked exception has occurred\n Class: {}\n {}".format(type(e), e))
+        else:
+            return self.programs[program](**self.flags_dict)
 
     def flag_check(self, program, ap_args_object):
         """ Function checks if required flags were set for a given program
 
+        :param ap_args_object: (ArgParse)   ArgParse object
         :param program: (str)	Name of program
-        :param flags_dict: (Dict[str])	Dictionary with key: progname and value: needed flags
         :return bool:
         """
         try:
@@ -103,15 +124,16 @@ class ProgramCaller:
                 return flag
         return None
 
-    def run(self, args):
+    def run(self, args, debug=False):
         """ Primary function to call ProgramCaller and to run the script
 
+        :param debug: (bool)    Set debug options to display full error Traceback
         :param args: (ArgParse.args)	ArgParse.args object
         """
         program = args.program
         failed = self.flag_check(program, args)
         if not failed:
-            self.mapper(program)
+            self.mapper(program, debug)
         else:
             self.error("INCORRECT_FLAGS", program, failed)
 
