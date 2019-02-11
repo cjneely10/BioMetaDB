@@ -1,5 +1,11 @@
 # BioMetaDB
 
+## Installation
+Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access dbdm.
+<pre><code>export PATH=/path/to/BioMetaDB:$PATH
+alias dbdm="python3.5 /path/to/BioMetaDB/dbdm.py"</code></pre>
+Adding these lines of code to a user's `.bashrc` file will maintain these settings on next log-in.
+
 ## About
 
 **BioMetaDB** is a data-management package that automatically generates database schemas, minimizing the amount
@@ -94,12 +100,6 @@ operations
     - ArgParse
 
 Such dependencies are best maintained within a separate Python virtual environment.
-
-### Installation
-Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access dbdm.
-<pre><code>export PATH=/path/to/BioMetaDB:$PATH
-alias dbdm="python3.5 /path/to/BioMetaDB/dbdm.py"</code></pre>
-Adding these lines of code to a user's `.bashrc` file will maintain these settings on next log-in.
 
 ### Usage Best Practices
 
