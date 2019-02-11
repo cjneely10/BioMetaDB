@@ -6,6 +6,17 @@ Clone this repository and add the project-level directory *BioMetaDB* to your pa
 alias dbdm="python3.5 /path/to/BioMetaDB/dbdm.py"</code></pre>
 Adding these lines of code to a user's `.bashrc` file will maintain these settings on next log-in.
 
+### Dependencies
+
+- Python3.5
+- Python packages
+    - SQLAlchemy
+    - BioPython
+    - ConfigParser
+    - ArgParse
+
+Such dependencies are best maintained within a separate Python virtual environment.
+
 ## About
 
 **BioMetaDB** is a data-management package that automatically generates database schemas, minimizing the amount
@@ -89,19 +100,7 @@ operations
     - `get()`: Returns entire file contents
     - `get_records()`: Returns data file contents as a list of `BioPython` objects
 
-
-### Dependencies
-
-- Python3.5
-- Python packages
-    - SQLAlchemy
-    - BioPython
-    - ConfigParser
-    - ArgParse
-
-Such dependencies are best maintained within a separate Python virtual environment.
-
-### Usage Best Practices
+## Usage Best Practices
 
 #### SQLAlchemy
 
