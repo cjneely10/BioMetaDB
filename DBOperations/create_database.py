@@ -103,7 +103,7 @@ def create_database(db_name, working_directory, table_name, directory_name, data
     classes_dir, config_dir, db_dir, table_dir = _create_all_directories(working_directory, table_name)
     # Create database file
     print_if_not_silent(silent, " Creating database file in %s" % db_dir)
-    touch(os.path.join(db_dir, db_name))
+    touch(os.path.join(db_dir, db_name + ".db"))
     # Write configuration info
     config_file = db_name + ".ini"
     print_if_not_silent(silent, " Writing database configuration to %s" % os.path.join(config_dir, config_file))
