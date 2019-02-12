@@ -103,8 +103,7 @@ def create_database(db_name, working_directory, table_name, directory_name, data
     classes_dir, config_dir, db_dir, table_dir = _create_all_directories(working_directory, table_name)
     # Create database file
     print_if_not_silent(silent, " Creating database file in %s" % db_dir)
-    _db_name = db_name.strip(".db") + ".db"
-    touch(os.path.join(db_dir, _db_name))
+    touch(os.path.join(db_dir, db_name))
     # Write configuration info
     config_file = db_name + ".ini"
     print_if_not_silent(silent, " Writing database configuration to %s" % os.path.join(config_dir, config_file))
@@ -132,9 +131,9 @@ def create_database(db_name, working_directory, table_name, directory_name, data
     with open(os.path.join(config_dir, config_file), "w") as W:
         config.write(W)
     # Create table
-    print_if_not_silent(silent, "Creating new table %s at %s" % (table_name, os.path.join(db_dir, _db_name)))
+    print_if_not_silent(silent, "Creating new table %s at %s" % (table_name, os.path.join(db_dir, db_name)))
     os.makedirs(table_dir)
-    ClassManager.create_initial_table_in_db(_db_name, working_directory, table_name, data_types, silent)
+    ClassManager.create_initial_table_in_db(db_name, working_directory, table_name, data_types, silent)
     # Populate table with data from file and genomes
     # Get config file - confirms that it was written correctly
     cfg = ConfigManager(config, table_name)
