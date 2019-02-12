@@ -131,6 +131,7 @@ class ClassManager:
         new_records = 0
         new_records_no_files = 0
         print_if_not_silent(silent, "\nGathering data by record:")
+        ids_to_add.remove('')
         for _id_ in ids_to_add:
             print_if_not_silent(silent, " ...Checking for record %s" % _id_)
             record = sess.query(UserClass).filter_by(_id=_id_).first()
