@@ -133,7 +133,7 @@ def create_database(db_name, working_directory, table_name, directory_name, data
     # Create table
     print_if_not_silent(silent, "Creating new table %s at %s" % (table_name, os.path.join(db_dir, db_name)))
     os.makedirs(table_dir)
-    ClassManager.create_initial_table_in_db(db_name, working_directory, table_name, data_types, silent)
+    ClassManager.create_initial_table_in_db(db_name, working_directory, table_name, data_types, silent, initial=False)
     # Populate table with data from file and genomes
     # Get config file - confirms that it was written correctly
     cfg = ConfigManager(config, table_name)
