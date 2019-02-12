@@ -30,10 +30,9 @@ class ClassManager:
     }
 
     @staticmethod
-    def create_initial_table_in_db(db_name, working_dir, table_name, data_types, silent):
+    def create_initial_table_in_db(db_name, working_dir, table_name, data_types, silent, initial=True):
         """ Creates initial database and tables
 
-        :param silent: 
         :param initial: (bool)      Initial table or not
         :param db_name: (str)       Name of database to create
         :param working_dir: (str)   Path to project folder
@@ -47,7 +46,8 @@ class ClassManager:
         print_if_not_silent(silent, " ..Generating table class from data file")
         data_types = ClassManager.correct_dict(data_types)
         engine = None
-        engine = BaseData.get_engine(db_dir, db_name + ".db")
+        if not initial:
+            engine = BaseData.get_engine(db_dir, db_name + ".db")
         t, metadata = ClassManager.generate_class(table_name, data_types, db_dir, db_name, table_dir, engine=engine)
         # Add functions for accessing to table
         print_if_not_silent(silent, " ..Creating tables")
