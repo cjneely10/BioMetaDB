@@ -1,4 +1,5 @@
 import os
+import glob
 from sqlalchemy.orm import mapper
 
 from Models.models import BaseData
@@ -50,13 +51,14 @@ def delete_from_table(config_file, table_name, list_file, alias, silent):
     :return:
     """
     config = Config()
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
     config.read(config_file)
     if alias != "None":
         table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
     if list_file == "None":
         raise ListFileNotProvidedError
     ids_to_remove = set(line.rstrip("\r\n") for line in open(list_file, "r"))
-    if not silent:
+    if silent == "n":
         _delete_records_display_message_prelude(
             config[ConfigKeys.DATABASES][ConfigKeys.db_name],
             config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],

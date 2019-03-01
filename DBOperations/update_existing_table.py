@@ -1,4 +1,5 @@
 import os
+import glob
 from Config.config_manager import Config
 from Config.config_manager import ConfigKeys
 from Config.config_manager import ConfigManager
@@ -48,8 +49,7 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     :return:
     """
     config = Config()
-    config.read(config_file)
-    config = Config()
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
     config.read(config_file)
     if alias != "None":
         if alias not in config[ConfigKeys.TABLES_TO_ALIAS].keys():
@@ -61,7 +61,7 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     if table_name not in config.keys():
         print("!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!")
         exit(1)
-    if not silent:
+    if silent == "n":
         _update_display_message_prelude(
             config[ConfigKeys.DATABASES][ConfigKeys.db_name],
             config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],

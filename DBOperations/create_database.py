@@ -78,7 +78,7 @@ def create_database(db_name, working_directory, table_name, directory_name, data
     assert os.path.isdir(working_directory) is False, AssertString.WORKING_DIR_EXISTS
     if directory_name != "None":
         assert os.path.isdir(directory_name), AssertString.SEQUENCE_DIR_NOT_EXISTS
-    if not silent:
+    if silent == "n":
         _initialization_display_message_prelude(db_name, working_directory, table_name, directory_name, data_file, alias)
     # Gather files to commit and initial data to store for each file
     print_if_not_silent(silent, "Beginning process...")

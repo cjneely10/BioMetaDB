@@ -1,4 +1,5 @@
 import os
+import glob
 import shutil
 from sqlalchemy.orm import mapper
 from Models.models import BaseData
@@ -48,10 +49,11 @@ def remove_table_from_database(config_file, table_name, alias, silent):
     :return:
     """
     config = Config()
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
     config.read(config_file)
     if alias != "None":
         table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
-    if not silent:
+    if silent == "n":
         _remove_table_display_message_prelude(
             config[ConfigKeys.DATABASES][ConfigKeys.db_name],
             config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],

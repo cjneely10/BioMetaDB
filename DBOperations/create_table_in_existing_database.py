@@ -1,4 +1,5 @@
 import os
+import glob
 from Config.directory_manager import Directories
 from Serializers.count_table import CountTable
 from Config.config_manager import Config
@@ -61,13 +62,12 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     :return:
     """
     config = Config()
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
     config.read(config_file)
-    if alias != "None":
-        table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
     if table_name in config.keys():
         print("!! Table exists, exiting. To update table, use UPDATE !!")
         exit(1)
-    if not silent:
+    if silent == "n":
         _create_table_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name],
                                               config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
                                               table_name,
@@ -99,7 +99,7 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
         ConfigKeys.class_dir: os.path.join(config[ConfigKeys.DATABASES][ConfigKeys.working_dir], Directories.CLASSES),
     }
     config.set(ConfigKeys.TABLES_TO_DB, table_name, config[ConfigKeys.DATABASES][ConfigKeys.db_name])
-    config.set(ConfigKeys.TABLES_TO_ALIAS, table_name, alias)
+    config.set(ConfigKeys.TABLES_TO_ALIAS, alias, table_name)
     # Write new config file
     with open(config_file, "w") as W:
         config.write(W)
