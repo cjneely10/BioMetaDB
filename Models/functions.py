@@ -15,7 +15,7 @@ class DBUserClass:
 
         :return str:
         """
-        return self.location + "/" + self._id + "." + self.data_type
+        return self.location + "/" + self._id
 
     def __repr__(self):
         """
@@ -23,7 +23,7 @@ class DBUserClass:
         :return str:
         """
         # Print sorted attributes, excluding instance state object info
-        first_vals = ["_id", "data_type", "location", "id"]
+        first_vals = ["_id", "data_type", "location"]
         attrs = {key: val for key, val in self.__dict__.items() if key != "_sa_instance_state"
                  and key not in first_vals}
         return_string = ""
