@@ -131,7 +131,8 @@ class ClassManager:
         new_records = 0
         new_records_no_files = 0
         print_if_not_silent(silent, "\nGathering data by record:")
-        ids_to_add.remove('')
+        if '' in ids_to_add:
+            ids_to_add.remove('')
         for _id_ in ids_to_add:
             print_if_not_silent(silent, " ...Checking for record %s" % _id_)
             record = sess.query(UserClass).filter_by(_id=_id_).first()
@@ -260,14 +261,14 @@ class ClassManager:
         :param class_as_dict:
         :return:
         """
-        corrected_class_as_dict = {}
+        corrected_dict = {}
         for key in class_as_dict.keys():
             new_key = str(key).lower()
             for bad_char in set(punctuation):
-                new_key = new_key.replace(bad_char, "_")
+                new_key = new_key.replace(bad_char, "")
             new_key = new_key.replace(" ", "_")
-            corrected_class_as_dict[new_key] = class_as_dict[key]
-        return corrected_class_as_dict
+            corrected_dict[new_key] = class_as_dict[key]
+        return corrected_dict
 
     @staticmethod
     def correct_iterable(iterable):
@@ -280,7 +281,7 @@ class ClassManager:
         for _iter in iterable:
             new_val = _iter.lower()
             for bad_char in set(punctuation):
-                new_val = new_val.replace(bad_char, "_")
+                new_val = new_val.replace(bad_char, "")
             new_val = new_val.replace(" ", "_")
             new_iter.append(new_val)
         return new_iter

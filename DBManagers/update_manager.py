@@ -41,7 +41,6 @@ class UpdateManager:
         :param DBClass:
         :return: (Dict[str, List[db_objects]])      DB data
         """
-        # json must load from string
         data = self.session.query(DBClass).all()
         # Return list of columns and dict with name of table as key and queried data as value
         try:
@@ -69,10 +68,11 @@ class UpdateManager:
             # Write comma-separated names of each column
             W.write(",".join(['"{}"'.format(col) for col in col_list]) + "\n")
             # Iterate over every entry
-            for entry in data[table_name]:
+            for record in data[table_name]:
                 # Write each entry by column
                 # W.write(','.join(['"{}"'.format(entry[col]) for col in col_list]) + "\n")
-                W.write(','.join([str(ent) for ent in entry]) + "\n")
+                W.write(','.join([str(getattr(record, col)) for col in col_list]) + "\n")
+                # W.write(','.join([str(ent) for ent in entry]) + "\n")
             W.write("\n")
         W.close()
         return W.name
@@ -118,11 +118,11 @@ class UpdateManager:
             # Create DB object using json data stored in file
             DBClass = type(name, (DBUserClass,), {})
             mapper(DBClass, Table)
-            db_object = DBClass()
             if name in csv_data.keys():
                 # Skip certain fields
                 # Useful for editing columns
                 for entry in csv_data[name]:
+                    db_object = DBClass()
                     for i in range(len(cols[name])):
                         if cols[name][i] not in ignore_fields:
                             setattr(db_object, cols[name][i], entry[i])
