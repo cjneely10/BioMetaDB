@@ -1,8 +1,8 @@
 # BioMetaDB
 
 ## Installation
-Download this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access dbdm.
-<pre><code>export PATH=/path/to/BioMetaDB:$PATH
+Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access dbdm.
+<pre><code>export PYTHONPATH=/path/to/BioMetaDB:$PYTHONPATH
 alias dbdm="python3.5 /path/to/BioMetaDB/dbdm.py"</code></pre>
 Adding these lines of code to a user's `.bashrc` file will maintain these settings on next log-in.
 
@@ -51,7 +51,7 @@ File systems created by **BioMetaDB** are accessible in Python scripts:
 <pre><code>from BioMetaDB import get_table
 sess, Table = get_table("/path/to/DB/config/db_config_file.ini", table_name="db_table_1")
 # Alternatively, 
-# sess, Table = get_table("/path/to/DB/config/db_config_file.ini", alias="table_1")
+# sess, Table = get_table("/path/to/DB", alias="table_1")
 sess.query(Table).all()  # Returns all values
 sess.query(Table).filter(Table.table_attr > 0).all()  # Simple filter query
 sess.query(Table).filter_by(table_attr = 12).all()  # Keyword filter query
@@ -234,7 +234,7 @@ columns from a provided .tsv file, and adds new data files from a provided direc
 project-level `migrations` folder.
 
 - Required flags
-    - --config_file (-c): Path to config file in project directory 
+    - --config_file (-c): Path to project directory 
     - --table_name (-t): Name of table to update
 - Optional flags
     - --directory_name (-d):- Path to directory with files to add to the database.
@@ -242,11 +242,11 @@ project-level `migrations` folder.
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm UPDATE -c /path/to/DB/config/database.ini -t db_table_1 -f /path/to/data_file.tsv -d /path/to/data_dir/`
-    - This command will update the table named `db_table_1`, which is part of the database `database`, and whose config 
-    file is located at `/path/to/DB/config/database.ini`. This command will add new column data from the file 
-    `/path/to/data_file.tsv` and will add new data files from the directory `/path/to/data_dir/`. A copy of the database
-    is stored in the project-directory `migrations`, named using the date that the command was run.
+    - `dbdm UPDATE -c /path/to/DB -t db_table_1 -f /path/to/data_file.tsv -d /path/to/data_dir/`
+    - This command will update the table named `db_table_1`, which is part of the database in the project `DB`. This 
+    command will add new column data from the file `/path/to/data_file.tsv` and will add new data files from the 
+    directory `/path/to/data_dir/`. A copy of the database is stored in the project-directory `migrations`, 
+    named using the date that the command was run.
 
 ### REMOVECOL
 
@@ -254,16 +254,16 @@ project-level `migrations` folder.
 is regenerated using existing data.
 
 - Required flags
-    - --config_file (-c): Path to config file in project directory 
+    - --config_file (-c): Path to project directory 
     - --table_name (-t): Name of table to update
     - --list_file (-l): Path to file with list of column names to remove from database table
 - Optional flags
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm REMOVECOL -c /path/to/DB/config/database.ini -t db_table_1 -l /path/to/list_to_remove.list`
+    - `dbdm REMOVECOL -c /path/to/DB -t db_table_1 -l /path/to/list_to_remove.list`
     - This command will remove all columns provided in the newline-separated file `list_to_remove.list` from 
-    `db_table_1` within `database`, whose config file is `database.ini`.
+    `db_table_1` within the project `DB`.
 - Possible exceptions
     - ListFileNotProvidedError:   List file not provided, pass path to a list
 
@@ -272,16 +272,16 @@ is regenerated using existing data.
 **DELETE** removes records, and their associated files, from a table in the database.
 
 - Required flags
-    - --config_file (-c): Path to config file in project directory 
+    - --config_file (-c): Path to project directory 
     - --table_name (-t): Name of table to update
     - --list_file (-l): Path to file with list of record ids to remove from database table
 - Optional flags
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm REMOVECOL -c /path/to/DB/config/database.ini -t db_table_1 -l /path/to/list_to_remove.list`
+    - `dbdm REMOVECOL -c /path/to/DB -t db_table_1 -l /path/to/list_to_remove.list`
     - This command will remove all record ids provided in the newline-separated file `list_to_remove.list` from 
-    `db_table_1` within `database`, whose config file is `database.ini`.
+    `db_table_1` within the project `DB`.
 - Possible exceptions
     - ListFileNotProvidedError:   List file not provided, pass path to a list
 
@@ -291,7 +291,7 @@ is regenerated using existing data.
 project structure.
 
 - Required flags
-    - --config_file (-c): Path to config file in project directory 
+    - --config_file (-c): Path to project directory 
     - --table_name (-t): Name of table to create
 - Optional flags
     - --directory_name (-d): Path to directory with files to add to the database. 
@@ -299,9 +299,9 @@ project structure.
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm CREATE -c /path/to/DB/config/database.ini -t db_table_2 -d /path/to/data/directory/ 
+    - `dbdm CREATE -c /path/to/DB -t db_table_2 -d /path/to/data/directory/ 
     -f /path/to/data_file.tsv -a table_2`
-    - This command will update the project structure associated with `database.ini` to include the new table:
+    - This command will update the project structure `DB` to include the new table:
 <pre><code>DB/
     classes/
         db_table_1.json
@@ -322,15 +322,14 @@ command cannot be undone, you are recommended to run `UPDATE` with only the requ
 your data as a .tsv file.
 
 - Required flags
-    - --config_file (-c): Path to config file in project directory 
+    - --config_file (-c): Path to project directory 
     - --table_name (-t): Name of table to remove
 - Optional flags
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
     - `dbdm REMOVE -c /path/to/DB/config/database.ini -t db_table_2`
-    - This command will remove the table `db_table_2` from `database`, and will update the project structure associated
-    with `database.ini`.
+    - This command will remove the table `db_table_2` from the project `DB`.
 
 ## Other Information
 
