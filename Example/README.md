@@ -31,7 +31,7 @@ In this example, users will:
     1. Create a table in database for prokaryotes.
     2. Populate database tables with output from `Quast`.
 2. Update the database with a new table.
-    1. Create a table for plants and populate with output from `Quast`.
+    1. Create a table for plants and populate with output from `diamond`.
 3. Write a simple script that queries the database and updates values.
 4. Update table with additional data.
 5. Remove extraneous columns and records.
