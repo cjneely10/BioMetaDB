@@ -137,8 +137,7 @@ DELETE`.
 when first creating your database or when making large updates, such as when adding/removing tables or updating/removing
 values or columns.
 
-<pre><code>
-usage: dbdm.py [-h] [-n DB_NAME] [-w WORKING_DIRECTORY] [-t TABLE_NAME]
+<pre><code>usage: dbdm.py [-h] [-n DB_NAME] [-w WORKING_DIRECTORY] [-t TABLE_NAME]
                [-d DIRECTORY_NAME] [-f DATA_FILE] [-l LIST_FILE]
                [-c CONFIG_FILE] [-a ALIAS]
                program
