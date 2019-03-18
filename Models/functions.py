@@ -15,7 +15,7 @@ class DBUserClass:
 
         :return str:
         """
-        return self.location + "/" + self._id + "." + self.data_type
+        return self.location + "/" + self._id
 
     def __repr__(self):
         """
@@ -23,7 +23,7 @@ class DBUserClass:
         :return str:
         """
         # Print sorted attributes, excluding instance state object info
-        first_vals = ["_id", "data_type", "location", "id"]
+        first_vals = ["_id", "data_type", "location"]
         attrs = {key: val for key, val in self.__dict__.items() if key != "_sa_instance_state"
                  and key not in first_vals}
         return_string = ""
@@ -33,12 +33,14 @@ class DBUserClass:
         sorted_keys = sorted(attrs.keys())
         num_rows = int(ceil(len(sorted_keys) / 3))
         # Organized printing, rows of 3
-        for i in range(1, num_rows + 1):
-            for j in range(3):
-                if j * i - 1 >= 0:
+        for j in range(num_rows + 1):
+            for i in range(3):
+                if i + 3 * j < len(sorted_keys):
                     return_string += "{:40s}".format(
-                            "%s: %s" % (sorted_keys[j * i - 1], attrs[sorted_keys[j * i - 1]]))
+                            "%s: %s" % (sorted_keys[i + 3 * j], attrs[sorted_keys[i + 3 * j]]))
                     return_string += "\t"
+                else:
+                    break
             return_string += "\n"
         return return_string
 

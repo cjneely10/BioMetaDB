@@ -18,6 +18,8 @@ if __name__ == "__main__":
          {"help": "KEGG-expander.py output", "require": True}],
         [["-m2", "--merops_file"],
          {"help": "MEROPS final Extracellular output from Peptidase Workflow", "require": True}],
+        # [["-m3", "--anammox_files"],
+        #  {"help": "Anammox tsv summary file", "require": True}],
         [["-l", "--nonredundant_genomes"],
          {"help": "File with list of non-redundant genomes in order", "require": True}],
         [["-p", "--pfam_count_table"],
@@ -44,15 +46,15 @@ if __name__ == "__main__":
 
     combined_tsv_header = "ID\tGTDBtk_taxonomy\tCheckM_Completion\tCheckM_Contamination\t"
 
-    combined_tsv_header += "\t".join(hmm_table.header[1:])
+    combined_tsv_header += "\t".join(hmm_table.header)
 
     combined_tsv_header += "\t"
 
-    combined_tsv_header += "\t".join(ko_table.header[1:])
+    combined_tsv_header += "\t".join(ko_table.header)
 
     combined_tsv_header += "\t"
 
-    combined_tsv_header += "\t".join(pfam_table.header[1:])
+    combined_tsv_header += "\t".join(pfam_table.header)
 
     combined_tsv_header += "\t"
 

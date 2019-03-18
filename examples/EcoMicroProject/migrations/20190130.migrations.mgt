@@ -1,4 +1,0 @@
-"Table","Genomic",
-"id","_id","data_type","location","random_int","random_float","file_type"
-1,sequences_1,fasta,/mnt/c/Users/cjnee/Desktop/Bioinformatics/EcoMicro/Projects/BioMetaDB/examples/EcoMicroProject/db/Genomic,4,15.5,fasta
-

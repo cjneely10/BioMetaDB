@@ -61,3 +61,14 @@ def touch(path):
     :return:
     """
     open(path, 'a').close()
+
+
+def print_if_not_silent(silence_value, output_text):
+    """ Prints value to standard output if user-setting for "silent" is not set
+
+    :param silence_value:
+    :param output_text:
+    :return:
+    """
+    if silence_value == "n":
+        print(output_text)

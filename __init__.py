@@ -1,3 +1,5 @@
+import os
+import glob
 from sqlalchemy.orm import mapper
 from Models.models import BaseData
 from Models.functions import DBUserClass
@@ -22,6 +24,7 @@ def get_table(config_path, table_name=None, alias=None):
     """
     # Load config data from file
     cfg = Config()
+    config_path = glob.glob(os.path.join(config_path, "config/*.ini"))[0]
     cfg.read(config_path)
     if alias:
         table_name = cfg[ConfigKeys.TABLES_TO_ALIAS][alias]
@@ -31,7 +34,7 @@ def get_table(config_path, table_name=None, alias=None):
     sess = BaseData.get_session_from_engine(engine)
     # Generate table class and name based on presence of alias
     TableClass = ClassManager.get_class_orm(table_name, engine)
-    UserClass = type(alias or table_name, (DBUserClass,), {})
+    UserClass = type(table_name, (DBUserClass,), {})
     # Map to SQL orm
     mapper(UserClass, TableClass)
     return sess, UserClass

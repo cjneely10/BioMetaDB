@@ -526,4 +526,4 @@ if __name__ == '__main__':
 
     pc = ProgramCaller(programs=programs, flags=flags, errors=errors, _help=_help)
 
-    pc.run(ap.args)
+    pc.run(ap.args, debug=False)

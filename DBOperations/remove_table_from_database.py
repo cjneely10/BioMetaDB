@@ -1,13 +1,18 @@
 import os
+import glob
+import shutil
 from sqlalchemy.orm import mapper
 from Models.models import BaseData
 from Models.functions import DBUserClass
 from Config.config_manager import Config
 from Config.config_manager import ConfigKeys
+from Accessories.ops import print_if_not_silent
 from Config.config_manager import ConfigManager
 from DBManagers.class_manager import ClassManager
 
 """
+Script will hold functionality for REMOVE, which removes a table from a database,
+deleting all associated files
 
 """
 
@@ -34,31 +39,45 @@ def _remove_columns_display_message_epilogue():
     print("Table removed from database!", "\n")
 
 
-def remove_table_from_database(config_file, table_name, alias):
+def remove_table_from_database(config_file, table_name, alias, silent):
+    """ Function removes a given table from a database
+
+    :param silent:
+    :param config_file:
+    :param table_name:
+    :param alias:
+    :return:
+    """
     config = Config()
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
     config.read(config_file)
     if alias != "None":
         table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
-    _remove_table_display_message_prelude(
-        config[ConfigKeys.DATABASES][ConfigKeys.db_name],
-        config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
-        table_name,
-        alias
-    )
+    if silent == "n":
+        _remove_table_display_message_prelude(
+            config[ConfigKeys.DATABASES][ConfigKeys.db_name],
+            config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
+            table_name,
+            alias
+        )
 
     cfg = ConfigManager(config, table_name)
     engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
     sess = BaseData.get_session_from_engine(engine)
     TableClass = ClassManager.get_class_orm(table_name, engine)
-    UserClass = type(alias or table_name, (DBUserClass,), {})
+    UserClass = type(table_name, (DBUserClass,), {})
     mapper(UserClass, TableClass)
     all_records = sess.query(UserClass).all()
     for record in all_records:
         if record:
-            print(" ..Removing record %s" % record)
-            os.remove(record.full_path())
+            print_if_not_silent(silent, " ..Removing record %s" % record._id)
+            try:
+                os.remove(record.full_path())
+            except OSError:
+                continue
     TableClass.drop(engine)
     cfg.remove_table_from_config_file(table_name)
-    _remove_columns_display_message_epilogue()
     os.remove(cfg.classes_file)
-    _remove_columns_display_message_epilogue()
+    shutil.rmtree(cfg.table_dir)
+    if not silent:
+        _remove_columns_display_message_epilogue()

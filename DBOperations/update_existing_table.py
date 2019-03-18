@@ -1,4 +1,5 @@
 import os
+import glob
 from Config.config_manager import Config
 from Config.config_manager import ConfigKeys
 from Config.config_manager import ConfigManager
@@ -36,9 +37,11 @@ def _update_table_display_message_epilogue():
     print("Update complete!", "\n")
 
 
-def update_existing_table(config_file, table_name, directory_name, data_file, alias):
+def update_existing_table(config_file, table_name, directory_name, data_file, alias, silent):
     """
 
+    :param alias:
+    :param silent:
     :param config_file:
     :param table_name:
     :param directory_name:
@@ -46,20 +49,29 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     :return:
     """
     config = Config()
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
     config.read(config_file)
+    if alias != "None":
+        if alias not in config[ConfigKeys.TABLES_TO_ALIAS].keys():
+            print(
+                "!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!"
+            )
+            exit(1)
+        table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
     if table_name not in config.keys():
         print("!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!")
         exit(1)
-    _update_display_message_prelude(
-        config[ConfigKeys.DATABASES][ConfigKeys.db_name],
-        config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
-        table_name,
-        directory_name,
-        data_file,
-        alias
-    )
+    if silent == "n":
+        _update_display_message_prelude(
+            config[ConfigKeys.DATABASES][ConfigKeys.db_name],
+            config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
+            table_name,
+            directory_name,
+            data_file,
+            alias
+        )
     cfg = ConfigManager(config, table_name)
-    if data_file:
+    if data_file != "None":
         data_to_add = CountTable(data_file)
     else:
         data_to_add = None
@@ -69,9 +81,10 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
         genomic_files_to_add = ()
     if alias == "None":
         new_attrs = ClassManager.populate_data_to_existing_table(table_name, data_to_add, cfg, genomic_files_to_add,
-                                                                 directory_name, alias)
+                                                                 directory_name, silent, alias)
     else:
         new_attrs = ClassManager.populate_data_to_existing_table(table_name, data_to_add, cfg, genomic_files_to_add,
-                                                                 directory_name)
+                                                                 directory_name, silent)
     ClassManager.write_class(new_attrs, cfg.classes_file)
-    _update_table_display_message_epilogue()
+    if not silent:
+        _update_table_display_message_epilogue()

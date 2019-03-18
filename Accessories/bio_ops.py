@@ -12,7 +12,9 @@ class BioOps:
 
         :param file_name: (str)	User-passed name of file
         """
-        _, file_type = os.path.splitext(file_name)
+        _f, file_type = os.path.splitext(file_name)
+        if file_type == ".gz":
+            _f, file_type = os.path.splitext(_f)
         return BioOps._get_corrected_data_format(file_type.strip("."))
 
     @staticmethod
@@ -44,6 +46,7 @@ class BioOps:
             "fasta": "fasta",
             "fastq": "fastq",
             "fna": "fasta",
+            "aln": "fasta",
             "faa": "fasta",
             "fa": "fasta",
             "fq": "fastq",
@@ -58,7 +61,7 @@ class BioOps:
                 return IndexExtensions.match["." + dt]
             except KeyError:
                 print("Invalid data type: {}\nConfirm correct file extension".format(e))
-                exit(1)
+                raise KeyError
 
     @staticmethod
     def parse_large(file_name, data_type, batch_size=10000):

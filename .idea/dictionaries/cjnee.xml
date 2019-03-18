@@ -4,12 +4,17 @@
       <w>bamm</w>
       <w>bowtie</w>
       <w>coords</w>
+      <w>dbdm</w>
       <w>fasta</w>
       <w>fastq</w>
       <w>fastx</w>
       <w>imidx</w>
+      <w>metagenomes</w>
+      <w>ncbi</w>
       <w>phred</w>
       <w>proc</w>
+      <w>prokaryotes</w>
+      <w>removecol</w>
       <w>sambamba</w>
       <w>subprocesses</w>
     </words>

@@ -23,6 +23,8 @@ class ArgParse:
         ap = ArgParse(args_list, description="Sample:\tSample program")
 
         ## Now you can access as ap.args.required_argument, ap.args.optional, and ap.args.required
+        ## This script will handle requirement checking, and will not allow the script to launch unless required flags
+            are set.
         ## Note that you CANNOT use '-' in the names of arguments!
         ## Note that any other constructor argument that argparse.ArgumentParser() takes will also be used
 

@@ -2,6 +2,7 @@ import os
 import csv
 from Models.functions import DBUserClass
 from sqlalchemy.orm import mapper
+from Accessories.ops import print_if_not_silent
 
 
 class UpdateManager:
@@ -12,21 +13,22 @@ class UpdateManager:
         self.class_as_dict = class_as_dict
         self.session = session
 
-    def create_table_copy(self, outfile_prefix, DBClass):
+    def create_table_copy(self, outfile_prefix, DBClass, silent):
         """ Function writes a copy of data currently stored in the DB table
 
+        :param silent:
         :param DBClass:
         :param outfile_prefix:
         :return:
         """
-        print(" ..Creating deep copy of existing table")
+        print_if_not_silent(silent, " ..Creating deep copy of existing table")
         return self._write_to_file(*self._query_table(DBClass), outfile_prefix)
 
-    def delete_old_table_and_populate(self, engine, TableClass, UpdatedClass, data_table, table_name, sess,
+    def delete_old_table_and_populate(self, engine, TableClass, UpdatedClass, data_table, table_name, sess, silent,
                                       ignore_fields=[]):
-        print(" ..Deleting old table schema")
+        print_if_not_silent(silent, " ..Deleting old table schema")
         TableClass.drop(engine)
-        print(" ..Creating new table and filling with existing data")
+        print_if_not_silent(silent, " ..Creating new table and filling with existing data")
         UpdatedClass.create(engine)
         records = self.create_from_csv(data_table, {table_name: UpdatedClass}, ignore_fields)
         for record in records[table_name]:
@@ -39,7 +41,6 @@ class UpdateManager:
         :param DBClass:
         :return: (Dict[str, List[db_objects]])      DB data
         """
-        # json must load from string
         data = self.session.query(DBClass).all()
         # Return list of columns and dict with name of table as key and queried data as value
         try:
@@ -67,10 +68,11 @@ class UpdateManager:
             # Write comma-separated names of each column
             W.write(",".join(['"{}"'.format(col) for col in col_list]) + "\n")
             # Iterate over every entry
-            for entry in data[table_name]:
+            for record in data[table_name]:
                 # Write each entry by column
                 # W.write(','.join(['"{}"'.format(entry[col]) for col in col_list]) + "\n")
-                W.write(','.join([str(ent) for ent in entry]) + "\n")
+                W.write(','.join([str(getattr(record, col)) for col in col_list]) + "\n")
+                # W.write(','.join([str(ent) for ent in entry]) + "\n")
             W.write("\n")
         W.close()
         return W.name
@@ -116,11 +118,11 @@ class UpdateManager:
             # Create DB object using json data stored in file
             DBClass = type(name, (DBUserClass,), {})
             mapper(DBClass, Table)
-            db_object = DBClass()
             if name in csv_data.keys():
                 # Skip certain fields
                 # Useful for editing columns
                 for entry in csv_data[name]:
+                    db_object = DBClass()
                     for i in range(len(cols[name])):
                         if cols[name][i] not in ignore_fields:
                             setattr(db_object, cols[name][i], entry[i])

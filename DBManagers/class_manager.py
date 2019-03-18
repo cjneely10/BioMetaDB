@@ -7,9 +7,10 @@ from sqlalchemy.orm import mapper
 from sqlalchemy import Column, Table, Integer, String, MetaData
 from Models.models import BaseData
 from Accessories.bio_ops import BioOps
-from DBManagers.type_mapper import TypeMapper
-from Config.directory_manager import Directories
 from Models.functions import DBUserClass
+from DBManagers.type_mapper import TypeMapper
+from Accessories.ops import print_if_not_silent
+from Config.directory_manager import Directories
 from DBManagers.update_manager import UpdateManager
 
 """
@@ -29,7 +30,7 @@ class ClassManager:
     }
 
     @staticmethod
-    def create_initial_table_in_db(db_name, working_dir, table_name, data_types, initial=True):
+    def create_initial_table_in_db(db_name, working_dir, table_name, data_types, silent, initial=True):
         """ Creates initial database and tables
 
         :param initial: (bool)      Initial table or not
@@ -42,29 +43,28 @@ class ClassManager:
         db_dir = os.path.join(working_dir, Directories.DATABASE)
         table_dir = os.path.join(db_dir, table_name)
         classes_dir = os.path.join(working_dir, Directories.CLASSES)
-        print(" ..Generating table class from data file")
+        print_if_not_silent(silent, " ..Generating table class from data file")
         data_types = ClassManager.correct_dict(data_types)
         engine = None
         if not initial:
             engine = BaseData.get_engine(db_dir, db_name + ".db")
         t, metadata = ClassManager.generate_class(table_name, data_types, db_dir, db_name, table_dir, engine=engine)
         # Add functions for accessing to table
-        print(" ..Creating tables")
+        print_if_not_silent(silent, " ..Creating tables")
         if not initial:
-            # metadata.create_all()
             t.create(bind=engine)
-            # metadata.create_all(BaseData.get_engine(working_dir, db_name + ".db"))
         else:
             metadata.create_all()
         classes_out_file = os.path.join(classes_dir, table_name + ".json")
-        print(" ..Saving table data as JSON to %s" % classes_out_file)
+        print_if_not_silent(silent, " ..Saving table data as JSON to %s" % classes_out_file)
         ClassManager.write_class(data_types, classes_out_file)
 
     @staticmethod
     def populate_data_to_existing_table(table_name, count_table_object, config, genome_files_to_add, directory_name,
-                                        alias=None):
+                                        silent, alias=None):
         """ Method will load data from CountTable into database
 
+        :param silent:
         :param directory_name:
         :param alias:
         :param genome_files_to_add:
@@ -73,31 +73,40 @@ class ClassManager:
         :param config: (object)  ConfigManager object
         :return:
         """
-        print("\nPopulating data to table")
-        print(" ..Loading database")
+        print_if_not_silent(silent, "\nPopulating schema")
+        print_if_not_silent(silent, " ..Loading database")
         engine = BaseData.get_engine(config.db_dir, config.db_name + ".db")
         sess = BaseData.get_session_from_engine(engine)
-        print(" ..Collecting class data")
+        print_if_not_silent(silent, " ..Collecting class data")
         TableClass = ClassManager.get_class_orm(table_name, engine)
-        print(" ..Determining updates")
+        print_if_not_silent(silent, " ..Determining updates")
         # Or operation on sets to get all ids to add
-        ids_to_add = set(count_table_object.file_contents.keys()) | set(genome_files_to_add)
+        try:
+            ids_to_add = set(count_table_object.file_contents.keys()) | set(genome_files_to_add)
+        except AttributeError:
+            ids_to_add = set(genome_files_to_add)
         table_class_attrs_keys = set(ClassManager.correct_iterable(ClassManager.get_class_as_dict(config).keys()))
-        data_file_attrs_keys = set(ClassManager.correct_iterable(
-            key for key in count_table_object.header if key not in ("", " ", "#")))
+        if count_table_object is not None:
+            data_file_attrs_keys = set(ClassManager.correct_iterable(
+                key for key in count_table_object.header if key not in ("", " ", "#")))
+        else:
+            data_file_attrs_keys = set()
         # Get combined values for writing to final JSON file
-        combined_attrs = {**ClassManager.correct_dict(ClassManager.get_class_as_dict(config)),
-                          **ClassManager.correct_dict(TypeMapper.get_translated_types(count_table_object,
-                                                                                      TypeMapper.py_type_to_string))}
+        try:
+            combined_attrs = {**ClassManager.correct_dict(ClassManager.get_class_as_dict(config)),
+                              **ClassManager.correct_dict(TypeMapper.get_translated_types(count_table_object,
+                                                                                          TypeMapper.py_type_to_string))}
+        except AttributeError:
+            combined_attrs = ClassManager.correct_dict(ClassManager.get_class_as_dict(config))
         # Update manager
         # Initialize with DB class name, ConfigManager instance
         # Will create csv file of all existing data,
         # If differences found between what is in database table and what is in datafile
         if len(table_class_attrs_keys - data_file_attrs_keys) > 1:
-            print("\n!! New column data detected, calling update manager !!")
+            print_if_not_silent(silent, "\n!! New column data detected, calling update manager !!")
             update_manager = UpdateManager(config, ClassManager.get_class_as_dict(config), sess)
-            table_copy_csv = update_manager.create_table_copy(datetime.today().strftime("%Y%m%d"), TableClass)
-            print(" ..Combining existing columns with new headers")
+            table_copy_csv = update_manager.create_table_copy(datetime.today().strftime("%Y%m%d"), TableClass, silent)
+            print_if_not_silent(silent, " ..Combining existing columns with new headers")
             UpdatedDBClass, metadata = ClassManager.generate_class(config.table_name,
                                                                    {key: value
                                                                     for key, value in
@@ -108,47 +117,69 @@ class ClassManager:
             ClassManager.write_class(combined_attrs, config.classes_file)
             config.update_config_file(table_name)
             update_manager.delete_old_table_and_populate(engine, TableClass, UpdatedDBClass, table_copy_csv, table_name,
-                                                         sess)
+                                                         sess, silent)
             TableClass = UpdatedDBClass
-            print(" ..Complete!\n")
+            print_if_not_silent(silent, " ..Complete!\n")
         to_add = []
         UserClass = type(alias or table_name, (DBUserClass,), {})
         mapper(UserClass, TableClass)
-        corrected_header = ClassManager.correct_iterable(count_table_object.header)
-        print("\nGathering data by record:")
+        try:
+            corrected_header = ClassManager.correct_iterable(count_table_object.header)
+        except AttributeError:
+            corrected_header = None
+        existing_records = 0
+        new_records = 0
+        new_records_no_files = 0
+        print_if_not_silent(silent, "\nGathering data by record:")
+        if '' in ids_to_add:
+            ids_to_add.remove('')
         for _id_ in ids_to_add:
-            print(_id_)
-            new_id = os.path.splitext(_id_)[0] + "." + BioOps.get_type(_id_)
-            print(" ...Checking for record %s" % new_id)
-            record = sess.query(UserClass).filter_by(_id=os.path.splitext(_id_)[0]).first()
+            print_if_not_silent(silent, " ...Checking for record %s" % _id_)
+            record = sess.query(UserClass).filter_by(_id=_id_).first()
             if record:
-                print(" ....Record exists, updating with new values\n")
+                print_if_not_silent(silent, " ....Record exists, updating with new values\n")
+                existing_records += 1
                 # Add values in the table that are already in the database class
-                for attr in corrected_header[1:]:
-                    try:
-                        setattr(record, attr, count_table_object.get_at(_id_, corrected_header.index(attr) - 1))
-                    except KeyError:
-                        continue
+                if corrected_header:
+                    for attr in corrected_header:
+                        try:
+                            setattr(record, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
+                        except KeyError:
+                            continue
             else:
                 if directory_name != "None":
-                    print(" ....Moving new record from %s to %s" % (directory_name, config.rel_db_dir))
-                    shutil.copy(os.path.join(directory_name or config.db_dir, _id_),
-                                os.path.join(config.table_dir, new_id))
+                    print_if_not_silent(silent, " ....Moving new record from %s to %s" % (directory_name,
+                                                                                          config.rel_db_dir))
+                    try:
+                        shutil.copy(os.path.join(directory_name, _id_),
+                                    os.path.join(config.table_dir, _id_))
+                        new_records += 1
+                    except FileNotFoundError:
+                        new_records_no_files += 1
+                else:
+                    new_records_no_files += 1
                 db_object = UserClass()
-                print(" Updating values for record %s in database\n" % new_id)
-                setattr(db_object, "_id", os.path.splitext(_id_)[0])
+                print_if_not_silent(silent, " ....Setting values for record %s in database\n" % _id_)
+                setattr(db_object, "_id", _id_)
                 setattr(db_object, "location", os.path.join(config.db_dir, table_name))
-                setattr(db_object, "data_type", BioOps.get_type(_id_))
                 try:
-                    for attr in corrected_header[1:]:
-                        setattr(db_object, attr, count_table_object.get_at(_id_, corrected_header.index(attr) - 1))
+                    setattr(db_object, "data_type", BioOps.get_type(_id_))
+                except KeyError:
+                    setattr(db_object, "data_type", "unknown")
+                try:
+                    if corrected_header:
+                        for attr in corrected_header:
+                            setattr(db_object, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
                 except KeyError:
                     continue
                 to_add.append(db_object)
         for val in to_add:
             sess.add(val)
         sess.commit()
-        print("Complete!")
+        print_if_not_silent(silent, " %i existing records updated" % existing_records)
+        print_if_not_silent(silent, " %i new records added" % new_records)
+        print_if_not_silent(silent, " %i new records without data files added\n" % new_records_no_files)
+        print_if_not_silent(silent, "Complete!\n")
         return combined_attrs
 
     @staticmethod
@@ -230,14 +261,14 @@ class ClassManager:
         :param class_as_dict:
         :return:
         """
-        corrected_class_as_dict = {}
+        corrected_dict = {}
         for key in class_as_dict.keys():
             new_key = str(key).lower()
             for bad_char in set(punctuation):
-                new_key = new_key.replace(bad_char, "_")
+                new_key = new_key.replace(bad_char, "")
             new_key = new_key.replace(" ", "_")
-            corrected_class_as_dict[new_key] = class_as_dict[key]
-        return corrected_class_as_dict
+            corrected_dict[new_key] = class_as_dict[key]
+        return corrected_dict
 
     @staticmethod
     def correct_iterable(iterable):
@@ -250,7 +281,7 @@ class ClassManager:
         for _iter in iterable:
             new_val = _iter.lower()
             for bad_char in set(punctuation):
-                new_val = new_val.replace(bad_char, "_")
+                new_val = new_val.replace(bad_char, "")
             new_val = new_val.replace(" ", "_")
             new_iter.append(new_val)
         return new_iter

@@ -1,5 +1,6 @@
 import os
 from Accessories.ops import touch
+from Accessories.ops import print_if_not_silent
 from Serializers.count_table import CountTable
 from Config.directory_manager import Directories
 from Exceptions.create_database_exceptions import AssertString
@@ -61,9 +62,10 @@ def _create_all_directories(working_directory, table_name):
     return classes_dir, config_dir, db_dir, table_dir
 
 
-def create_database(db_name, working_directory, table_name, directory_name, data_file, alias):
+def create_database(db_name, working_directory, table_name, directory_name, data_file, alias, silent):
     """ Function called from dbdm initializes project/module
 
+    :param silent:
     :param alias:
     :param db_name: (str)   Name of db
     :param working_directory: (str) Path to working directory
@@ -74,12 +76,17 @@ def create_database(db_name, working_directory, table_name, directory_name, data
     """
     # Confirm working dir does not exist and that directory with genomes does exist
     assert os.path.isdir(working_directory) is False, AssertString.WORKING_DIR_EXISTS
-    assert os.path.isdir(directory_name), AssertString.SEQUENCE_DIR_NOT_EXISTS
-    _initialization_display_message_prelude(db_name, working_directory, table_name, directory_name, data_file, alias)
+    if directory_name != "None":
+        assert os.path.isdir(directory_name), AssertString.SEQUENCE_DIR_NOT_EXISTS
+    if silent == "n":
+        _initialization_display_message_prelude(db_name, working_directory, table_name, directory_name, data_file, alias)
     # Gather files to commit and initial data to store for each file
-    print("Beginning process...")
-    print(" Getting files from %s" % directory_name)
-    genomic_files_to_add = (_f for _f in os.listdir(directory_name))
+    print_if_not_silent(silent, "Beginning process...")
+    print_if_not_silent(silent, " Getting files from %s" % directory_name)
+    if directory_name != "None":
+        genomic_files_to_add = (_f for _f in os.listdir(directory_name))
+    else:
+        genomic_files_to_add = ()
     data_types = {}
     initial_data = []
     if data_file is not "None":
@@ -92,15 +99,14 @@ def create_database(db_name, working_directory, table_name, directory_name, data
         data_types = TypeMapper.get_translated_types(_initial_data, TypeMapper.py_type_to_string)
         initial_data.append(_initial_data)
     # Create working directories
-    print(" Creating directories at database root %s" % working_directory)
+    print_if_not_silent(silent, " Creating directories at database root %s" % working_directory)
     classes_dir, config_dir, db_dir, table_dir = _create_all_directories(working_directory, table_name)
     # Create database file
-    print(" Creating database file in %s" % db_dir)
-    _db_name = db_name.strip(".db") + ".db"
-    touch(os.path.join(db_dir, _db_name))
+    print_if_not_silent(silent, " Creating database file in %s" % db_dir)
+    touch(os.path.join(db_dir, db_name + ".db"))
     # Write configuration info
     config_file = db_name + ".ini"
-    print(" Writing database configuration to %s" % os.path.join(config_dir, config_file))
+    print_if_not_silent(silent, " Writing database configuration to %s" % os.path.join(config_dir, config_file))
     config = Config()
     abs_path_working_dir = os.path.abspath(working_directory)
     config[ConfigKeys.DATABASES] = {
@@ -125,15 +131,15 @@ def create_database(db_name, working_directory, table_name, directory_name, data
     with open(os.path.join(config_dir, config_file), "w") as W:
         config.write(W)
     # Create table
-    print("Creating new table %s at %s" % (table_name, os.path.join(db_dir, _db_name)))
+    print_if_not_silent(silent, "Creating new table %s at %s" % (table_name, os.path.join(db_dir, db_name)))
     os.makedirs(table_dir)
-    ClassManager.create_initial_table_in_db(_db_name, working_directory, table_name, data_types)
+    ClassManager.create_initial_table_in_db(db_name, working_directory, table_name, data_types, silent, initial=False)
     # Populate table with data from file and genomes
     # Get config file - confirms that it was written correctly
     cfg = ConfigManager(config, table_name)
     if data_file is not "None":
         for _data in initial_data:
             ClassManager.populate_data_to_existing_table(table_name, _data, cfg,
-                                                         genomic_files_to_add, directory_name)
-
-    _initialization_display_message_epilogue()
+                                                         genomic_files_to_add, directory_name, silent)
+    if not silent:
+        _initialization_display_message_epilogue()

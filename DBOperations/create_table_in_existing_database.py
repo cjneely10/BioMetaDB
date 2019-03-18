@@ -1,4 +1,5 @@
 import os
+import glob
 from Config.directory_manager import Directories
 from Serializers.count_table import CountTable
 from Config.config_manager import Config
@@ -49,9 +50,10 @@ def _create_all_directories(working_directory, table_name):
     os.makedirs(os.path.join(db_dir, table_name), exist_ok=True)
 
 
-def create_table_in_existing_database(config_file, table_name, directory_name, data_file, alias):
+def create_table_in_existing_database(config_file, table_name, directory_name, data_file, alias, silent):
     """
 
+    :param silent:
     :param config_file:
     :param table_name:
     :param directory_name:
@@ -60,18 +62,18 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     :return:
     """
     config = Config()
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
     config.read(config_file)
-    if alias != "None":
-        table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
     if table_name in config.keys():
         print("!! Table exists, exiting. To update table, use UPDATE !!")
         exit(1)
-    _create_table_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name],
-                                          config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
-                                          table_name,
-                                          directory_name,
-                                          data_file,
-                                          alias)
+    if silent == "n":
+        _create_table_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name],
+                                              config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
+                                              table_name,
+                                              directory_name,
+                                              data_file,
+                                              alias)
     data_types = {}
     initial_data = []
     if data_file is not "None":
@@ -92,20 +94,22 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     _create_all_directories(config[ConfigKeys.DATABASES][ConfigKeys.working_dir], table_name)
     # Update config object with new data
     config[table_name] = {
-        ConfigKeys.rel_classes_dir: os.path.join(config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir], Directories.CLASSES),
+        ConfigKeys.rel_classes_dir: os.path.join(config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
+                                                 Directories.CLASSES),
         ConfigKeys.class_dir: os.path.join(config[ConfigKeys.DATABASES][ConfigKeys.working_dir], Directories.CLASSES),
     }
     config.set(ConfigKeys.TABLES_TO_DB, table_name, config[ConfigKeys.DATABASES][ConfigKeys.db_name])
-    config.set(ConfigKeys.TABLES_TO_ALIAS, table_name, alias)
+    config.set(ConfigKeys.TABLES_TO_ALIAS, alias, table_name)
     # Write new config file
     with open(config_file, "w") as W:
         config.write(W)
     # Update ConfigManager object
     cfg = ConfigManager(config, table_name)
     # Create new table and populate with new data
-    ClassManager.create_initial_table_in_db(cfg.db_name, cfg.working_dir, table_name, data_types, initial=False)
+    ClassManager.create_initial_table_in_db(cfg.db_name, cfg.working_dir, table_name, data_types, silent, initial=False)
     if data_file is not "None":
         for _data in initial_data:
             ClassManager.populate_data_to_existing_table(table_name, _data, cfg,
-                                                         genomic_files_to_add, directory_name)
-    _create_table_display_message_epilogue()
+                                                         genomic_files_to_add, directory_name, silent)
+    if not silent:
+        _create_table_display_message_epilogue()
