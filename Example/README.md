@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #BioMetaDB Example
+=======
+# BioMetaDB Example
+>>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
 
 ## About
 

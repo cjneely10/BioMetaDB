@@ -16,7 +16,11 @@ class CountTable:
         contents_in_file = {}
         with open(file_name, "rb") as R:
             # Save first line, removing empty tabs that may exist on header line
+<<<<<<< HEAD
             self.header = [val for val in R.readline().decode().rstrip("\r\n").split("\t")[1:] if val != ""]
+=======
+            self.header = [val for val in R.readline().decode().rstrip("\r\n").split("\t") if val != ""]
+>>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
             for line in R:
                 # ID/key is first item on line
                 line = line.decode().rstrip("\r\n").split("\t")
@@ -35,18 +39,29 @@ class CountTable:
         else:
             return "\t".join(self.file_contents[genome_id])
 
+<<<<<<< HEAD
     def get_header_line(self, endline=False, start_field=False):
+=======
+    def get_header_line(self, endline=False):
+>>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
         """ Returns header as string
 
         :param endline: (bool)  Add newline character
         :return str:
         """
+<<<<<<< HEAD
         return_string = "\t".join(self.header)
         if endline:
             return_string += "\n"
         elif start_field:
             return_string = "ID\t" + return_string
         return return_string
+=======
+        if endline:
+            return "\t".join(self.header) + "\n"
+        else:
+            return "\t".join(self.header)
+>>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
 
     def get_at(self, genome_id, location):
         """ Returns value from count table based on genome id and location

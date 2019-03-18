@@ -71,10 +71,14 @@ def remove_table_from_database(config_file, table_name, alias, silent):
     for record in all_records:
         if record:
             print_if_not_silent(silent, " ..Removing record %s" % record._id)
+<<<<<<< HEAD
             try:
                 os.remove(record.full_path())
             except OSError:
                 continue
+=======
+            os.remove(record.full_path())
+>>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
     TableClass.drop(engine)
     cfg.remove_table_from_config_file(table_name)
     os.remove(cfg.classes_file)
