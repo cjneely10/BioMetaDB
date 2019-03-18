@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 import os
 import glob
-=======
->>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
 from sqlalchemy.orm import mapper
 from Models.models import BaseData
 from Models.functions import DBUserClass
@@ -27,10 +24,7 @@ def get_table(config_path, table_name=None, alias=None):
     """
     # Load config data from file
     cfg = Config()
-<<<<<<< HEAD
     config_path = glob.glob(os.path.join(config_path, "config/*.ini"))[0]
-=======
->>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
     cfg.read(config_path)
     if alias:
         table_name = cfg[ConfigKeys.TABLES_TO_ALIAS][alias]

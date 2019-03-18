@@ -50,11 +50,7 @@ class TypeMapper:
         return {
             counttable_object.header[i]:
                 dict_to_reference[
-<<<<<<< HEAD
                     type(counttable_object.get_at(random.sample(counttable_object.file_contents.keys(), 1)[0], i))
-=======
-                    type(counttable_object.get_at(random.sample(counttable_object.file_contents.keys(), 1)[0], i - 1))
->>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
                 ]
             for i in range(1, len(counttable_object.header))
         }

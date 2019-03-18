@@ -12,13 +12,9 @@ class BioOps:
 
         :param file_name: (str)	User-passed name of file
         """
-<<<<<<< HEAD
         _f, file_type = os.path.splitext(file_name)
         if file_type == ".gz":
             _f, file_type = os.path.splitext(_f)
-=======
-        _, file_type = os.path.splitext(file_name)
->>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
         return BioOps._get_corrected_data_format(file_type.strip("."))
 
     @staticmethod

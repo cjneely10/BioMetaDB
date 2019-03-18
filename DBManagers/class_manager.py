@@ -141,15 +141,9 @@ class ClassManager:
                 existing_records += 1
                 # Add values in the table that are already in the database class
                 if corrected_header:
-<<<<<<< HEAD
                     for attr in corrected_header:
                         try:
                             setattr(record, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
-=======
-                    for attr in corrected_header[1:]:
-                        try:
-                            setattr(record, attr, count_table_object.get_at(_id_, corrected_header.index(attr) - 1))
->>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
                         except KeyError:
                             continue
             else:
@@ -174,13 +168,8 @@ class ClassManager:
                     setattr(db_object, "data_type", "unknown")
                 try:
                     if corrected_header:
-<<<<<<< HEAD
                         for attr in corrected_header:
                             setattr(db_object, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
-=======
-                        for attr in corrected_header[1:]:
-                            setattr(db_object, attr, count_table_object.get_at(_id_, corrected_header.index(attr) - 1))
->>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
                 except KeyError:
                     continue
                 to_add.append(db_object)

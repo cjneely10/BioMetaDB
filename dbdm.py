@@ -13,7 +13,6 @@ from Exceptions.remove_columns_from_table_exceptions import ListFileNotProvidedE
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     args_list = (
         (("program",),
          {"help": "Program to run"}),
@@ -36,30 +35,6 @@ if __name__ == "__main__":
         (("-s", "--silent"),
          {"help": " (y) Silence all standard output (Standard error still displays to screen)", "default": "n"}),
     )
-=======
-    args_list = [
-        [["program"],
-         {"help": "Program to run"}],
-        [["-n", "--db_name"],
-         {"help": "Name of database"}],
-        [["-w", "--working_directory"],
-         {"help": "Absolute path for initializing database directories"}],
-        [["-t", "--table_name"],
-         {"help": "Name of database table", "default": "None"}],
-        [["-d", "--directory_name"],
-         {"help": "Directory path with bio data (fasta or fastq)", "default": "None"}],
-        [["-f", "--data_file"],
-         {"help": ".tsv or .csv file to add", "default": "None"}],
-        [["-l", "--list_file"],
-         {"help": "Comma-separated list of files ids to remove", "default": "None"}],
-        [["-c", "--config_file"],
-         {"help": "Config file for loading database schema"}],
-        [["-a", "--alias"],
-         {"help": "Provide alias for locating and creating table class", "default": "None"}],
-        [["-s", "--silent"],
-         {"help": " (y) Silence all standard output (Standard error still displays to screen)", "default": "n"}],
-    ]
->>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
     programs = {
         "INIT":                     create_database,
         "UPDATE":                   update_existing_table,
@@ -96,8 +71,4 @@ if __name__ == "__main__":
 
     pc = ProgramCaller(programs=programs, flags=flags, _help=_help, errors=errors)
 
-<<<<<<< HEAD
     pc.run(ap.args, debug=True)
-=======
-    pc.run(ap.args, debug=False)
->>>>>>> a30fe8ef0814606711a96454c4bf16df682ca9cf
