@@ -1,6 +1,2 @@
-.idea/
-Parsers/
-__pycache__/
-Visualizers/
-ReadMappers/
-Workflows/
+.idea/*
+__pycache__/*
