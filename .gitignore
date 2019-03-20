@@ -1,5 +1,7 @@
 .idea/*
 __pycache__/*
+Accessories/__pycache__/*
+Config/__pycache__/*
 BioMetaDB/*
 build/*
 *.c
