@@ -8,6 +8,7 @@ from DBOperations.delete_from_table import delete_from_table
 from DBOperations.remove_columns_from_table import remove_columns_from_table
 from DBOperations.remove_table_from_database import remove_table_from_database
 from DBOperations.update_existing_table import update_existing_table
+from DBOperations.summarize_database import summarize_database
 from Exceptions.config_manager_exceptions import TableNameNotFoundError
 from Exceptions.remove_columns_from_table_exceptions import ListFileNotProvidedError
 
@@ -42,6 +43,7 @@ if __name__ == "__main__":
         "REMOVECOL":                remove_columns_from_table,
         "DELETE":                   delete_from_table,
         "REMOVE":                   remove_table_from_database,
+        "SUMMARIZE":                summarize_database,
     }
     flags = {
         "INIT":                 ("db_name", "table_name", "directory_name", "data_file", "working_directory", "alias",

@@ -2,6 +2,13 @@
 __pycache__/*
 Accessories/__pycache__/*
 Config/__pycache__/*
+DBOperations/__pycache__/*
+DBManagers/__pycache__/*
+Exceptions/__pycache__/*
+Indexers/__pycache__/*
+Example/DB/*
+Models/__pycache__/*
+Serializers/__pycache__/*
 BioMetaDB/*
 build/*
 *.c
