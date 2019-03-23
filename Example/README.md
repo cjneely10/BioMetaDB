@@ -102,7 +102,7 @@ In this example, users will:
 
 ## Simple scripting: Get assemblies with an n50 value that is less than its length
 
-The below script will allow users to user a database query to identify genome assemblies that may still need a little work.
+The below script will allow users to use a database query to identify genome assemblies that may still need a little work.
 
 <pre><code>#!/usr/bin/env python3.5
 
@@ -117,8 +117,7 @@ matching_genomes = sess.query(Table).filter(Table.n50 < Table.total_length).all(
 
 # View query results
 for match in matching_genomes:
-    print(match)
-</code></pre>
+    print(match)</code></pre>
 
 The power of the SQLAlchemy package becomes apparent here - using the `filter` function, users can easily create fast and
 powerful SQL queries that are based on the fields provided in the `.tsv` file!

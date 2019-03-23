@@ -1,5 +1,2 @@
-from Exceptions.error import Error
-
-
-class DirectoryNotFoundError(Error):
-    pass
+class AssertString:
+    DIRECTORY_NOT_EXIST = "Genome directory does not exist, exiting"

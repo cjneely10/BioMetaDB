@@ -53,6 +53,7 @@ if __name__ == "__main__":
         "REMOVECOL":            ("config_file", "table_name", "list_file", "alias", "silent"),
         "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent"),
         "REMOVE":               ("config_file", "table_name", "alias", "silent"),
+        "SUMMARIZE":            ("config_file",),
     }
     errors = {
         TableNameNotFoundError:     "Name of table not found",
@@ -65,6 +66,7 @@ if __name__ == "__main__":
         "REMOVECOL":        "Remove column list (including data) from table",
         "DELETE":           "Delete list of ids from database tables, remove associated files",
         "REMOVE":           "Remove table and all associated data from database",
+        "SUMMARIZE":        "Quick summary of project",
     }
 
     ap = ArgParse(args_list,
