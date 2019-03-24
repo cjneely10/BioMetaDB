@@ -38,6 +38,8 @@ if __name__ == "__main__":
           "default": False}),
         (("-v", "--view"),
          {"help": "Display column names only with SUMMARIZE", "action": "store_true", "default": False}),
+        (("-q", "--query"),
+         {"help": "Query to pass to SUMMARIZE", "default": "None"}),
     )
     programs = {
         "INIT":                     create_database,
@@ -57,7 +59,7 @@ if __name__ == "__main__":
         "REMOVECOL":            ("config_file", "table_name", "list_file", "alias", "silent"),
         "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent"),
         "REMOVE":               ("config_file", "table_name", "alias", "silent"),
-        "SUMMARIZE":            ("config_file", "view"),
+        "SUMMARIZE":            ("config_file", "view", "query"),
         "INTEGRITY":            ("config_file",),
         "FIX":                  ("data_file", "silent"),
     }

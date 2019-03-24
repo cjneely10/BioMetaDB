@@ -23,7 +23,7 @@ def _update_display_message_prelude(db_name):
     print(" Name of database:\t\t%s.db\n" % db_name.strip(".db"))
 
 
-def summarize_database(config_file, view):
+def summarize_database(config_file, view, query):
     """ Function will query all tables listed in the config file, outputting simple
     metrics to the screen
 
@@ -43,6 +43,8 @@ def summarize_database(config_file, view):
         # Map to SQL orm
         mapper(UserClass, TableClass)
         rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+        if query != "None":
+            rl.query(query)
         if view:
             print(rl.get_columns())
         else:
