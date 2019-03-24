@@ -3,7 +3,7 @@ from BioMetaDB.Accessories.ops import touch
 from BioMetaDB.Accessories.ops import print_if_not_silent
 from BioMetaDB.Serializers.count_table import CountTable
 from BioMetaDB.Config.directory_manager import Directories
-from BioMetaDB.Exceptions.create_database_exceptions import AssertString
+from BioMetaDB.Exceptions.create_database_exceptions import CreateDBAssertString
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.DBManagers.type_mapper import TypeMapper
 from BioMetaDB.Config.config_manager import Config
@@ -75,9 +75,10 @@ def create_database(db_name, working_directory, table_name, directory_name, data
     :return:
     """
     # Confirm working dir does not exist and that directory with genomes does exist
-    assert os.path.isdir(working_directory) is False, AssertString.WORKING_DIR_EXISTS
+    assert working_directory != "None", CreateDBAssertString.WORKING_DB_NOT_SET
+    assert os.path.isdir(working_directory) is False, CreateDBAssertString.WORKING_DIR_EXISTS
     if directory_name != "None":
-        assert os.path.isdir(directory_name), AssertString.SEQUENCE_DIR_NOT_EXISTS
+        assert os.path.isdir(directory_name), CreateDBAssertString.SEQUENCE_DIR_NOT_EXISTS
     if not silent:
         _initialization_display_message_prelude(db_name, working_directory, table_name, directory_name, data_file, alias)
     # Gather files to commit and initial data to store for each file
