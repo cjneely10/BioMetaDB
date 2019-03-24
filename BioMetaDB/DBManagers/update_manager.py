@@ -1,5 +1,6 @@
 import os
 import csv
+import glob
 from BioMetaDB.Models.functions import DBUserClass
 from sqlalchemy.orm import mapper
 from BioMetaDB.Accessories.ops import print_if_not_silent
@@ -7,6 +8,7 @@ from BioMetaDB.Accessories.ops import print_if_not_silent
 
 class UpdateManager:
     IGNORE = ("BaseData", "DataTypes", "FileLocations", "DBManager", "Base")
+    MGMT_EXT = ".migrations.mgt"
 
     def __init__(self, config_manager_object, class_as_dict, session):
         self.cfg = config_manager_object
@@ -60,7 +62,9 @@ class UpdateManager:
         :return:
         """
         # Iterate over tables
-        W = open(os.path.join(self.cfg.migrations_dir, outfile_prefix + ".migrations.mgt"), "w")
+        outfile_path = UpdateManager._check_migration_file_number(
+            os.path.join(self.cfg.migrations_dir, outfile_prefix + UpdateManager.MGMT_EXT))
+        W = open(os.path.join(self.cfg.migrations_dir, outfile_path), "w")
         for table_name in data.keys():
             # List of columns in table
             col_list = cols[table_name]
@@ -77,6 +81,31 @@ class UpdateManager:
             W.write("\n")
         W.close()
         return W.name
+
+    @staticmethod
+    def _check_migration_file_number(simple_migration_path):
+        """ Protected method will determine the most recent migration and will write new copy
+
+        :param simple_migration_path:   (str) template migration string as ########.migrations.mgt
+        :return:
+        """
+        if os.path.isfile(simple_migration_path):
+            possible_migrations = sorted(glob.glob("%s*" % simple_migration_path.rstrip(UpdateManager.MGMT_EXT)))
+            if len(possible_migrations) > 1:
+                possible_migrations.pop(-1)
+            if len(possible_migrations) == 1:
+                path_prefix = os.path.basename(possible_migrations[0])
+            else:
+                path_prefix = os.path.basename(possible_migrations[-1])
+            path_prefix = path_prefix.rstrip(UpdateManager.MGMT_EXT)
+            # First rewrite:    #########.migrations.mgt
+            if len(path_prefix) == 8:
+                return path_prefix + ".001" + UpdateManager.MGMT_EXT
+            # Second rewrite:   ########.###.migrations.mgt
+            if len(path_prefix) == 12:
+                path_prefix, current_version = path_prefix.split(".")
+                return path_prefix + "." + "{:03d}".format(int(current_version) + 1) + UpdateManager.MGMT_EXT
+        return simple_migration_path
 
     @staticmethod
     def _load_from_csv(csv_file):

@@ -126,7 +126,7 @@ def create_database(db_name, table_name, directory_name, data_file, alias, silen
         table_name: db_name,
     }
     config[ConfigKeys.TABLES_TO_ALIAS] = {
-        alias: table_name,
+        "{}|{}".format(alias, table_name): table_name,
     }
     with open(os.path.join(config_dir, config_file), "w") as W:
         config.write(W)

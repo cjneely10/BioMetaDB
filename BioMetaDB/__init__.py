@@ -1,5 +1,3 @@
-import os
-import glob
 from sqlalchemy.orm import mapper
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Models.functions import DBUserClass

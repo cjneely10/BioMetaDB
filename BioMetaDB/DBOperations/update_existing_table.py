@@ -48,15 +48,16 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     """
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
-        if alias not in config[ConfigKeys.TABLES_TO_ALIAS].keys():
+        table_name = ConfigManager.get_name_by_alias(alias, config)
+        if table_name is None:
             print(
                 "!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!"
             )
             exit(1)
-        table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
-    if table_name not in config.keys():
+    if table_name != "None" and table_name not in config.keys():
         print("!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!")
         exit(1)
+    cfg = ConfigManager(config, table_name)
     if not silent:
         _update_display_message_prelude(
             config[ConfigKeys.DATABASES][ConfigKeys.db_name],
@@ -66,7 +67,6 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
             data_file,
             alias
         )
-    cfg = ConfigManager(config, table_name)
     if data_file != "None":
         data_to_add = CountTable(data_file)
     else:

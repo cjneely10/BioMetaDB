@@ -48,7 +48,7 @@ def remove_table_from_database(config_file, table_name, alias, silent):
     """
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
-        table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
+        table_name = ConfigManager.get_name_by_alias(alias, config)
     if not silent:
         _remove_table_display_message_prelude(
             config[ConfigKeys.DATABASES][ConfigKeys.db_name],

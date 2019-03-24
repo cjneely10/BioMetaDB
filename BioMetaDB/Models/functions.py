@@ -15,7 +15,12 @@ class DBUserClass:
 
         :return str:
         """
-        return self.location + "/" + self._id
+        file_path = None
+        if os.path.isfile(self.location + "/" + self._id):
+            file_path = self.location + "/" + self._id
+        elif os.path.isfile(self.location + "/" + self._id + ".gz"):
+            file_path = self.location + "/" + self._id + ".gz"
+        return file_path
 
     def __repr__(self):
         """

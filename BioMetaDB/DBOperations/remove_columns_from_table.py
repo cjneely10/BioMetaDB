@@ -49,9 +49,10 @@ def remove_columns_from_table(config_file, table_name, list_file, alias, silent)
     """
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
-        table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
+        table_name = ConfigManager.get_name_by_alias(alias, config)
     if list_file == "None":
         raise ListFileNotProvidedError
+    cfg = ConfigManager(config, table_name)
     columns_to_remove = set(line.rstrip("\r\n") for line in open(list_file, "r"))
     if not silent:
         _remove_columns_display_message_prelude(
@@ -62,7 +63,6 @@ def remove_columns_from_table(config_file, table_name, list_file, alias, silent)
             columns_to_remove
         )
 
-    cfg = ConfigManager(config, table_name)
     engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
     sess = BaseData.get_session_from_engine(engine)
     TableClass = ClassManager.get_class_orm(table_name, engine)

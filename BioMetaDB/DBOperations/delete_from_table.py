@@ -49,9 +49,10 @@ def delete_from_table(config_file, table_name, list_file, alias, silent):
     """
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
-        table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
+        table_name = ConfigManager.get_name_by_alias(alias, config)
     if list_file == "None":
         raise ListFileNotProvidedError
+    cfg = ConfigManager(config, table_name)
     ids_to_remove = set(line.rstrip("\r\n") for line in open(list_file, "r"))
     if not silent:
         _delete_records_display_message_prelude(
@@ -62,7 +63,6 @@ def delete_from_table(config_file, table_name, list_file, alias, silent):
             ids_to_remove
         )
 
-    cfg = ConfigManager(config, table_name)
     engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
     sess = BaseData.get_session_from_engine(engine)
     TableClass = ClassManager.get_class_orm(table_name, engine)
@@ -70,7 +70,10 @@ def delete_from_table(config_file, table_name, list_file, alias, silent):
     mapper(UserClass, TableClass)
     for _id in ids_to_remove:
         print_if_not_silent(silent, " ..Removing record %s" % _id)
-        os.remove(sess.query(UserClass).filter_by(_id=_id).first().full_path())
+        try:
+            os.remove(sess.query(UserClass).filter_by(_id=_id).first().full_path())
+        except TypeError:
+            continue
         sess.delete(sess.query(UserClass).filter_by(_id=_id).first())
     sess.commit()
     if not silent:

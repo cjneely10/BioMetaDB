@@ -100,3 +100,11 @@ class ConfigManager:
         assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
         config.read(config_file[0])
         return config, config_file[0]
+
+    @staticmethod
+    def get_name_by_alias(alias, config):
+        for key in config[ConfigKeys.TABLES_TO_ALIAS].keys():
+            key = key.split("|")
+            if key[0] == alias:
+                return key[1]
+        return None
