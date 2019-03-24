@@ -35,9 +35,26 @@ class RecordList:
 
         :return:
         """
+        cdef str summary_string
+        cdef list sorted_keys
+        cdef str key
+        sorted_keys = sorted(ClassManager.get_class_as_dict(self.cfg))
+        summary_string = "*******************************************************************\n"
+        summary_string += "\t\t{:>20s}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name)
+        summary_string += "\t\t{:>20s}\n\n".format("Column Name")
+        for key in sorted_keys:
+            summary_string += "\t\t{:>20s}\n".format(key)
+        summary_string += "------------------------------------------------------------------\n"
+        return summary_string
+
+    def columns(self):
+        """ Returns dict of columns
+
+        :return:
+        """
         return ClassManager.get_class_as_dict(self.cfg)
 
-    def get_summary_string(self):
+    def summarize(self):
         """ Returns metadata for list of records queried in list
 
         :return:
@@ -85,7 +102,7 @@ class RecordList:
         summary_data = {}
         records_in_table = self.results or self.sess.query(self.TableClass).all()
         num_records = len(records_in_table)
-        column_keys = list(self.get_columns().keys())
+        column_keys = list(self.columns().keys())
         for record in records_in_table:
             for column in column_keys:
                 if column not in summary_data.keys():
@@ -111,7 +128,7 @@ class RecordList:
         # Determine standard deviation values
         if num_records > 1:
             for record in records_in_table:
-                for column in self.get_columns().keys():
+                for column in self.columns().keys():
                     # print(summary_data[column][1], summary_data[column][2])
                     summary_data[column][3] = sqrt((summary_data[column][2] -
                                                     ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
