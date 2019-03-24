@@ -9,6 +9,5 @@ Indexers/__pycache__/*
 Example/DB/*
 Models/__pycache__/*
 Serializers/__pycache__/*
-BioMetaDB/*
 build/*
 *.c
