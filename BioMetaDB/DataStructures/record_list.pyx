@@ -34,10 +34,12 @@ class RecordList:
         return ClassManager.get_class_as_dict(self.cfg)
 
     def get_summary_string(self):
-        """
+        """ Returns metadata for list of records queried in list
 
         :return:
         """
+        cdef str summary_string
+        cdef list sorted_keys
         summary_string = "***********************************************************\n"
         summary_string += "Table Name:\t\t%s\nNumber of Records:\t%s\n\n" \
                          % (self.cfg.table_name, self.num_records)
@@ -45,10 +47,17 @@ class RecordList:
             sorted_keys = sorted(self._summary.keys())
             for key in sorted_keys:
                 summary_string += "%s:  %s\n" % (key, self._summary[key])
-        summary_string += "-----------------------------------------------------------\n"
+        summary_string += "----------------------------------------------------------\n"
         return summary_string
 
     def _gather_metadata(self):
+        """ Protected method to collect data, averages, and standard deviations
+
+        :return:
+        """
+        cdef dict summary_data
+        cdef list records_in_table
+        cdef int num_records
         summary_data = {}
         records_in_table = self.sess.query(self.TableClass).all()
         num_records = len(records_in_table)

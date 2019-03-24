@@ -3,5 +3,5 @@ from Cython.Build import cythonize
 
 
 setup(
-    ext_modules=cythonize(["*/*/*.pyx",]), requires=['Cython', 'luigi']
+    ext_modules=cythonize(["*/*/*.pyx",]), requires=['Cython', 'luigi', 'sqlalchemy']
 )

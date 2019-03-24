@@ -2,6 +2,8 @@ import os
 import glob
 import shutil
 from sqlalchemy.orm import mapper
+
+from BioMetaDB.Exceptions.config_manager_exceptions import ConfigAssertString
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Models.functions import DBUserClass
 from BioMetaDB.Config.config_manager import Config
@@ -48,9 +50,10 @@ def remove_table_from_database(config_file, table_name, alias, silent):
     :param alias:
     :return:
     """
+    assert config_file != "None", ConfigAssertString.CONFIG_FILE_NOT_PASSED
     config = Config()
     config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
-    config.read(config_file)
+    assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
     if alias != "None":
         table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
     if not silent:

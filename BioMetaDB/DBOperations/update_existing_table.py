@@ -4,6 +4,7 @@ from BioMetaDB.Config.config_manager import Config
 from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.Config.config_manager import ConfigManager
 from BioMetaDB.DBManagers.class_manager import ClassManager
+from BioMetaDB.Exceptions.config_manager_exceptions import ConfigAssertString
 from BioMetaDB.Serializers.count_table import CountTable
 
 """
@@ -48,9 +49,10 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     :param data_file:
     :return:
     """
+    assert config_file != "None", ConfigAssertString.CONFIG_FILE_NOT_PASSED
     config = Config()
     config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
-    config.read(config_file)
+    assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
     if alias != "None":
         if alias not in config[ConfigKeys.TABLES_TO_ALIAS].keys():
             print(
