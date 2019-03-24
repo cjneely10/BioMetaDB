@@ -110,10 +110,10 @@ from BioMetaDB import get_table
 
 # Generate database session and get a reference to the database table
 # Can also access through table_name instead of alias
-sess, Table = get_table("/path/to/DB", alias="pro")
+table = get_table("/path/to/DB", alias="pro")
 
 # Query the database for records whose n50 is less than their total length
-matching_genomes = sess.query(Table).filter(Table.n50 < Table.total_length).all()
+matching_genomes = table.query("n50 < total_length")
 
 # View query results
 for match in matching_genomes:

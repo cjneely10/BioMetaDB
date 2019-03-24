@@ -120,11 +120,13 @@ class RecordList:
     def query(self, *args):
         """ Wrapper function for querying database. Converts text argument to query statement
 
-        :param clear_prior_metadata:
         :param args:
         :return:
         """
-        self.results = self.sess.query(self.TableClass).filter(text(*args)).all()
+        if len(args) > 0:
+            self.results = self.sess.query(self.TableClass).filter(text(*args)).all()
+        else:
+            self.results = self.sess.query(self.TableClass).all()
         self._clear_prior_metadata()
         return self.results
 

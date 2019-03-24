@@ -51,12 +51,14 @@ Database projects are organized into file-systems:
 File systems created by **BioMetaDB** are accessible in Python scripts:
 
 <pre><code>from BioMetaDB import get_table
-sess, Table = get_table("/path/to/DB/config/db_config_file.ini", table_name="db_table_1")
+
+table = get_table("/path/to/DB", table_name="db_table_1")
 # Alternatively, 
-# sess, Table = get_table("/path/to/DB", alias="table_1")
-sess.query(Table).all()  # Returns all values
-sess.query(Table).filter(Table.table_attr > 0).all()  # Simple filter query
-sess.query(Table).filter_by(table_attr = 12).all()  # Keyword filter query
+# table = get_table("/path/to/DB", alias="table_1")
+
+table.query()  # Returns all values
+table.query("n50 >= 100000")  # Simple filter query
+table.query("n50 >= 100000 AND n75 <= 1000000")  # More complex filter query
 # Additional SQLAlchemy operations...
 </code></pre>
 
