@@ -1,7 +1,9 @@
 import os
+import glob
 from configparser import ConfigParser
 from BioMetaDB.Config.directory_manager import Directories
 from BioMetaDB.Exceptions.config_manager_exceptions import TableNameNotFoundError
+from BioMetaDB.Exceptions.config_manager_exceptions import ConfigAssertString
 
 
 class Config(ConfigParser):
@@ -71,3 +73,12 @@ class ConfigManager:
         del self.config[ConfigKeys.TABLES_TO_DB][table_name]
         with open(os.path.join(os.path.join(self.working_dir, Directories.CONFIG), self.db_name + ".ini"), "w") as W:
             self.config.write(W)
+
+    @staticmethod
+    def confirm_config_set(config_file):
+        assert config_file != "None", ConfigAssertString.CONFIG_FILE_NOT_PASSED
+        config = Config()
+        config_file = glob.glob(os.path.join(config_file, "config/*.ini"))
+        assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
+        config.read(config_file[0])
+        return config

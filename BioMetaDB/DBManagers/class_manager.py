@@ -116,7 +116,7 @@ class ClassManager:
                                                                    config.table_dir)
             ClassManager.write_class(combined_attrs, config.classes_file)
             # config.update_config_file(table_name)
-            update_manager.delete_old_table_and_populate(engine, TableClass, UpdatedDBClass, table_copy_csv, table_name,
+            UpdateManager.delete_old_table_and_populate(engine, TableClass, UpdatedDBClass, table_copy_csv, table_name,
                                                          sess, silent)
             TableClass = UpdatedDBClass
             print_if_not_silent(silent, " ..Complete!\n")

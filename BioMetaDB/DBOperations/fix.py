@@ -1,2 +1,2 @@
-def fix():
+def fix(data_file, silent):
     pass

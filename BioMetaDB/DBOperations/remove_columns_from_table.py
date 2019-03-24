@@ -1,13 +1,9 @@
-import os
-import glob
 from datetime import datetime
 from BioMetaDB.Models.models import BaseData
-from BioMetaDB.Config.config_manager import Config
 from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.Config.config_manager import ConfigManager
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.DBManagers.update_manager import UpdateManager
-from BioMetaDB.Exceptions.config_manager_exceptions import ConfigAssertString
 from BioMetaDB.Exceptions.remove_columns_from_table_exceptions import ListFileNotProvidedError
 
 """
@@ -32,7 +28,7 @@ def _remove_columns_display_message_prelude(db_name, working_directory, table_na
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t%s" % db_name)
     print(" Name of table:\t\t%s" % table_name)
-    print(" Table aliases:\t\t%s" % alias)
+    print(" Table aliases:\t\t%s" % alias, "\n")
     print("DATA:\tRemove columns from schema")
     print(" Do not include columns:\t%s" % ",".join(cols_to_remove).strip(","), "\n")
 
@@ -51,11 +47,7 @@ def remove_columns_from_table(config_file, table_name, list_file, alias, silent)
     :param alias:
     :return:
     """
-    assert config_file != "None", ConfigAssertString.CONFIG_FILE_NOT_PASSED
-    config = Config()
-    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))
-    assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
-    config.read(config_file[0])
+    config = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
     if list_file == "None":

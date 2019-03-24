@@ -24,13 +24,14 @@ class UpdateManager:
         print_if_not_silent(silent, " ..Creating deep copy of existing table")
         return self._write_to_file(*self._query_table(DBClass), outfile_prefix)
 
-    def delete_old_table_and_populate(self, engine, TableClass, UpdatedClass, data_table, table_name, sess, silent,
+    @staticmethod
+    def delete_old_table_and_populate(engine, TableClass, UpdatedClass, data_table, table_name, sess, silent,
                                       ignore_fields=[]):
         print_if_not_silent(silent, " ..Deleting old table schema")
         TableClass.drop(engine)
         print_if_not_silent(silent, " ..Creating new table and filling with existing data")
         UpdatedClass.create(engine)
-        records = self.create_from_csv(data_table, {table_name: UpdatedClass}, ignore_fields)
+        records = UpdateManager.create_from_csv(data_table, {table_name: UpdatedClass}, ignore_fields)
         for record in records[table_name]:
             sess.add(record)
         sess.commit()
@@ -101,7 +102,8 @@ class UpdateManager:
                     row = next(csv_reader)
         return cols, tables
 
-    def create_from_csv(self, csv_file, tables, ignore_fields):
+    @staticmethod
+    def create_from_csv(csv_file, tables, ignore_fields):
         """ Create database objects using new schema.
         This is to be completed once all data has been backed up from the server
 

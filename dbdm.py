@@ -57,7 +57,7 @@ if __name__ == "__main__":
         "REMOVE":               ("config_file", "table_name", "alias", "silent"),
         "SUMMARIZE":            ("config_file",),
         "INTEGRITY":            ("config_file",),
-        "FIX":                  ("data_file",),
+        "FIX":                  ("data_file", "silent"),
     }
     errors = {
         TableNameNotFoundError:     "Name of table not found",

@@ -1,10 +1,7 @@
 import os
-import glob
-from BioMetaDB.Config.config_manager import Config
 from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.Config.config_manager import ConfigManager
 from BioMetaDB.DBManagers.class_manager import ClassManager
-from BioMetaDB.Exceptions.config_manager_exceptions import ConfigAssertString
 from BioMetaDB.Serializers.count_table import CountTable
 
 """
@@ -27,8 +24,8 @@ def _update_display_message_prelude(db_name, working_directory, table_name, dire
     print("UPDATE:\tUpdate table in existing database")
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t\t%s.db" % db_name.strip(".db"))
-    print(" Name of table:\t\t\t%s" % table_name, "\n")
-    print(" Table aliases:\t\t\t%s" % alias)
+    print(" Name of table:\t\t\t%s" % table_name)
+    print(" Table aliases:\t\t\t%s" % alias, "\n")
     print("DATA:\tPopulate table")
     print(" Get metadata from\t\t%s" % data_file)
     print(" Copy fastx files from\t\t%s" % directory_name, "\n")
@@ -49,11 +46,7 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     :param data_file:
     :return:
     """
-    assert config_file != "None", ConfigAssertString.CONFIG_FILE_NOT_PASSED
-    config = Config()
-    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))
-    assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
-    config.read(config_file[0])
+    config = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         if alias not in config[ConfigKeys.TABLES_TO_ALIAS].keys():
             print(
