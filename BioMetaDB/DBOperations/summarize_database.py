@@ -1,6 +1,7 @@
 import os
 import glob
 from sqlalchemy.orm import mapper
+from BioMetaDB.DataStructures.record_list import RecordList
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Models.functions import DBUserClass
 from BioMetaDB.DBManagers.class_manager import ClassManager
@@ -27,3 +28,5 @@ def summarize_database(config_file):
         UserClass = type(table_name, (DBUserClass,), {})
         # Map to SQL orm
         mapper(UserClass, TableClass)
+        rl = RecordList(sess, UserClass, cfg)
+        print(rl.get_summary())
