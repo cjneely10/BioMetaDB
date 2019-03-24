@@ -1,4 +1,0 @@
-sqlalchemy
-biopython
-configparser
-argparse
