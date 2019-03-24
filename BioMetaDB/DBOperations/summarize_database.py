@@ -24,6 +24,12 @@ def _update_display_message_prelude(db_name):
 
 
 def summarize_database(config_file):
+    """ Function will query all tables listed in the config file, outputting simple
+    metrics to the screen
+
+    :param config_file:
+    :return:
+    """
     config, config_file = ConfigManager.confirm_config_set(config_file)
     tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     _update_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name])

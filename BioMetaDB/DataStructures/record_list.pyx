@@ -1,5 +1,6 @@
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from sqlalchemy import text
+from math import sqrt
 
 """
 Script holds functionality for handling data types associated with database records
@@ -10,7 +11,7 @@ And will provide info about most frequently occurring characters/words in charac
 
 
 class RecordList:
-    def __init__(self, db_session, table_class, cfg, compute_metadata=False):
+    def __init__(self, db_session, table_class, cfg, compute_metadata=False, query=None):
         """ Class for handling (mostly) user interfacing to inner classes
 
         :param db_session:
@@ -23,8 +24,11 @@ class RecordList:
         self._summary = None
         self._data = None
         self.num_records = 0
-        if compute_metadata:
-            self._summary, self._data, self.num_records = self._gather_metadata()
+        self.results = None
+        if compute_metadata and query:
+            self._summary, self._data, self.num_records = self._gather_metadata(query)
+        elif query:
+            self.results = self.query(query)
 
     def get_columns(self):
         """ Wrapper for returning columns in class as simple dictionary Name: SQLType
@@ -58,14 +62,13 @@ class RecordList:
         if self._summary:
             sorted_keys = sorted(self._summary.keys())
             for key in sorted_keys:
-                if type(self._summary[key]) == int:
-                    summary_string += "\t{:>20s}\t{:<12d}\n".format(
+                if type(self._summary[key]) == str:
+                    summary_string += "\t{:>20s}\n".format("Text entry")
+                else:
+                    summary_string += "\t{:>20s}\t{:<12.3f}\t{:<12.3f}\n".format(
                         key,
-                        self._summary[key])
-                elif type(self._summary[key]) == float:
-                    summary_string += "\t{:>20s}\t{:<12.3f}\n".format(
-                        key,
-                        self._summary[key])
+                        self._summary[key][0],
+                        self._summary[key][3])
         summary_string += "------------------------------------------------------------------\n"
         return summary_string
 
@@ -78,31 +81,52 @@ class RecordList:
         cdef list records_in_table
         cdef int num_records
         cdef str column
-        cdef float running_sum
-        cdef float running_sq_sum
-        running_sq_sum = 0.0
-        running_sum = 0.0
+        cdef list column_keys
         summary_data = {}
-        records_in_table = self.sess.query(self.TableClass).all()
+        records_in_table = self.results or self.sess.query(self.TableClass).all()
         num_records = len(records_in_table)
+        column_keys = list(self.get_columns().keys())
         for record in records_in_table:
-            for column in self.get_columns().keys():
+            for column in column_keys:
                 if column not in summary_data.keys():
                     if type(getattr(record, column)) != str:
-                        # Compute average
-                        summary_data[column] = getattr(record, column) / num_records
+                        summary_data[column] = []
+                        # Gather portion for average calculation
+                        summary_data[column].append(float(getattr(record, column)) / num_records)
+                        # Gather portion for running sum
+                        summary_data[column].append(float(getattr(record, column)))
+                        # Gather portion for running sq sum
+                        summary_data[column].append(float(getattr(record, column) ** 2))
+                        summary_data[column].append(0.0)
                     else:
-                        summary_data[column] = "string"
+                        summary_data[column] = "s"
                 else:
                     if type(getattr(record, column)) != str:
-                        summary_data[column] += (getattr(record, column) / num_records)
-
+                        # Gather portion for average calculation
+                        summary_data[column][0] += getattr(record, column) / num_records
+                        # Gather portion for running sum
+                        summary_data[column][1] += getattr(record, column)
+                        # Gather portion for running sq sum
+                        summary_data[column][2] += getattr(record, column) ** 2
+        # Determine standard deviation values
+        if num_records > 1:
+            for record in records_in_table:
+                for column in self.get_columns().keys():
+                    # print(summary_data[column][1], summary_data[column][2])
+                    summary_data[column][3] = sqrt((summary_data[column][2] -
+                                                    ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
         return summary_data, records_in_table, num_records
 
     def query(self, *args):
         """ Wrapper function for querying database. Converts text argument to query statement
 
+        :param clear_prior_metadata:
         :param args:
         :return:
         """
-        return self.sess.query(self.TableClass).filter(text(*args)).all()
+        self.results = self.sess.query(self.TableClass).filter(text(*args)).all()
+        self._clear_prior_metadata()
+        return self.results
+
+    def _clear_prior_metadata(self):
+        self._summary, self._data, self.num_records = None, None, None

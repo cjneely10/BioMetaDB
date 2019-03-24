@@ -24,7 +24,7 @@ def get_table(config_path, table_name=None, alias=None):
     # Load config data from file
     cfg, config_path = ConfigManager.confirm_config_set(config_path)
     if alias:
-        table_name = cfg[ConfigKeys.TABLES_TO_ALIAS][alias]
+        table_name = ConfigManager.get_name_by_alias(alias, cfg)
     config = ConfigManager(cfg, table_name)
     # Get session to return
     engine = BaseData.get_engine(config.db_dir, config.db_name + ".db")
@@ -34,4 +34,4 @@ def get_table(config_path, table_name=None, alias=None):
     UserClass = type(table_name, (DBUserClass,), {})
     # Map to SQL orm
     mapper(UserClass, TableClass)
-    return RecordList(sess, UserClass, config, compute_metadata=False)
+    return RecordList(sess, UserClass, config)
