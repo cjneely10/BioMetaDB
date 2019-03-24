@@ -79,7 +79,7 @@ if __name__ == "__main__":
     }
 
     ap = ArgParse(args_list,
-                  description=ArgParse.description_builder("dbdm:\tManaging database operations.",
+                  description=ArgParse.description_builder("dbdm:\tManage BioMetaDB project",
                                                            _help, flags))
 
     pc = ProgramCaller(programs=programs, flags=flags, _help=_help, errors=errors)
