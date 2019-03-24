@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 
+from BioMetaDB.DBOperations.fix import fix
 from BioMetaDB.Accessories.arg_parse import ArgParse
 from BioMetaDB.Accessories.program_caller import ProgramCaller
-from BioMetaDB.DBOperations.create_table_in_existing_database import create_table_in_existing_database
+from BioMetaDB.DBOperations.integrity_check import integrity_check
 from BioMetaDB.DBOperations.create_database import create_database
 from BioMetaDB.DBOperations.delete_from_table import delete_from_table
+from BioMetaDB.DBOperations.summarize_database import summarize_database
+from BioMetaDB.DBOperations.update_existing_table import update_existing_table
+from BioMetaDB.Exceptions.config_manager_exceptions import TableNameNotFoundError
 from BioMetaDB.DBOperations.remove_columns_from_table import remove_columns_from_table
 from BioMetaDB.DBOperations.remove_table_from_database import remove_table_from_database
-from BioMetaDB.DBOperations.update_existing_table import update_existing_table
-from BioMetaDB.DBOperations.summarize_database import summarize_database
-from BioMetaDB.Exceptions.config_manager_exceptions import TableNameNotFoundError
 from BioMetaDB.Exceptions.remove_columns_from_table_exceptions import ListFileNotProvidedError
+from BioMetaDB.DBOperations.create_table_in_existing_database import create_table_in_existing_database
 
 
 if __name__ == "__main__":
@@ -45,6 +47,8 @@ if __name__ == "__main__":
         "DELETE":                   delete_from_table,
         "REMOVE":                   remove_table_from_database,
         "SUMMARIZE":                summarize_database,
+        "INTEGRITY":                integrity_check,
+        "FIX":                      fix,
     }
     flags = {
         "INIT":                 ("db_name", "table_name", "directory_name", "data_file", "working_directory", "alias",
@@ -55,6 +59,8 @@ if __name__ == "__main__":
         "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent"),
         "REMOVE":               ("config_file", "table_name", "alias", "silent"),
         "SUMMARIZE":            ("config_file",),
+        "INTEGRITY":            ("config_file",),
+        "FIX":                  ("data_file",),
     }
     errors = {
         TableNameNotFoundError:     "Name of table not found",
@@ -68,6 +74,8 @@ if __name__ == "__main__":
         "DELETE":           "Delete list of ids from database tables, remove associated files",
         "REMOVE":           "Remove table and all associated data from database",
         "SUMMARIZE":        "Quick summary of project",
+        "INTEGRITY":        "Queries project database and structure to generate .fix file for possible issues",
+        "FIX":              "Repairs errors in DB structure using .fix file",
     }
 
     ap = ArgParse(args_list,
