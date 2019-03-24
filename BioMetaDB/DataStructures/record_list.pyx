@@ -10,7 +10,7 @@ And will provide info about most frequently occurring characters/words in charac
 
 
 class RecordList:
-    def __init__(self, db_session, table_class, cfg, compute_metadata=True):
+    def __init__(self, db_session, table_class, cfg, compute_metadata=False):
         """ Class for handling (mostly) user interfacing to inner classes
 
         :param db_session:
@@ -41,14 +41,32 @@ class RecordList:
         cdef str summary_string
         cdef list sorted_keys
         cdef str key
-        summary_string = "***********************************************************\n"
-        summary_string += "Table Name:\t\t%s\nNumber of Records:\t%s\n\n" \
-                         % (self.cfg.table_name, self.num_records)
+        if self._summary is None or self._data is None:
+            self._summary, self._data, self.num_records = self._gather_metadata()
+        # Pretty formatting
+        summary_string = "*******************************************************************\n"
+        summary_string += "\t{:>20s}\t{:<12s}\n\t{:>20s}\t{:<10d}\n\n".format(
+            "Table Name:",
+            self.cfg.table_name,
+            "Number of Records:",
+            self.num_records)
+        summary_string += "\t{:>20s}\t{:<12s}\t{:<10s}\n\n".format(
+            "Column Name",
+            "Average",
+            "Std Dev"
+        )
         if self._summary:
             sorted_keys = sorted(self._summary.keys())
             for key in sorted_keys:
-                summary_string += "%s:  %s\n" % (key, self._summary[key])
-        summary_string += "----------------------------------------------------------\n"
+                if type(self._summary[key]) == int:
+                    summary_string += "\t{:>20s}\t{:<12d}\n".format(
+                        key,
+                        self._summary[key])
+                elif type(self._summary[key]) == float:
+                    summary_string += "\t{:>20s}\t{:<12.3f}\n".format(
+                        key,
+                        self._summary[key])
+        summary_string += "------------------------------------------------------------------\n"
         return summary_string
 
     def _gather_metadata(self):
@@ -60,6 +78,10 @@ class RecordList:
         cdef list records_in_table
         cdef int num_records
         cdef str column
+        cdef float running_sum
+        cdef float running_sq_sum
+        running_sq_sum = 0.0
+        running_sum = 0.0
         summary_data = {}
         records_in_table = self.sess.query(self.TableClass).all()
         num_records = len(records_in_table)
@@ -67,6 +89,7 @@ class RecordList:
             for column in self.get_columns().keys():
                 if column not in summary_data.keys():
                     if type(getattr(record, column)) != str:
+                        # Compute average
                         summary_data[column] = getattr(record, column) / num_records
                     else:
                         summary_data[column] = "string"
@@ -77,4 +100,9 @@ class RecordList:
         return summary_data, records_in_table, num_records
 
     def query(self, *args):
+        """ Wrapper function for querying database. Converts text argument to query statement
+
+        :param args:
+        :return:
+        """
         return self.sess.query(self.TableClass).filter(text(*args)).all()

@@ -46,7 +46,7 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     :param data_file:
     :return:
     """
-    config = ConfigManager.confirm_config_set(config_file)
+    config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         if alias not in config[ConfigKeys.TABLES_TO_ALIAS].keys():
             print(

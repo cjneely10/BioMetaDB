@@ -59,7 +59,7 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     :param alias:
     :return:
     """
-    config = ConfigManager.confirm_config_set(config_file)
+    config, config_file = ConfigManager.confirm_config_set(config_file)
     if table_name in config.keys():
         print("!! Table exists, exiting. To update table, use UPDATE !!")
         exit(1)

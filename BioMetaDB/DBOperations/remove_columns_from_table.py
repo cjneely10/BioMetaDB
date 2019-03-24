@@ -47,7 +47,7 @@ def remove_columns_from_table(config_file, table_name, list_file, alias, silent)
     :param alias:
     :return:
     """
-    config = ConfigManager.confirm_config_set(config_file)
+    config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
     if list_file == "None":

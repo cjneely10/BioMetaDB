@@ -6,6 +6,7 @@ from BioMetaDB.Models.functions import DBUserClass
 from BioMetaDB.Config.config_manager import ConfigManager, Config
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Config.config_manager import ConfigKeys
+from BioMetaDB.DataStructures.record_list import RecordList
 
 """
 Script is for top-level function and classes
@@ -23,9 +24,7 @@ def get_table(config_path, table_name=None, alias=None):
     :return:
     """
     # Load config data from file
-    cfg = Config()
-    config_path = glob.glob(os.path.join(config_path, "config/*.ini"))[0]
-    cfg.read(config_path)
+    cfg, config_path = ConfigManager.confirm_config_set(config_path)
     if alias:
         table_name = cfg[ConfigKeys.TABLES_TO_ALIAS][alias]
     config = ConfigManager(cfg, table_name)
@@ -37,4 +36,4 @@ def get_table(config_path, table_name=None, alias=None):
     UserClass = type(table_name, (DBUserClass,), {})
     # Map to SQL orm
     mapper(UserClass, TableClass)
-    return sess, UserClass
+    return RecordList(sess, UserClass, config, compute_metadata=False)
