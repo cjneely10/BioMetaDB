@@ -53,8 +53,9 @@ def remove_columns_from_table(config_file, table_name, list_file, alias, silent)
     """
     assert config_file != "None", ConfigAssertString.CONFIG_FILE_NOT_PASSED
     config = Config()
-    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))
     assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
+    config.read(config_file[0])
     if alias != "None":
         table_name = config[ConfigKeys.TABLES_TO_ALIAS][alias]
     if list_file == "None":

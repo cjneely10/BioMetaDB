@@ -40,6 +40,7 @@ class RecordList:
         """
         cdef str summary_string
         cdef list sorted_keys
+        cdef str key
         summary_string = "***********************************************************\n"
         summary_string += "Table Name:\t\t%s\nNumber of Records:\t%s\n\n" \
                          % (self.cfg.table_name, self.num_records)
@@ -58,11 +59,12 @@ class RecordList:
         cdef dict summary_data
         cdef list records_in_table
         cdef int num_records
+        cdef str column
         summary_data = {}
         records_in_table = self.sess.query(self.TableClass).all()
         num_records = len(records_in_table)
         for record in records_in_table:
-            for column in self.get_columns():
+            for column in self.get_columns().keys():
                 if column not in summary_data.keys():
                     if type(getattr(record, column)) != str:
                         summary_data[column] = getattr(record, column) / num_records

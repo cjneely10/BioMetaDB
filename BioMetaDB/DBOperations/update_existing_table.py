@@ -51,8 +51,9 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     """
     assert config_file != "None", ConfigAssertString.CONFIG_FILE_NOT_PASSED
     config = Config()
-    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))
     assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
+    config.read(config_file[0])
     if alias != "None":
         if alias not in config[ConfigKeys.TABLES_TO_ALIAS].keys():
             print(

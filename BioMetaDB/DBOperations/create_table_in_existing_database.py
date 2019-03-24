@@ -65,9 +65,9 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     """
     assert config_file != "None", ConfigAssertString.CONFIG_FILE_NOT_PASSED
     config = Config()
-    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))[0]
+    config_file = glob.glob(os.path.join(config_file, "config/*.ini"))
     assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
-    assert os.path.isdir(directory_name), DirectoryAssertString.DIRECTORY_NOT_EXIST
+    config.read(config_file[0])
     if table_name in config.keys():
         print("!! Table exists, exiting. To update table, use UPDATE !!")
         exit(1)
