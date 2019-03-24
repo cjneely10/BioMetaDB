@@ -203,16 +203,15 @@ project.
 - Required flags
     - --db_name (-n): Name to assign database (for example, Metagenomes)
     - --table_name (-t): Name to give table in database (for example, Genomic)
-    - --working_directory (-w): Name to assign the new database project (for example, DB)
 - Optional flags
     - --directory_name (-d): Path to directory with files to add to the database.
     - --data_file (-f): Path to .tsv file to use to generate DB table schema
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm INIT -n database -t db_table_1 -w DB -d /path/to/data/directory/ -f /path/to/data_file.tsv -a table_1`
+    - `dbdm INIT -n database -t db_table_1 -d /path/to/data/directory/ -f /path/to/data_file.tsv -a table_1`
     - This command will generate the following project structure and assign an alias name to the table:
-<pre><code>DB/
+<pre><code>database/
     classes/
         db_table_1.json  # Generated from data_file.tsv
     config/

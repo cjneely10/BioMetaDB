@@ -21,8 +21,6 @@ if __name__ == "__main__":
          {"help": "Program to run"}),
         (("-n", "--db_name"),
          {"help": "Name of database"}),
-        (("-w", "--working_directory"),
-         {"help": "Absolute path for initializing database directories", "default": "None"}),
         (("-t", "--table_name"),
          {"help": "Name of database table", "default": "None"}),
         (("-d", "--directory_name"),
@@ -51,8 +49,7 @@ if __name__ == "__main__":
         "FIX":                      fix,
     }
     flags = {
-        "INIT":                 ("db_name", "table_name", "directory_name", "data_file", "working_directory", "alias",
-                                 "silent"),
+        "INIT":                 ("db_name", "table_name", "directory_name", "data_file", "alias", "silent"),
         "CREATE":               ("config_file", "table_name", "directory_name", "data_file", "alias", "silent"),
         "UPDATE":               ("config_file", "table_name", "directory_name", "data_file", "alias", "silent"),
         "REMOVECOL":            ("config_file", "table_name", "list_file", "alias", "silent"),

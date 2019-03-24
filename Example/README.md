@@ -42,11 +42,11 @@ In this example, users will:
 1. Ensure that `BioMetaDB` is installed.
 2. Navigate to a directory where you would like to initialize this project's directory.
 3. Run the following command:
-    1. `dbdm INIT -w DB -n ModelOrganisms -d /path/to/Example/prokaryotes/ -t Prokaryotes -a pro -f /path/to/Example/prokaryotes.tsv`
+    1. `dbdm INIT -n ModelOrganisms -d /path/to/Example/prokaryotes/ -t Prokaryotes -a pro -f /path/to/Example/prokaryotes.tsv`
     2. This will generate a new project structure, titled `DB`, in your current directory. This project will contain the
     database named `ModelOrganisms` and will have the table `Prokaryotes`, accessible using the alias `pro`. The table
     schema will use information from `prokaryotes.tsv` to generate table columns.
-<pre><code>DB
+<pre><code>ModelOrganisms
 ├── classes
 │   └── Prokaryotes.json
 ├── config
@@ -73,7 +73,7 @@ In this example, users will:
     1. `dbdm CREATE -c /path/to/Example/DB -d /path/to/Example/plants/ -t Plants -a plants -f /path/to/Example/plants.tsv`
     2. This will add a new table to the database `ModelOrganisms` within the project structure `DB`. This project will
     now have the table `Plants`, accessible with `plants`, and populated using `plants.tsv`.
-<pre><code>DB
+<pre><code>ModelOrganisms
 ├── classes
 │   ├── Plants.json
 │   └── Prokaryotes.json
@@ -168,7 +168,7 @@ the provided table.
 1. Run the following command to remove a table from the project structure:
     1. `dbdm REMOVE -c /path/to/DB -a plants`
     2. This command will remove the `plants` table from the project.
-<pre><code>DB
+<pre><code>ModelOrganisms
 ├── classes
 │   └── Prokaryotes.json
 ├── config
