@@ -29,4 +29,4 @@ def summarize_database(config_file):
         # Map to SQL orm
         mapper(UserClass, TableClass)
         rl = RecordList(sess, UserClass, cfg)
-        print(rl.get_summary())
+        print(rl.get_summary_string())
