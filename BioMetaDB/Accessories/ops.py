@@ -70,5 +70,5 @@ def print_if_not_silent(silence_value, output_text):
     :param output_text:
     :return:
     """
-    if silence_value == "n":
+    if not silence_value:
         print(output_text)

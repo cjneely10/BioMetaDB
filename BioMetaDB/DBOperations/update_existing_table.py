@@ -61,7 +61,7 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     if table_name not in config.keys():
         print("!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!")
         exit(1)
-    if silent == "n":
+    if not silent:
         _update_display_message_prelude(
             config[ConfigKeys.DATABASES][ConfigKeys.db_name],
             config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],

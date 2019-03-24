@@ -7,7 +7,7 @@ BioMetaDB/DBOperations/__pycache__/*
 BioMetaDB/DBManagers/__pycache__/*
 BioMetaDB/Exceptions/__pycache__/*
 BioMetaDB/Indexers/__pycache__/*
-BioMetaDB/Example/DB/*
+Example/DB/*
 BioMetaDB/Models/__pycache__/*
 BioMetaDB/Serializers/__pycache__/*
 build/*

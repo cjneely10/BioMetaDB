@@ -58,7 +58,7 @@ def delete_from_table(config_file, table_name, list_file, alias, silent):
     if list_file == "None":
         raise ListFileNotProvidedError
     ids_to_remove = set(line.rstrip("\r\n") for line in open(list_file, "r"))
-    if silent == "n":
+    if not silent:
         _delete_records_display_message_prelude(
             config[ConfigKeys.DATABASES][ConfigKeys.db_name],
             config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],

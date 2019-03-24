@@ -120,7 +120,7 @@ class ProgramCaller:
             print(" ERROR: Invalid program name", str(e))
             exit(1)
         for flag in self.flags[program]:
-            if not self.flags_dict[flag] or self.flags_dict[flag] == "":
+            if self.flags_dict[flag] == "":
                 return flag
         return None
 
