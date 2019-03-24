@@ -75,6 +75,7 @@ def create_database(db_name, table_name, directory_name, data_file, alias, silen
     """
     # Confirm working dir does not exist and that directory with genomes does exist
     assert db_name != "None", CreateDBAssertString.WORKING_DB_NOT_SET
+    assert table_name != "None", CreateDBAssertString.TABLE_NAME_NOT_SET
     assert os.path.isdir(db_name) is False, CreateDBAssertString.WORKING_DIR_EXISTS
     if directory_name != "None":
         assert os.path.isdir(directory_name), CreateDBAssertString.SEQUENCE_DIR_NOT_EXISTS
