@@ -39,13 +39,15 @@ class RecordList:
         cdef str summary_string
         cdef list sorted_keys
         cdef str key
+        cdef int longest_key
         sorted_keys = sorted(ClassManager.get_class_as_dict(self.cfg))
-        summary_string = "*******************************************************************\n"
-        summary_string += "\t\t{:>20s}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name)
-        summary_string += "\t\t{:>20s}\n\n".format("Column Name")
+        longest_key = max([len(key) for key in sorted_keys])
+        summary_string = ("*" * (longest_key + 30)) + "\n"
+        summary_string += "\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name, longest_key=longest_key)
+        summary_string += "\t\t{:>{longest_key}s}\n\n".format("Column Name", longest_key=longest_key)
         for key in sorted_keys:
-            summary_string += "\t\t{:>20s}\n".format(key)
-        summary_string += "------------------------------------------------------------------\n"
+            summary_string += "\t\t{:>{longest_key}s}\n".format(key, longest_key=longest_key)
+        summary_string += ("-" * (longest_key + 30) + "\n")
         return summary_string
 
     def columns(self):
@@ -63,31 +65,35 @@ class RecordList:
         cdef str summary_string
         cdef list sorted_keys
         cdef str key
+        cdef int longest_key
         if self._summary is None or self._data is None:
             self._summary, self._data, self.num_records = self._gather_metadata()
+        sorted_keys = sorted(self._summary.keys())
+        longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
-        summary_string = "*******************************************************************\n"
-        summary_string += "\t{:>20s}\t{:<12s}\n\t{:>20s}\t{:<10d}\n\n".format(
+        summary_string = ("*" * (longest_key + 50)) + "\n"
+        summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<10d}\n\n".format(
             "Table Name:",
             self.cfg.table_name,
             "Number of Records:",
-            self.num_records)
-        summary_string += "\t{:>20s}\t{:<12s}\t{:<10s}\n\n".format(
+            self.num_records,
+            longest_key=longest_key)
+        summary_string += "\t{:>{longest_key}}\t{:<12s}\t{:<10s}\n\n".format(
             "Column Name",
             "Average",
-            "Std Dev"
+            "Std Dev",
+            longest_key=longest_key
         )
-        if self._summary:
-            sorted_keys = sorted(self._summary.keys())
-            for key in sorted_keys:
-                if type(self._summary[key]) == str:
-                    summary_string += "\t{:>20s}\n".format("Text entry")
-                else:
-                    summary_string += "\t{:>20s}\t{:<12.3f}\t{:<12.3f}\n".format(
-                        key,
-                        self._summary[key][0],
-                        self._summary[key][3])
-        summary_string += "------------------------------------------------------------------\n"
+        for key in sorted_keys:
+            if type(self._summary[key]) == str:
+                summary_string += "\t{:>{longest_key}}\n".format("Text entry", longest_key=longest_key)
+            else:
+                summary_string += "\t{:>{longest_key}}\t{:<12.3f}\t{:<12.3f}\n".format(
+                    key,
+                    self._summary[key][0],
+                    self._summary[key][3],
+                longest_key=longest_key)
+        summary_string += ("-" * (longest_key + 50)) + "\n"
         return summary_string
 
     def _gather_metadata(self):
@@ -112,22 +118,22 @@ class RecordList:
                     if type(getattr(record, column)) != str:
                         summary_data[column] = []
                         # Gather portion for average calculation
-                        summary_data[column].append(<long>(getattr(record, column)) / num_records)
+                        summary_data[column].append(float(getattr(record, column)) / num_records)
                         # Gather portion for running sum
-                        summary_data[column].append(<long>(getattr(record, column)))
+                        summary_data[column].append(float(getattr(record, column)))
                         # Gather portion for running sq sum
-                        summary_data[column].append(<long>(getattr(record, column) ** 2))
-                        summary_data[column].append(<long>(0.0))
+                        summary_data[column].append(float(getattr(record, column) ** 2))
+                        summary_data[column].append(0.0)
                     else:
                         summary_data[column] = "s"
                 else:
                     if type(getattr(record, column)) != str:
                         # Gather portion for average calculation
-                        summary_data[column][0] += <long>(getattr(record, column) / num_records)
+                        summary_data[column][0] += float(getattr(record, column) / num_records)
                         # Gather portion for running sum
-                        summary_data[column][1] += <long>(getattr(record, column))
+                        summary_data[column][1] += float(getattr(record, column))
                         # Gather portion for running sq sum
-                        summary_data[column][2] += <long>(getattr(record, column) ** 2)
+                        summary_data[column][2] += float(getattr(record, column) ** 2)
         # Determine standard deviation values
         if num_records > 1:
             for record in records_in_table:
