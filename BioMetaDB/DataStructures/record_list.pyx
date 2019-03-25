@@ -112,22 +112,22 @@ class RecordList:
                     if type(getattr(record, column)) != str:
                         summary_data[column] = []
                         # Gather portion for average calculation
-                        summary_data[column].append(float(getattr(record, column)) / num_records)
+                        summary_data[column].append(<long>(getattr(record, column)) / num_records)
                         # Gather portion for running sum
-                        summary_data[column].append(float(getattr(record, column)))
+                        summary_data[column].append(<long>(getattr(record, column)))
                         # Gather portion for running sq sum
-                        summary_data[column].append(float(getattr(record, column) ** 2))
+                        summary_data[column].append(<long>(getattr(record, column) ** 2))
                         summary_data[column].append(0.0)
                     else:
                         summary_data[column] = "s"
                 else:
                     if type(getattr(record, column)) != str:
                         # Gather portion for average calculation
-                        summary_data[column][0] += getattr(record, column) / num_records
+                        summary_data[column][0] += <long>(getattr(record, column) / num_records)
                         # Gather portion for running sum
-                        summary_data[column][1] += getattr(record, column)
+                        summary_data[column][1] += <long>(getattr(record, column))
                         # Gather portion for running sq sum
-                        summary_data[column][2] += getattr(record, column) ** 2
+                        summary_data[column][2] += <long>(getattr(record, column) ** 2)
         # Determine standard deviation values
         if num_records > 1:
             for record in records_in_table:

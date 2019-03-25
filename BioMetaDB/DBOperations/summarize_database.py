@@ -4,6 +4,7 @@ from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Models.functions import DBUserClass
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Config.config_manager import ConfigManager, ConfigKeys
+from BioMetaDB.Exceptions.summarize_database_exceptions import SummarizeDBAssertString
 
 
 """
@@ -27,11 +28,15 @@ def summarize_database(config_file, view, query, table_name, alias):
     """ Function will query all tables listed in the config file, outputting simple
     metrics to the screen
 
+    :param alias:
+    :param table_name: 
     :param query:
     :param view:
     :param config_file:
     :return:
     """
+    assert (query != "None" and (table_name != "None" or alias != "None")), SummarizeDBAssertString.QUERY_AND_TABLE_SET
+    assert not (table_name != "None" and alias != "None"), SummarizeDBAssertString.ALIAS_OR_TABLE_ONLY
     config, config_file = ConfigManager.confirm_config_set(config_file)
     tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     _update_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name])
@@ -45,17 +50,17 @@ def summarize_database(config_file, view, query, table_name, alias):
         UserClass = type(tbl_name, (DBUserClass,), {})
         # Map to SQL orm
         mapper(UserClass, TableClass)
+        # Display queried info for single table and break
         if query != "None" and not view and table_name == tbl_name:
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             rl.query(query)
             print(rl.summarize())
             break
+        # Display column info for table
         elif query == "None" and view:
             rl = RecordList(sess, UserClass, cfg)
             print(rl.get_columns())
-            exit(1)
+        # Display summary info for table
         elif query == "None" and not view:
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
-        else:
-            rl = RecordList(sess, UserClass, cfg)
-        print(rl.summarize())
+            print(rl.summarize())
