@@ -26,9 +26,10 @@ class RecordList:
         self.num_records = 0
         self.results = None
         if compute_metadata and query:
-            self._summary, self._data, self.num_records = self._gather_metadata(query)
+            self.query(query)
+            self._summary, self._data, self.num_records = self._gather_metadata()
         elif query:
-            self.results = self.query(query)
+            self.query(query)
 
     def get_columns(self):
         """ Wrapper for returning columns in class as simple dictionary Name: SQLType
@@ -100,7 +101,9 @@ class RecordList:
         cdef str column
         cdef list column_keys
         summary_data = {}
-        records_in_table = self.results or self.sess.query(self.TableClass).all()
+        records_in_table = self.results
+        if records_in_table is None:
+             records_in_table = self.sess.query(self.TableClass).all()
         num_records = len(records_in_table)
         column_keys = list(self.columns().keys())
         for record in records_in_table:
@@ -145,7 +148,6 @@ class RecordList:
         else:
             self.results = self.sess.query(self.TableClass).all()
         self._clear_prior_metadata()
-        return self.results
 
     def _clear_prior_metadata(self):
         self._summary, self._data, self.num_records = None, None, None

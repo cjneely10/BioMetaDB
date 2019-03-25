@@ -27,6 +27,7 @@ def summarize_database(config_file, view, query):
     """ Function will query all tables listed in the config file, outputting simple
     metrics to the screen
 
+    :param query:
     :param view:
     :param config_file:
     :return:
@@ -42,10 +43,15 @@ def summarize_database(config_file, view, query):
         UserClass = type(table_name, (DBUserClass,), {})
         # Map to SQL orm
         mapper(UserClass, TableClass)
-        rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
-        if query != "None":
+        if query != "None" and not view:
+            rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             rl.query(query)
-        if view:
+        elif query == "None" and view:
+            rl = RecordList(sess, UserClass, cfg)
             print(rl.get_columns())
+            exit(1)
+        elif query == "None" and not view:
+            rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
         else:
-            print(rl.summarize())
+            rl = RecordList(sess, UserClass, cfg)
+        print(rl.summarize())
