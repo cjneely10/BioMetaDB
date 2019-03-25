@@ -80,7 +80,7 @@ data_file_1.faa 25  4.7
 data_file_2.fna 100 12.5
 
 # dbdm would generate database objects with attributes accessible as:
-db_objects = sess.query(Table).all()
+db_objects = table.query()
 db_objects[0]._id  # Returns data_file_1.faa  
 db_objects[0].column_1  # Returns 25
 db_objects[1].column_2  # Returns 12.5
@@ -141,27 +141,33 @@ DELETE`.
 when first creating your database or when making large updates, such as when adding/removing tables or updating/removing
 values or columns.
 
-<pre><code>usage: dbdm.py [-h] [-n DB_NAME] [-w WORKING_DIRECTORY] [-t TABLE_NAME]
-               [-d DIRECTORY_NAME] [-f DATA_FILE] [-l LIST_FILE]
-               [-c CONFIG_FILE] [-a ALIAS]
+<pre><code>usage: dbdm.py [-h] [-n DB_NAME] [-t TABLE_NAME] [-d DIRECTORY_NAME]
+               [-f DATA_FILE] [-l LIST_FILE] [-c CONFIG_FILE] [-a ALIAS] [-s]
+               [-v] [-q QUERY]
                program
 
-dbdm:   Managing database operations.
+dbdm:   Manage BioMetaDB project
 
 Available Programs:
 
 CREATE: Create a new table in an existing database, optionally populate using data files
-                (Req:  --config_file --table_name --directory_name --data_file --alias)
+                (Req:  --config_file --table_name --directory_name --data_file --alias --silent)
 DELETE: Delete list of ids from database tables, remove associated files
-                (Req:  --config_file --table_name --list_file --alias)
+                (Req:  --config_file --table_name --list_file --alias --silent)
+FIX: Repairs errors in DB structure using .fix file
+                (Req:  --data_file --silent)
 INIT: Initialize database with starting table, fasta directory, and/or data files
-                (Req:  --db_name --table_name --directory_name --data_file --working_directory --alias)
-REMOVE: Remove table and all associated data from database
+                (Req:  --db_name --table_name --directory_name --data_file --alias --silent)
+INTEGRITY: Queries project database and structure to generate .fix file for possible issues
                 (Req:  --config_file --table_name --alias)
+REMOVE: Remove table and all associated data from database
+                (Req:  --config_file --table_name --alias --silent)
 REMOVECOL: Remove column list (including data) from table
-                (Req:  --config_file --table_name --list_file --alias)
+                (Req:  --config_file --table_name --list_file --alias --silent)
+SUMMARIZE: Quick summary of project
+                (Req:  --config_file --view --query --table_name --alias)
 UPDATE: Update values in existing table or add new sequences
-                (Req:  --config_file --table_name --directory_name --data_file --alias)
+                (Req:  --config_file --table_name --directory_name --data_file --alias --silent)
 
 positional arguments:
   program               Program to run
@@ -170,23 +176,22 @@ optional arguments:
   -h, --help            show this help message and exit
   -n DB_NAME, --db_name DB_NAME
                         Name of database
-  -w WORKING_DIRECTORY, --working_directory WORKING_DIRECTORY
-                        Absolute path for initializing database directories
   -t TABLE_NAME, --table_name TABLE_NAME
                         Name of database table
   -d DIRECTORY_NAME, --directory_name DIRECTORY_NAME
                         Directory path with bio data (fasta or fastq)
   -f DATA_FILE, --data_file DATA_FILE
-                        .tsv or .csv file to add
+                        .tsv or .csv file to add, or .fix file to integrate
   -l LIST_FILE, --list_file LIST_FILE
-                        Comma-separated list of files ids to remove
+                        File with list of items, typically ids or column names
   -c CONFIG_FILE, --config_file CONFIG_FILE
                         Config file for loading database schema
   -a ALIAS, --alias ALIAS
                         Provide alias for locating and creating table class
-  -s SILENT, --silent SILENT
-                         (y) Silence all standard output (Standard error still displays to screen)
-</code></pre>
+  -s, --silent          Silence all standard output (Standard error still displays to screen)
+  -v, --view            Display column names only with SUMMARIZE
+  -q QUERY, --query QUERY
+                        Query to pass to SUMMARIZE</code></pre>
 
 The typical workflow for initializing **BioMetaDB** is straightforward. Many options exist for updating, adding to, 
 and removing from the existing project structure. You may also choose to assign an alternate name to a table within a

@@ -117,7 +117,7 @@ table = get_table("/path/to/DB", alias="pro")
 matching_genomes = table.query("n50 < total_length")
 
 # View query results
-for match in matching_genomes:
+for match in matching_genomes.results:
     print(match)</code></pre>
 
 The power of the SQLAlchemy package becomes apparent here - using the `filter` function, users can easily create fast and
