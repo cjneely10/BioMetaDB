@@ -29,14 +29,15 @@ def summarize_database(config_file, view, query, table_name, alias):
     metrics to the screen
 
     :param alias:
-    :param table_name: 
+    :param table_name:
     :param query:
     :param view:
     :param config_file:
     :return:
     """
-    assert (query != "None" and (table_name != "None" or alias != "None")), SummarizeDBAssertString.QUERY_AND_TABLE_SET
-    assert not (table_name != "None" and alias != "None"), SummarizeDBAssertString.ALIAS_OR_TABLE_ONLY
+    if not view:
+        assert (query != "None" and (table_name != "None" or alias != "None")), SummarizeDBAssertString.QUERY_AND_TABLE_SET
+        assert not (table_name != "None" and alias != "None"), SummarizeDBAssertString.ALIAS_OR_TABLE_ONLY
     config, config_file = ConfigManager.confirm_config_set(config_file)
     tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     _update_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name])
