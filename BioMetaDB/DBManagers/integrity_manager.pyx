@@ -1,2 +1,3 @@
 class IntegrityManager:
-    pass
+    def __init__(self):
+        pass

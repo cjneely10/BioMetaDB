@@ -36,6 +36,7 @@ In this example, users will:
 4. Update table with additional data.
 5. Remove extraneous columns and records.
 6. Delete plant table.
+7. View a summary of the database as it is
 
 ## Create database and initial file system using prokaryote data
 

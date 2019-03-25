@@ -23,7 +23,7 @@ def _update_display_message_prelude(db_name):
     print(" Name of database:\t\t%s.db\n" % db_name.strip(".db"))
 
 
-def summarize_database(config_file, view, query):
+def summarize_database(config_file, view, query, table_name, alias):
     """ Function will query all tables listed in the config file, outputting simple
     metrics to the screen
 
@@ -35,17 +35,21 @@ def summarize_database(config_file, view, query):
     config, config_file = ConfigManager.confirm_config_set(config_file)
     tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     _update_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name])
-    for table_name in tables_in_database:
-        cfg = ConfigManager(config, table_name)
+    if alias != "None":
+        table_name = ConfigManager.get_name_by_alias(alias, config)
+    for tbl_name in tables_in_database:
+        cfg = ConfigManager(config, tbl_name)
         engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
         sess = BaseData.get_session_from_engine(engine)
-        TableClass = ClassManager.get_class_orm(table_name, engine)
-        UserClass = type(table_name, (DBUserClass,), {})
+        TableClass = ClassManager.get_class_orm(tbl_name, engine)
+        UserClass = type(tbl_name, (DBUserClass,), {})
         # Map to SQL orm
         mapper(UserClass, TableClass)
-        if query != "None" and not view:
+        if query != "None" and not view and table_name == tbl_name:
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             rl.query(query)
+            print(rl.summarize())
+            break
         elif query == "None" and view:
             rl = RecordList(sess, UserClass, cfg)
             print(rl.get_columns())

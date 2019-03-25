@@ -59,8 +59,8 @@ if __name__ == "__main__":
         "REMOVECOL":            ("config_file", "table_name", "list_file", "alias", "silent"),
         "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent"),
         "REMOVE":               ("config_file", "table_name", "alias", "silent"),
-        "SUMMARIZE":            ("config_file", "view", "query"),
-        "INTEGRITY":            ("config_file",),
+        "SUMMARIZE":            ("config_file", "view", "query", "table_name", "alias"),
+        "INTEGRITY":            ("config_file", "table_name", "alias"),
         "FIX":                  ("data_file", "silent"),
     }
     errors = {
