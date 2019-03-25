@@ -117,7 +117,7 @@ class RecordList:
                         summary_data[column].append(<long>(getattr(record, column)))
                         # Gather portion for running sq sum
                         summary_data[column].append(<long>(getattr(record, column) ** 2))
-                        summary_data[column].append(0.0)
+                        summary_data[column].append(<long>(0.0))
                     else:
                         summary_data[column] = "s"
                 else:
