@@ -237,7 +237,7 @@ cdef class RecordList:
             assert item < self.num_records, "Index must be less than length"
             return self.results[item]
         elif type(item) == str:
-            for record in self:
+            for record in self.results:
                 if record._id == item:
                     return record
         return None
@@ -255,7 +255,7 @@ cdef class RecordList:
         :return:
         """
         cdef object record
-        return [record._id for record in self]
+        return [record._id for record in self.results]
 
     def values(self):
         """ Returns list of records
@@ -263,7 +263,7 @@ cdef class RecordList:
         :return:
         """
         cdef object record
-        return [record for record in self]
+        return [record for record in self.results]
 
     def items(self):
         """ Returns tuple of (key, value) pairs
@@ -271,7 +271,7 @@ cdef class RecordList:
         :return:
         """
         cdef object record
-        return [(record._id, record) for record in self]
+        return [(record._id, record) for record in self.results]
 
     def save(self):
         """ Calls the session's commit function to store changes

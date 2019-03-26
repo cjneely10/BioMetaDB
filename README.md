@@ -1,7 +1,7 @@
 # BioMetaDB
 
 ## Installation
-Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access dbdm.
+Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access `dbdm`.
 <pre><code>cd /path/to/BioMetaDB
 python3 setup.py build_ext --inplace
 export PYTHONPATH=/path/to/BioMetaDB:$PYTHONPATH
