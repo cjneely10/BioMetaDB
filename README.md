@@ -1,11 +1,11 @@
-# BioMetadatabase
+# BioMetaDB
 
 ## Installation
-Clone this repository and add the project-level directory *BioMetadatabase* to your path. Create an alias to access dbdm.
-<pre><code>cd /path/to/BioMetadatabase
+Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access dbdm.
+<pre><code>cd /path/to/BioMetaDB
 python3 setup.py build_ext --inplace
-export PYTHONPATH=/path/to/BioMetadatabase:$PYTHONPATH
-alias dbdm="python3.5 /path/to/BioMetadatabase/dbdm.py"</code></pre>
+export PYTHONPATH=/path/to/BioMetaDB:$PYTHONPATH
+alias dbdm="python3.5 /path/to/BioMetaDB/dbdm.py"</code></pre>
 Adding the last two lines of the above code to a user's `.bashrc` file will maintain these settings on next log-in.
 
 ### Dependencies
@@ -21,7 +21,7 @@ Such dependencies are best maintained within a separate Python virtual environme
 
 ## About
 
-**BioMetadatabase** is a data-management package that automatically generates database schemas, minimizing the amount
+**BioMetaDB** is a data-management package that automatically generates database schemas, minimizing the amount
 of temporary files used and handling migrations and updates smoothly. This SQLAlchemy-based wrapper package allows
 researchers and data engineers to quickly generate Python classes and objects for fast data-searching, abstracting 
 searches to a SQL-based API and allowing end-users to focus on query building for analysis. Finally, this schema is 
@@ -48,9 +48,9 @@ Database projects are organized into file-systems:
         ########.migrations.mgt
 </code></pre>
 
-File systems created by **BioMetadatabase** are accessible in Python scripts:
+File systems created by **BioMetaDB** are accessible in Python scripts:
 
-<pre><code>from BioMetadatabase import get_table
+<pre><code>from BioMetaDB import get_table
 
 table = get_table("/path/to/database", table_name="db_table_1")
 # Alternatively, 
@@ -62,7 +62,7 @@ table.query("n50 >= 100000 AND n75 <= 1000000")  # More complex filter query
 # Additional SQLAlchemy operations...
 </code></pre>
 
-**BioMetadatabase** returns objects that directly inherit from SQLAlchemy data types, meaning that (most, if not all) 
+**BioMetaDB** returns objects that directly inherit from SQLAlchemy data types, meaning that (most, if not all) 
 functions that are available to SQLAlchemy objects are available here.
 
 ### Why bother?
@@ -99,7 +99,7 @@ data storage, which allows for more centralized data tracking.
 
 #### SQLAlchemy
 
-- **BioMetadatabase** uses this powerful library to generate and use databases, in this case SQLite3.
+- **BioMetaDB** uses this powerful library to generate and use databases, in this case SQLite3.
 - SQLAlchemy is a powerful Python package that makes working with SQL easy and fairly uniform between relational 
 database management systems (RdatabaseMSs).
 - Read more about SQLAlchemy, its functionality, and its limitations:
@@ -107,25 +107,25 @@ database management systems (RdatabaseMSs).
 
 #### Data file integrity
 
-- **BioMetadatabase** uses .tsv files to generate names and data types of columns in the RdatabaseMS tables.
+- **BioMetaDB** uses .tsv files to generate names and data types of columns in the RdatabaseMS tables.
 - Before running this software, ensure that data file column names are adequately formatted, with no trailing `\n` 
 or `\t` in the file.
     - Columns named `Column.1` and `column_1` will both override to `column_1`.
 - Data types are automatically predicted based on a randomly selected value within the column.
     - Ensure that all values in a given column store the same kind of data (e.g. Integer, Float, VARCHAR, etc).
-- **BioMetadatabase** matches names of data files (e.g. file_1.fasta) to record ids in the .tsv files, so make sure that
+- **BioMetaDB** matches names of data files (e.g. file_1.fasta) to record ids in the .tsv files, so make sure that
 they match.
 
 #### Modifiying project structure or source code
 
-- **BioMetadatabase** relies on the integrity of this file system that it creates when `dbdm INIT` is first called. It is 
+- **BioMetaDB** relies on the integrity of this file system that it creates when `dbdm INIT` is first called. It is 
 ill-advised to manually delete files or records from the database or project, respectively. Updating records using 
 `table.save()` is the preferred method for updating database table values within code, but records themselves should
 only be removed using `dbdm DELETE`
 - Certain portions of the source code can be modified to better fit a user's needs.
-    - `BioMetadatabase/Models/functions.py` holds the class `databaseUserClass`, which is the parent class of all database objects 
+    - `BioMetaDB/Models/functions.py` holds the class `databaseUserClass`, which is the parent class of all database objects 
     generated using `get_table()`. Any additional functions added to this class will be available to your records.
-    - `BioMetadatabase/DataStructures/record_list.pyx` holds the class `RecordList`, which is a simple container class for 
+    - `BioMetaDB/DataStructures/record_list.pyx` holds the class `RecordList`, which is a simple container class for 
     handling database records. Currently, this class functions as a quasi-dictionary-and-list data structure.
 
 ## dbdm
@@ -139,7 +139,7 @@ values or columns.
                [-v] [-q QUERY]
                program
 
-dbdm:   Manage BioMetadatabase project
+dbdm:   Manage BioMetaDB project
 
 Available Programs:
 
@@ -186,7 +186,7 @@ optional arguments:
   -q QUERY, --query QUERY
                         Query to pass to SUMMARIZE</code></pre>
 
-The typical workflow for initializing **BioMetadatabase** is straightforward. Many options exist for updating, adding to, 
+The typical workflow for initializing **BioMetaDB** is straightforward. Many options exist for updating, adding to, 
 and removing from the existing project structure. You may also choose to assign an alternate name to a table within a
 database in the form of an alias. Depending on the number of entries involved, these commands can result in voluminous
 output, which can either be silenced by passing `-s` as parameters in your command, or by redirecting standard output
