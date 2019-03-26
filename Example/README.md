@@ -132,7 +132,6 @@ quick glance at a particular table or database, as well as to test queries on th
                          n75    4458040.375     2655302.860
     (...)
                 total_length    4874381.000     2438681.143
-          total_length_10000    4874381.000     2438681.143
     (...)
         total_length_gt_1000    4874381.000     2438681.143
 ----------------------------------------------------------------------
@@ -143,15 +142,14 @@ quick glance at a particular table or database, as well as to test queries on th
 
                  Column Name    Average         Std Dev
 
-                          gc    37483729.333    34603612.901
+                          gc    42.560          5.660
     (...)
-                         n50    201090266.667   76434391.936
-                         n75    199912857.667   76181672.154
+                         n50    28113428.000    28972021.833
+                         n75    23065659.000    24023210.450
     (...)
-                total_length    28113428.000    28972021.833
-          total_length_10000    253.000         422.625
+                total_length    201093640.333   76435013.348
     (...)
-        total_length_gt_1000    253.000         422.625
+        total_length_gt_1000    201090333.333   76434285.411
 ----------------------------------------------------------------------</code></pre>
 
 ## Simple scripting: Get assemblies with an n50 value that is less than its length
