@@ -208,33 +208,7 @@ cdef class RecordList:
 
         :return:
         """
-        cdef object r
-        cdef set possible_columns
-        cdef set cols_in_db = set(self.columns())
-        cdef dict db_cols = {col: col for col in cols_in_db}
-        cdef set unusable_punctuation = set(punctuation) - set("_")
-        cdef str punct
-        cdef str tmp = possible_column
-
-        r = re.compile(r"%s" % possible_column)
-        # Exact matches
-        possible_columns = set(filter(r.findall, cols_in_db))
-        # Stored column name has punctuation, user value does not
-        for punct in punctuation:
-            db_cols = {col.replace(punct, ""): col for col in cols_in_db}
-            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.findall, db_cols.keys())))
-            db_cols = {col.replace(punct, ""): col for col in cols_in_db}
-            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.findall, db_cols.keys())))
-        # User value has punctuation, stored column name does not
-        for punct in unusable_punctuation:
-            tmp = possible_column.replace(punct, "")
-            r = re.compile(tmp)
-            possible_columns = possible_columns.union(set(filter(r.findall, cols_in_db)))
-            tmp = possible_column.replace(punct, "_")
-            r = re.compile(tmp)
-            possible_columns = possible_columns.union(set(filter(r.findall, cols_in_db)))
-        # Return all possible values
-        return list(possible_columns)
+        return self._regex_search(possible_column, list(self.columns()))
 
     def __next__(self):
         """ Returns self as iterator
@@ -305,3 +279,38 @@ cdef class RecordList:
         :return:
         """
         self.sess.commit()
+
+    def _regex_search(self, str possible_column, list search_list):
+        """ Protected method to search a list of values for a given string
+
+        :param possible_column:
+        :param search_list:
+        :return:
+        """
+        cdef object r
+        cdef set possible_columns
+        cdef set cols_in_db = set(search_list)
+        cdef dict db_cols = {col: col for col in cols_in_db}
+        cdef set unusable_punctuation = set(punctuation) - set("_")
+        cdef str punct
+        cdef str tmp = possible_column
+
+        r = re.compile(r"%s" % possible_column)
+        # Exact matches
+        possible_columns = set(filter(r.findall, cols_in_db))
+        # Stored column name has punctuation, user value does not
+        for punct in punctuation:
+            db_cols = {col.replace(punct, ""): col for col in cols_in_db}
+            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.findall, db_cols.keys())))
+            db_cols = {col.replace(punct, "_"): col for col in cols_in_db}
+            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.findall, db_cols.keys())))
+        # User value has punctuation, stored column name does not
+        for punct in unusable_punctuation:
+            tmp = possible_column.replace(punct, "")
+            r = re.compile(tmp)
+            possible_columns = possible_columns.union(set(filter(r.findall, cols_in_db)))
+            tmp = possible_column.replace(punct, "_")
+            r = re.compile(tmp)
+            possible_columns = possible_columns.union(set(filter(r.findall, cols_in_db)))
+        # Return all possible values
+        return list(possible_columns)
