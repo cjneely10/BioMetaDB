@@ -240,7 +240,7 @@ project-level `migrations` folder.
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm UPDATE -c /path/to/ -t db_table_1 -f /path/to/data_file.tsv -d /path/to/data_dir/`
+    - `dbdm UPDATE -c /path/to/database -t db_table_1 -f /path/to/data_file.tsv -d /path/to/data_dir/`
     - This command will update the table named `db_table_1`, which is part of the database in the project `database`. This 
     command will add new column data from the file `/path/to/data_file.tsv` and will add new data files from the 
     directory `/path/to/data_dir/`. A copy of the database is stored in the project-directory `migrations`, 
@@ -326,12 +326,24 @@ your data as a .tsv file.
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm REMOVE -c /path/to/database/config/database.ini -t db_table_2`
+    - `dbdm REMOVE -c /path/to/database/config/database -t db_table_2`
     - This command will remove the table `db_table_2` from the project `database`.
     
 ### SUMMARIZE
 
-**SUMMARIZE** is used to display information about the project or a table within the project.
+**SUMMARIZE** is used to display information about the project or a table within the project. This command can also run 
+queries to the database and display summary data on only these selected records.
+
+- Required flags
+    - --config_file (-c): Path to project directory 
+- Optional flags
+    - --table_name (-t): Name of table to summarize
+    - --alias (-a): Alias (short name) for table in database
+    - --view (-v): View only column names in database
+- Example
+    - `dbdm SUMMARIZE -c /path/to/database/config/database`
+    - This command will summarize all tables in the database. Per table, this command displays the number of records as 
+    well as averages and standard deviations for each column.
 
 ## Other Information
 
