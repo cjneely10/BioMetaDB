@@ -341,6 +341,7 @@ queries to the database and display summary data on only these selected records.
     - --table_name (-t): Name of table to summarize
     - --alias (-a): Alias (short name) for table in database
     - --view (-v): View only column names in database
+    - --query (-q): Attach SQL query to summarize select records only. Must be combined with `-t` or `-a` flags
 - Example
     - `dbdm SUMMARIZE -c /path/to/database/config/database`
     - This command will summarize all tables in the database. Per table, this command displays the number of records as 
