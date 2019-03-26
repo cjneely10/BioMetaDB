@@ -85,4 +85,4 @@ if __name__ == "__main__":
 
     pc = ProgramCaller(programs=programs, flags=flags, _help=_help, errors=errors)
 
-    pc.run(ap.args, debug=False)
+    pc.run(ap.args, debug=True)

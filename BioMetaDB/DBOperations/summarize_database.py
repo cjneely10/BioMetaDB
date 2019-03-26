@@ -68,3 +68,4 @@ def summarize_database(config_file, view, query, table_name, alias):
         elif query == "None" and not view:
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             print(rl.summarize())
+

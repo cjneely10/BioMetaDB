@@ -4,7 +4,7 @@
 
 This README file will provide a simple walk-through example that outlines key features and functionality within BioMetaDB.
 
-In this example, users will create a simple database of `Quast` output for various reference genomes.
+In this example, users will create a simple database of `Quast` and `diamond` outputs for various reference genomes.
 
 The following files are available for this example:
 
@@ -15,8 +15,7 @@ The following files are available for this example:
     prokaryotes.tsv
     prokaryotes_update.tsv
     columns_to_delete.list
-    records_to_delete.list
-</code></pre> 
+    records_to_delete.list</code></pre> 
 
 The `.tsv` files contain output related to each genome.
 The `.list` files are used in the end of this example. 
@@ -36,7 +35,8 @@ In this example, users will:
 4. Update table with additional data.
 5. Remove extraneous columns and records.
 6. Delete plant table.
-7. View a summary of the database as it is
+7. View a summary of the database.
+8. Ensure the table is appropriately integrated.
 
 ## Create database and initial file system using prokaryote data
 
@@ -44,9 +44,9 @@ In this example, users will:
 2. Navigate to a directory where you would like to initialize this project's directory.
 3. Run the following command:
     1. `dbdm INIT -n ModelOrganisms -d /path/to/Example/prokaryotes/ -t Prokaryotes -a pro -f /path/to/Example/prokaryotes.tsv`
-    2. This will generate a new project structure, titled `DB`, in your current directory. This project will contain the
-    database named `ModelOrganisms` and will have the table `Prokaryotes`, accessible using the alias `pro`. The table
-    schema will use information from `prokaryotes.tsv` to generate table columns.
+    2. This will generate a new project structure, titled `ModelOrganisms`, in your current directory. This project will 
+    contain the database named `ModelOrganisms` and will have the table `Prokaryotes`, accessible using the alias `pro`. 
+    The table schema will use information from `prokaryotes.tsv` to generate table columns.
 <pre><code>ModelOrganisms
 ├── classes
 │   └── Prokaryotes.json
@@ -71,9 +71,9 @@ In this example, users will:
 ## Update the database with a new table for plants
 
 1. Run the following command:
-    1. `dbdm CREATE -c /path/to/Example/DB -d /path/to/Example/plants/ -t Plants -a plants -f /path/to/Example/plants.tsv`
-    2. This will add a new table to the database `ModelOrganisms` within the project structure `DB`. This project will
-    now have the table `Plants`, accessible with `plants`, and populated using `plants.tsv`.
+    1. `dbdm CREATE -c /path/to/Example/ModelOrganisms -d /path/to/Example/plants/ -t Plants -a plants -f /path/to/Example/plants.tsv`
+    2. This will add a new table to the project `ModelOrganisms`. This project will now have the table `Plants`, 
+    accessible with `plants`, and populated using `plants.tsv`.
 <pre><code>ModelOrganisms
 ├── classes
 │   ├── Plants.json
@@ -117,11 +117,11 @@ table = get_table("/path/to/DB", alias="pro")
 matching_genomes = table.query("n50 < total_length")
 
 # View query results
-for match in matching_genomes.results:
+for match in matching_genomes:
     print(match)</code></pre>
 
-The power of the SQLAlchemy package becomes apparent here - using the `filter` function, users can easily create fast and
-powerful SQL queries that are based on the fields provided in the `.tsv` file!
+The power of the SQLAlchemy package becomes apparent here - users can easily create fast and powerful SQL queries that 
+are based on the fields provided in the `.tsv` file!
 
 ## Update an existing table with additional data
 
@@ -130,7 +130,7 @@ example, `diamond` was used to search for Nitrogen Fixation genes within the mod
 was generated, and this will be used to update the database schema. In this example, no additional genomes are saved.
 
 1. Run the following command:
-    1. `dbdm UPDATE -c /path/to/DB -f /path/to/Example/prokaryotes_update.tsv -a pro`
+    1. `dbdm UPDATE -c /path/to/ModelOrganisms -f /path/to/Example/prokaryotes_update.tsv -a pro`
     2. This command will update the table associated with the alias `pro` in the project `DB` to include additional columns 
     and column data from `prokaryotes_update.tsv`.
     
@@ -148,7 +148,7 @@ For the file called `columns_to_delete.list` that contains a list of column name
 nifh
 </code></pre>
 1. Run the following command to remove items in this file:
-    1. `dbdm REMOVECOL -c /path/to/DB -a pro -l /path/to/Example/columns_to_delete.list`
+    1. `dbdm REMOVECOL -c /path/to/ModelOrganisms -a pro -l /path/to/Example/columns_to_delete.list`
     2. This command will remove all columns in `columns_to_delete.list` from the database. This will also remove 
     associated data
     
@@ -158,7 +158,7 @@ For the file called `records_to_delete.list` that contains a list of files:
 <pre><code>Bacillus_subtilis.fna
 </code></pre>
 1. Run the following command to delete these records from the database:
-    1. `dbdm DELETE -c /path/to/DB -a pro -l /path/to/Example/records_to_delete.list`
+    1. `dbdm DELETE -c /path/to/ModelOrganisms -a pro -l /path/to/Example/records_to_delete.list`
     2. This command will remove all records in `records_to_delete.list` from the project `DB`. 
 
 ## Remove table from database
@@ -167,7 +167,7 @@ Users may choose to remove a table from the project entirely. This action will r
 the provided table.
 
 1. Run the following command to remove a table from the project structure:
-    1. `dbdm REMOVE -c /path/to/DB -a plants`
+    1. `dbdm REMOVE -c /path/to/ModelOrganisms -a plants`
     2. This command will remove the `plants` table from the project.
 <pre><code>ModelOrganisms
 ├── classes
@@ -188,3 +188,11 @@ the provided table.
 └── migrations
     └── ########.migrations.mgt
 </code></pre>
+
+## View a summary of the database
+
+Often, one may wish to view a summary of the information stored in a database or table. This is helpful for getting a 
+quick glance at a particular table or database, as well as to test queries on the command line.
+
+1. Run the following command to retrieve a summary of all tables in the project:
+    1. `dbdm SUMMARIZE -c /path/to/ModelOrganisms`
