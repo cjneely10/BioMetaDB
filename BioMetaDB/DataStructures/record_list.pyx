@@ -218,21 +218,21 @@ cdef class RecordList:
 
         r = re.compile(possible_column)
         # Exact matches
-        possible_columns = set(filter(r.match, cols_in_db))
+        possible_columns = set(filter(r.findall, cols_in_db))
         # Stored column name has punctuation, user value does not
         for punct in punctuation:
             db_cols = {col.replace(punct, ""): col for col in cols_in_db}
-            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.match, db_cols.keys())))
+            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.findall, db_cols.keys())))
             db_cols = {col.replace(punct, ""): col for col in cols_in_db}
-            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.match, db_cols.keys())))
+            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.findall, db_cols.keys())))
         # User value has punctuation, stored column name does not
         for punct in unusable_punctuation:
             tmp = possible_column.replace(punct, "")
             r = re.compile(tmp)
-            possible_columns = possible_columns.union(set(filter(r.match, cols_in_db)))
+            possible_columns = possible_columns.union(set(filter(r.findall, cols_in_db)))
             tmp = possible_column.replace(punct, "_")
             r = re.compile(tmp)
-            possible_columns = possible_columns.union(set(filter(r.match, cols_in_db)))
+            possible_columns = possible_columns.union(set(filter(r.findall, cols_in_db)))
         # Return all possible values
         return list(possible_columns)
 
@@ -298,3 +298,10 @@ cdef class RecordList:
         """
         cdef object record
         return [(record._id, record) for record in self]
+
+    def save(self):
+        """ Calls the session's commit function to store changes
+
+        :return:
+        """
+        self.sess.commit()

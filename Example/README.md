@@ -50,12 +50,12 @@ Be sure to gunzip all fasta files prior to use.
     The table schema will use information from `prokaryotes.tsv` to generate table columns.
 <pre><code>ModelOrganisms
 ├── classes
-│   └── Prokaryotes.json
+│   └── prokaryotes.json
 ├── config
 │   └── ModelOrganisms.ini
 ├── db
 │   ├── ModelOrganisms.db
-│   └── Prokaryotes
+│   └── prokaryotes
 │       ├── Aliivibrio_fischeri.fna
 │       ├── Azotobacter_vinelandii.fna
 │       ├── Bacillus_subtilis.fna
@@ -72,24 +72,24 @@ Be sure to gunzip all fasta files prior to use.
 
 1. Run the following command:
     1. `dbdm CREATE -c /path/to/Example/ModelOrganisms -d /path/to/Example/plants/ 
-    -t Plants -a plants -f /path/to/Example/plants.tsv`
-    2. This will add a new table to the project `ModelOrganisms`. This project will now have the table `Plants`, 
+    -t plants -a plants -f /path/to/Example/plants.tsv`
+    2. This will add a new table to the project `ModelOrganisms`. This project will now have the table `plants`, 
     accessible with `plants`, and populated using `plants.tsv`.
 <pre><code>ModelOrganisms
 ├── classes
-│   ├── Plants.json
+│   ├── plants.json
 │   └── Prokaryotes.json
 ├── config
 │   └── ModelOrganisms.ini
 ├── db
 │   ├── ModelOrganisms
 │   ├── ModelOrganisms.db
-│   ├── Plants
+│   ├── plants
 │   │   ├── Arabidopsis_thaliana.fna
 │   │   ├── Brachypodium_distachyon.fna
 │   │   ├── Selaginella_moellendorffii.fna
 │   │   └── Solanum_lycopersicum.fna
-│   └── Prokaryotes
+│   └── prokaryotes
 │       ├── Aliivibrio_fischeri.fna
 │       ├── Azotobacter_vinelandii.fna
 │       ├── Bacillus_subtilis.fna
@@ -109,6 +109,50 @@ quick glance at a particular table or database, as well as to test queries on th
 
 1. Run the following command to retrieve a summary of all tables in the project:
     1. `dbdm SUMMARIZE -c /path/to/ModelOrganisms`
+    2. This command will display a simple summary of all records in all tables in the project. Averages and standard
+    deviations are automatically calculated for valid fields.
+    3. Other flags:
+        1. `-v/--view`  View only column names
+        2. `-t/--table_name`    View only for given table
+        3. `-a/--alias`     View only for given alias
+        4. `-q/--query`     Attach SQL query to summarize select records only
+<pre><code>SUMMARIZE:      View summary of all tables in database
+ Project root directory:        ModelOrganisms
+ Name of database:              ModelOrganisms.db
+
+**********************************************************************
+                 Table Name:    prokaryotes
+          Number of Records:    8
+
+                 Column Name    Average         Std Dev
+
+                          gc    53.751          14.849
+    (...)
+                         n50    4653940.750     2440726.993
+                         n75    4458040.375     2655302.860
+    (...)
+                total_length    4874381.000     2438681.143
+          total_length_10000    4874381.000     2438681.143
+    (...)
+        total_length_gt_1000    4874381.000     2438681.143
+----------------------------------------------------------------------
+
+**********************************************************************
+                 Table Name:    plants
+          Number of Records:    3
+
+                 Column Name    Average         Std Dev
+
+                          gc    37483729.333    34603612.901
+    (...)
+                         n50    201090266.667   76434391.936
+                         n75    199912857.667   76181672.154
+    (...)
+                total_length    28113428.000    28972021.833
+          total_length_10000    253.000         422.625
+    (...)
+        total_length_gt_1000    253.000         422.625
+----------------------------------------------------------------------</code></pre>
 
 ## Simple scripting: Get assemblies with an n50 value that is less than its length
 
@@ -123,16 +167,24 @@ from BioMetaDB import get_table
 table = get_table("/path/to/DB", alias="pro")
 
 # Query the database for records whose n50 is less than their total length
-matching_genomes = table.query("n50 < total_length")
+table.query("n50 < total_length")
+print(len(table))  # Prints 8
+print(table.columns())  # Prints all columns as dict_keys
 
 # View query results
 for match in matching_genomes:
-    print(match)
+    print(match)  # 'pretty-print' viewing of record
 
-# Change value of in database
+# Change value of first record retrieved in query
+matching_genomes[0].n75 = 0
+print(matching_genomes[0].n75)  # Prints 0 to screen
+table.save()  # Saves data to database
 
-    
-    </code></pre>
+# Search for field names, 
+table.find_column("totallength")  # Returns list ['total_length', 'total_length_gt_0', ...]
+table.find_column("totallength$")  # Returns ['total_length']
+
+</code></pre>
 
 The power of the SQLAlchemy package becomes apparent here - users can easily create fast and powerful SQL queries that 
 are based on the fields provided in the `.tsv` file!
@@ -173,7 +225,7 @@ For the file called `records_to_delete.list` that contains a list of files:
 </code></pre>
 1. Run the following command to delete these records from the database:
     1. `dbdm DELETE -c /path/to/ModelOrganisms -a pro -l /path/to/Example/records_to_delete.list`
-    2. This command will remove all records in `records_to_delete.list` from the project `DB`. 
+    2. This command will remove all records in `records_to_delete.list` from the project `DB`.
 
 ## Remove table from database
 
