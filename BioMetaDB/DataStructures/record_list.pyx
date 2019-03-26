@@ -74,16 +74,41 @@ cdef class RecordList:
         cdef int longest_key
         if self._summary is None:
             self._summary, self.num_records = self._gather_metadata()
-        sorted_keys = sorted(self._summary.keys())
+        sorted_keys = sorted(self.columns())
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
         summary_string = ("*" * (longest_key + 50)) + "\n"
-        summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<10d}\n\n".format(
-            "Table Name:",
-            self.cfg.table_name,
-            "Number of Records:",
-            self.num_records,
-            longest_key=longest_key)
+        # Display multiple records
+        if self.num_records > 1:
+            summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<10d}\n\n".format(
+                "Table Name:",
+                self.cfg.table_name,
+                "Number of Records:",
+                self.num_records,
+                longest_key=longest_key)
+        # Display single record
+        elif self.num_records == 1:
+            # Long name
+            if len(self.results[0]._id) > 30:
+                summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}...\n\n".format(
+                    "Table Name:",
+                    self.cfg.table_name,
+                    "ID:",
+                    self.results[0]._id,
+                    longest_key=longest_key)
+            else:
+                summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}\n\n".format(
+                    "Table Name:",
+                    self.cfg.table_name,
+                    "ID:",
+                    self.results[0]._id,
+                    longest_key=longest_key)
+        # No records found
+        else:
+            summary_string += "\t{:>{longest_key}}".format("No records found", longest_key=longest_key)
+            # Do not create summary info
+            return summary_string
+        # Metadata display column headers
         summary_string += "\t{:>{longest_key}}\t{:<12s}\t{:<10s}\n\n".format(
             "Column Name",
             "Average",
@@ -116,9 +141,9 @@ cdef class RecordList:
         summary_data = {}
         if self.results is None:
              self.results = self.query()
-        num_records = len(self)
-        column_keys = list(self.columns().keys())
-        for record in self:
+        num_records = self.num_records
+        column_keys = list(self.columns())
+        for record in self.results:
             for column in column_keys:
                 if column not in summary_data.keys():
                     if type(getattr(record, column)) != str:
@@ -142,8 +167,8 @@ cdef class RecordList:
                         summary_data[column][2] += float(getattr(record, column) ** 2)
         # Determine standard deviation values
         if num_records > 1:
-            for record in self:
-                for column in self.columns().keys():
+            for record in self.results:
+                for column in self.columns():
                     # print(summary_data[column][1], summary_data[column][2])
                     summary_data[column][3] = sqrt((summary_data[column][2] -
                                                     ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
@@ -272,4 +297,4 @@ cdef class RecordList:
         :return:
         """
         cdef object record
-        return ((record._id, record) for record in self)
+        return [(record._id, record) for record in self]

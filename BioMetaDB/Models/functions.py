@@ -28,26 +28,54 @@ class DBUserClass:
         :return str:
         """
         # Print sorted attributes, excluding instance state object info
-        first_vals = ["_id", "data_type", "location"]
+        first_vals = ("_id", "data_type", "location")
+        first_cor_vals = ("ID", "Data Type", "File Location")
         attrs = {key: val for key, val in self.__dict__.items() if key != "_sa_instance_state"
                  and key not in first_vals and key != "id"}
-        return_string = ""
+        longest_key = max([len(key) for key in attrs])
+        # Pretty formatting
+        summary_string = ("*" * (longest_key + 30)) + "\n"
         for i in range(len(first_vals)):
-            return_string += "%s:\t%s\n" % (first_vals[i], self.__dict__[first_vals[i]])
-        return_string += "\n"
-        sorted_keys = sorted(attrs.keys())
-        num_rows = int(ceil(len(sorted_keys) / 3))
-        # Organized printing, rows of 3
-        for j in range(num_rows + 1):
-            for i in range(3):
-                if i + 3 * j < len(sorted_keys):
-                    return_string += "{:40s}".format(
-                            "%s: %s" % (sorted_keys[i + 3 * j], attrs[sorted_keys[i + 3 * j]]))
-                    return_string += "\t"
-                else:
-                    break
-            return_string += "\n"
-        return return_string
+            if len(self.__dict__[first_vals[i]]) > 50:
+                summary_string += "\t{:>{longest_key}}\t{:<12.47s}...\n".format(
+                    first_cor_vals[i],
+                    self.__dict__[first_vals[i]],
+                    longest_key=longest_key)
+            else:
+                summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(
+                    first_cor_vals[i],
+                    self.__dict__[first_vals[i]],
+                    longest_key=longest_key)
+        summary_string += "\n\t{:>{longest_key}}\n\n".format(
+            "Column Name",
+            longest_key=longest_key
+        )
+        # Get all columns
+        for key, val in attrs.items():
+            if type(val) == str:
+                summary_string += "\t{:>{longest_key}}\n".format("Text entry", longest_key=longest_key)
+            else:
+                summary_string += "\t{:>{longest_key}}\t{:<12.3f}\n".format(
+                    key,
+                    val,
+                    longest_key=longest_key)
+        summary_string += ("-" * (longest_key + 30) + "\n")
+        # for i in range(len(first_vals)):
+        #     return_string += "%s:\t%s\n" % (first_vals[i], self.__dict__[first_vals[i]])
+        # return_string += "\n"
+        # sorted_keys = sorted(attrs.keys())
+        # num_rows = int(ceil(len(sorted_keys) / 3))
+        # # Organized printing, rows of 3
+        # for j in range(num_rows + 1):
+        #     for i in range(3):
+        #         if i + 3 * j < len(sorted_keys):
+        #             return_string += "{:40s}".format(
+        #                     "%s: %s" % (sorted_keys[i + 3 * j], attrs[sorted_keys[i + 3 * j]]))
+        #             return_string += "\t"
+        #         else:
+        #             break
+        #     return_string += "\n"
+        return summary_string
 
     def write(self):
         """ Method writes file contents to temporary file and stores file name as instance attribute

@@ -43,7 +43,8 @@ Be sure to gunzip all fasta files prior to use.
 1. Ensure that `BioMetaDB` is installed.
 2. Navigate to a directory where you would like to initialize this project's directory.
 3. Run the following command:
-    1. `dbdm INIT -n ModelOrganisms -d /path/to/Example/prokaryotes/ -t Prokaryotes -a pro -f /path/to/Example/prokaryotes.tsv`
+    1. `dbdm INIT -n ModelOrganisms -d /path/to/Example/prokaryotes/ -t Prokaryotes -a pro 
+    -f /path/to/Example/prokaryotes.tsv`
     2. This will generate a new project structure, titled `ModelOrganisms`, in your current directory. This project will 
     contain the database named `ModelOrganisms` and will have the table `Prokaryotes`, accessible using the alias `pro`. 
     The table schema will use information from `prokaryotes.tsv` to generate table columns.
@@ -71,7 +72,8 @@ Be sure to gunzip all fasta files prior to use.
 ## Update the database with a new table for plants
 
 1. Run the following command:
-    1. `dbdm CREATE -c /path/to/Example/ModelOrganisms -d /path/to/Example/plants/ -t Plants -a plants -f /path/to/Example/plants.tsv`
+    1. `dbdm CREATE -c /path/to/Example/ModelOrganisms -d /path/to/Example/plants/ 
+    -t Plants -a plants -f /path/to/Example/plants.tsv`
     2. This will add a new table to the project `ModelOrganisms`. This project will now have the table `Plants`, 
     accessible with `plants`, and populated using `plants.tsv`.
 <pre><code>ModelOrganisms
