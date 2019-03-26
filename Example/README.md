@@ -115,7 +115,7 @@ quick glance at a particular table or database, as well as to test queries on th
         1. `-v/--view`  View only column names
         2. `-t/--table_name`    View only for given table
         3. `-a/--alias`     View only for given alias
-        4. `-q/--query`     Attach SQL query to summarize select records only
+        4. `-q/--query`     Attach SQL query to summarize select records only. Must be combined with `-t` or `-a` flags
 <pre><code>SUMMARIZE:      View summary of all tables in database
  Project root directory:        ModelOrganisms
  Name of database:              ModelOrganisms.db
@@ -168,7 +168,7 @@ table = get_table("/path/to/DB", alias="pro")
 
 # Query the database for records whose n50 is less than their total length
 table.query("n50 < total_length")
-print(len(table))  # Prints 8
+print(len(table))  # Prints 2
 print(table.columns())  # Prints all columns as dict_keys
 
 # View query results
