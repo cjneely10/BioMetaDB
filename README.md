@@ -11,6 +11,7 @@ Adding the last two lines of the above code to a user's `.bashrc` file will main
 ### Dependencies
 
 - Python3.5
+- Cython
 - Python packages
     - SQLAlchemy
     - BioPython

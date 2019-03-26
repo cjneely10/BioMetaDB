@@ -2,3 +2,4 @@ sqlalchemy
 biopython
 configparser
 argparse
+Cython
