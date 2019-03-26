@@ -63,7 +63,7 @@ def summarize_database(config_file, view, query, table_name, alias):
         # Display column info for table
         elif query == "None" and view:
             rl = RecordList(sess, UserClass, cfg)
-            print(rl.get_columns())
+            print(rl.get_column_summary())
         # Display summary info for table
         elif query == "None" and not view:
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)

@@ -30,7 +30,7 @@ class DBUserClass:
         # Print sorted attributes, excluding instance state object info
         first_vals = ["_id", "data_type", "location"]
         attrs = {key: val for key, val in self.__dict__.items() if key != "_sa_instance_state"
-                 and key not in first_vals}
+                 and key not in first_vals and key != "id"}
         return_string = ""
         for i in range(len(first_vals)):
             return_string += "%s:\t%s\n" % (first_vals[i], self.__dict__[first_vals[i]])

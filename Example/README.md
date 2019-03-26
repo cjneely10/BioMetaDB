@@ -24,7 +24,7 @@ The sequences gathered for this example are all NCBI RefSeq assemblies.
 **Note**: All fasta files are gzipped, and the provided `.tsv` files use extensions `.fna`. 
 Be sure to gunzip all fasta files prior to use.
 
-In this example, users will:
+### In this example, users will:
 
 1. Create a database for tracking features in model organisms.
     1. Create a table in database for prokaryotes.
@@ -118,7 +118,12 @@ matching_genomes = table.query("n50 < total_length")
 
 # View query results
 for match in matching_genomes:
-    print(match)</code></pre>
+    print(match)
+
+# Change value of in database
+
+    
+    </code></pre>
 
 The power of the SQLAlchemy package becomes apparent here - users can easily create fast and powerful SQL queries that 
 are based on the fields provided in the `.tsv` file!

@@ -8,6 +8,7 @@ from BioMetaDB.DBOperations.create_database import create_database
 from BioMetaDB.DBOperations.delete_from_table import delete_from_table
 from BioMetaDB.DBOperations.summarize_database import summarize_database
 from BioMetaDB.DBOperations.update_existing_table import update_existing_table
+from BioMetaDB.Exceptions.record_list_exceptions import ColumnNameNotFoundError
 from BioMetaDB.Exceptions.config_manager_exceptions import TableNameNotFoundError
 from BioMetaDB.DBOperations.remove_columns_from_table import remove_columns_from_table
 from BioMetaDB.DBOperations.remove_table_from_database import remove_table_from_database
@@ -66,6 +67,7 @@ if __name__ == "__main__":
     errors = {
         TableNameNotFoundError:     "Name of table not found",
         ListFileNotProvidedError:   "List file not provided",
+        ColumnNameNotFoundError:    "Column name not in table",
     }
     _help = {
         "INIT":             "Initialize database with starting table, fasta directory, and/or data files",
@@ -85,4 +87,4 @@ if __name__ == "__main__":
 
     pc = ProgramCaller(programs=programs, flags=flags, _help=_help, errors=errors)
 
-    pc.run(ap.args, debug=True)
+    pc.run(ap.args, debug=False)

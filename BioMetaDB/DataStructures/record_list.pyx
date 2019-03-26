@@ -1,6 +1,10 @@
-from BioMetaDB.DBManagers.class_manager import ClassManager
-from sqlalchemy import text
+import re
 from math import sqrt
+from string import punctuation
+from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
+from BioMetaDB.DBManagers.class_manager import ClassManager
+from BioMetaDB.Exceptions.record_list_exceptions import ColumnNameNotFoundError
 
 """
 Script holds functionality for handling data types associated with database records
@@ -12,7 +16,7 @@ And will provide info about most frequently occurring characters/words in charac
 
 cdef class RecordList:
 
-    def __init__(self, db_session, table_class, cfg, compute_metadata=False, query=None):
+    def __init__(self, db_session, table_class, cfg, bint compute_metadata=False, str query=None):
         """ Class for handling (mostly) user interfacing to inner classes
 
         :param db_session:
@@ -31,7 +35,7 @@ cdef class RecordList:
         elif query:
             self.query(query)
 
-    def get_columns(self):
+    def get_column_summary(self):
         """ Wrapper for returning columns in class as simple dictionary Name: SQLType
 
         :return:
@@ -42,9 +46,11 @@ cdef class RecordList:
         cdef int longest_key
         sorted_keys = sorted(ClassManager.get_class_as_dict(self.cfg))
         longest_key = max([len(key) for key in sorted_keys])
+        # Pretty formatting
         summary_string = ("*" * (longest_key + 30)) + "\n"
         summary_string += "\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name, longest_key=longest_key)
         summary_string += "\t\t{:>{longest_key}s}\n\n".format("Column Name", longest_key=longest_key)
+        # Get all columns
         for key in sorted_keys:
             summary_string += "\t\t{:>{longest_key}s}\n".format(key, longest_key=longest_key)
         summary_string += ("-" * (longest_key + 30) + "\n")
@@ -55,7 +61,7 @@ cdef class RecordList:
 
         :return:
         """
-        return ClassManager.get_class_as_dict(self.cfg)
+        return ClassManager.get_class_as_dict(self.cfg).keys()
 
     def summarize(self):
         """ Returns metadata for list of records queried in list
@@ -84,6 +90,7 @@ cdef class RecordList:
             "Std Dev",
             longest_key=longest_key
         )
+        # Build summary string
         for key in sorted_keys:
             if type(self._summary[key]) == str:
                 summary_string += "\t{:>{longest_key}}\n".format("Text entry", longest_key=longest_key)
@@ -108,10 +115,10 @@ cdef class RecordList:
         cdef object record
         summary_data = {}
         if self.results is None:
-             self.results = self.sess.query(self.TableClass).all()
-        num_records = len(self.results)
+             self.results = self.query()
+        num_records = len(self)
         column_keys = list(self.columns().keys())
-        for record in self.results:
+        for record in self:
             for column in column_keys:
                 if column not in summary_data.keys():
                     if type(getattr(record, column)) != str:
@@ -135,7 +142,7 @@ cdef class RecordList:
                         summary_data[column][2] += float(getattr(record, column) ** 2)
         # Determine standard deviation values
         if num_records > 1:
-            for record in self.results:
+            for record in self:
                 for column in self.columns().keys():
                     # print(summary_data[column][1], summary_data[column][2])
                     summary_data[column][3] = sqrt((summary_data[column][2] -
@@ -149,14 +156,60 @@ cdef class RecordList:
         :return:
         """
         self._clear_prior_metadata()
+        # Query passed
         if len(args) > 0:
-            self.results = self.sess.query(self.TableClass).filter(text(*args)).all()
+            # Attempt query
+            try:
+                self.results = self.sess.query(self.TableClass).filter(text(*args)).all()
+            # Column name not founc
+            except OperationalError:
+                raise ColumnNameNotFoundError
+        # Default get all
         else:
             self.results = self.sess.query(self.TableClass).all()
         self.num_records = len(self.results)
 
     def _clear_prior_metadata(self):
+        """ Protected member will clear existing data
+        To be called with query()
+
+        :return:
+        """
         self._summary, self.num_records = None, 0
+
+    def find_column(self, str possible_column):
+        """ Searches available columns for user-passed value
+        Will attempt to look for values that may result from punctuation changes
+
+        :return:
+        """
+        cdef object r
+        cdef set possible_columns
+        cdef set cols_in_db = set(self.columns())
+        cdef dict db_cols = {col: col for col in cols_in_db}
+        cdef set unusable_punctuation = set(punctuation) - set("_")
+        cdef str punct
+        cdef str tmp = possible_column
+
+        r = re.compile(possible_column)
+        # Exact matches
+        possible_columns = set(filter(r.match, cols_in_db))
+        # Stored column name has punctuation, user value does not
+        for punct in punctuation:
+            db_cols = {col.replace(punct, ""): col for col in cols_in_db}
+            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.match, db_cols.keys())))
+            db_cols = {col.replace(punct, ""): col for col in cols_in_db}
+            possible_columns = possible_columns.union(set(db_cols[col] for col in filter(r.match, db_cols.keys())))
+        # User value has punctuation, stored column name does not
+        for punct in unusable_punctuation:
+            tmp = possible_column.replace(punct, "")
+            r = re.compile(tmp)
+            possible_columns = possible_columns.union(set(filter(r.match, cols_in_db)))
+            tmp = possible_column.replace(punct, "_")
+            r = re.compile(tmp)
+            possible_columns = possible_columns.union(set(filter(r.match, cols_in_db)))
+        # Return all possible values
+        return list(possible_columns)
 
     def __next__(self):
         """ Returns self as iterator
@@ -173,3 +226,50 @@ cdef class RecordList:
         cdef int i
         for i in range(self.num_records):
             yield self.results[i]
+
+    def __getitem__(self, item):
+        """ Allows class to be indexed and searched
+
+        :param item:
+        :return:
+        """
+        cdef object record
+        if type(item) == int:
+            assert item < self.num_records, "Index must be less than length"
+            return self.results[item]
+        elif type(item) == str:
+            for record in self:
+                if record._id == item:
+                    return record
+        return None
+
+    def __len__(self):
+        """ Accessible through len()
+
+        :return:
+        """
+        return self.num_records
+
+    def keys(self):
+        """ Returns list of ids
+
+        :return:
+        """
+        cdef object record
+        return [record._id for record in self]
+
+    def values(self):
+        """ Returns list of records
+
+        :return:
+        """
+        cdef object record
+        return [record for record in self]
+
+    def items(self):
+        """ Returns tuple of (key, value) pairs
+
+        :return:
+        """
+        cdef object record
+        return ((record._id, record) for record in self)
