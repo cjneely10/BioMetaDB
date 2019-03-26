@@ -172,12 +172,12 @@ print(len(table))  # Prints 2
 print(table.columns())  # Prints all columns as dict_keys
 
 # View query results
-for match in matching_genomes:
+for match in table:
     print(match)  # 'pretty-print' viewing of record
 
 # Change value of first record retrieved in query
-matching_genomes[0].n75 = 0
-print(matching_genomes[0].n75)  # Prints 0 to screen
+table[0].n75 = 0
+print(table[0].n75)  # Prints 0 to screen
 table.save()  # Saves data to database
 
 # Search for field names, 
