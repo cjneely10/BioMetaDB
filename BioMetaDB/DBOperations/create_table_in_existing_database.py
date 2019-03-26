@@ -5,6 +5,7 @@ from BioMetaDB.Config.config_manager import ConfigManager
 from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.DBManagers.type_mapper import TypeMapper
+from BioMetaDB.Exceptions.create_database_exceptions import CreateDBAssertString
 
 """
 Script will hold functionality for CREATE, to create new tables when in existing database
@@ -59,6 +60,7 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     :param alias:
     :return:
     """
+    assert table_name != "None", CreateDBAssertString.TABLE_NAME_NOT_SET
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if table_name in config.keys():
         print("!! Table exists, exiting. To update table, use UPDATE !!")
@@ -89,6 +91,7 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     # Create new table directories
     _create_all_directories(config[ConfigKeys.DATABASES][ConfigKeys.working_dir], table_name)
     # Update config object with new data
+    table_name = table_name.lower()
     config[table_name] = {
         ConfigKeys.rel_classes_dir: os.path.join(config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
                                                  Directories.CLASSES),

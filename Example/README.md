@@ -31,12 +31,12 @@ Be sure to gunzip all fasta files prior to use.
     2. Populate database tables with output from `Quast`.
 2. Update the database with a new table.
     1. Create a table for plants and populate with output from `diamond`.
-3. Write a simple script that queries the database and updates values.
-4. Update table with additional data.
-5. Remove extraneous columns and records.
-6. Delete plant table.
-7. View a summary of the database.
-8. Ensure the table is appropriately integrated.
+3. View a summary of the database in its current state
+5. Write a simple script that queries the database and updates values.
+6. Update table with additional data.
+7. Remove extraneous columns and records.
+8. Delete plant table.
+9. Ensure the table is appropriately integrated.
 
 ## Create database and initial file system using prokaryote data
 
@@ -54,7 +54,6 @@ Be sure to gunzip all fasta files prior to use.
 ├── config
 │   └── ModelOrganisms.ini
 ├── db
-│   ├── ModelOrganisms
 │   ├── ModelOrganisms.db
 │   └── Prokaryotes
 │       ├── Aliivibrio_fischeri.fna
@@ -102,6 +101,14 @@ Be sure to gunzip all fasta files prior to use.
 └── migrations
     └── ########.migrations.mgt
 </code></pre>
+
+## View a summary of the database
+
+Often, one may wish to view a summary of the information stored in a database or table. This is helpful for getting a 
+quick glance at a particular table or database, as well as to test queries on the command line.
+
+1. Run the following command to retrieve a summary of all tables in the project:
+    1. `dbdm SUMMARIZE -c /path/to/ModelOrganisms`
 
 ## Simple scripting: Get assemblies with an n50 value that is less than its length
 
@@ -195,11 +202,3 @@ the provided table.
 └── migrations
     └── ########.migrations.mgt
 </code></pre>
-
-## View a summary of the database
-
-Often, one may wish to view a summary of the information stored in a database or table. This is helpful for getting a 
-quick glance at a particular table or database, as well as to test queries on the command line.
-
-1. Run the following command to retrieve a summary of all tables in the project:
-    1. `dbdm SUMMARIZE -c /path/to/ModelOrganisms`

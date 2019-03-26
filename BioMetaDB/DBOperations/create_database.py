@@ -79,6 +79,7 @@ def create_database(db_name, table_name, directory_name, data_file, alias, silen
     assert os.path.isdir(db_name) is False, CreateDBAssertString.WORKING_DIR_EXISTS
     if directory_name != "None":
         assert os.path.isdir(directory_name), CreateDBAssertString.SEQUENCE_DIR_NOT_EXISTS
+    table_name = table_name.lower()
     if not silent:
         _initialization_display_message_prelude(db_name, db_name, table_name, directory_name, data_file, alias)
     # Gather files to commit and initial data to store for each file
