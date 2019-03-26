@@ -1,12 +1,12 @@
-# BioMetaDB
+# BioMetadatabase
 
 ## Installation
-Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access dbdm.
-<pre><code>cd /path/to/BioMetaDB
+Clone this repository and add the project-level directory *BioMetadatabase* to your path. Create an alias to access dbdm.
+<pre><code>cd /path/to/BioMetadatabase
 python3 setup.py build_ext --inplace
-export PYTHONPATH=/path/to/BioMetaDB:$PYTHONPATH
-alias dbdm="python3.5 /path/to/BioMetaDB/dbdm.py"</code></pre>
-Adding the last two lines of code to a user's `.bashrc` file will maintain these settings on next log-in.
+export PYTHONPATH=/path/to/BioMetadatabase:$PYTHONPATH
+alias dbdm="python3.5 /path/to/BioMetadatabase/dbdm.py"</code></pre>
+Adding the last two lines of the above code to a user's `.bashrc` file will maintain these settings on next log-in.
 
 ### Dependencies
 
@@ -21,7 +21,7 @@ Such dependencies are best maintained within a separate Python virtual environme
 
 ## About
 
-**BioMetaDB** is a data-management package that automatically generates database schemas, minimizing the amount
+**BioMetadatabase** is a data-management package that automatically generates database schemas, minimizing the amount
 of temporary files used and handling migrations and updates smoothly. This SQLAlchemy-based wrapper package allows
 researchers and data engineers to quickly generate Python classes and objects for fast data-searching, abstracting 
 searches to a SQL-based API and allowing end-users to focus on query building for analysis. Finally, this schema is 
@@ -30,7 +30,7 @@ from these files to existing data records and files quickly and efficiently.
 
 Database projects are organized into file-systems:
 
-<pre><code>DB/
+<pre><code>database/
     classes/
         db_table_1.json
         db_table_2.json
@@ -48,13 +48,13 @@ Database projects are organized into file-systems:
         ########.migrations.mgt
 </code></pre>
 
-File systems created by **BioMetaDB** are accessible in Python scripts:
+File systems created by **BioMetadatabase** are accessible in Python scripts:
 
-<pre><code>from BioMetaDB import get_table
+<pre><code>from BioMetadatabase import get_table
 
-table = get_table("/path/to/DB", table_name="db_table_1")
+table = get_table("/path/to/database", table_name="db_table_1")
 # Alternatively, 
-# table = get_table("/path/to/DB", alias="table_1")
+# table = get_table("/path/to/database", alias="table_1")
 
 table.query()  # Returns all values
 table.query("n50 >= 100000")  # Simple filter query
@@ -62,7 +62,7 @@ table.query("n50 >= 100000 AND n75 <= 1000000")  # More complex filter query
 # Additional SQLAlchemy operations...
 </code></pre>
 
-**BioMetaDB** returns objects that directly inherit from SQLAlchemy data types, meaning that (most, if not all) 
+**BioMetadatabase** returns objects that directly inherit from SQLAlchemy data types, meaning that (most, if not all) 
 functions that are available to SQLAlchemy objects are available here.
 
 ### Why bother?
@@ -80,11 +80,11 @@ data_file_1.faa 25  4.7
 data_file_2.fna 100 12.5
 
 # dbdm would generate database objects with attributes accessible as:
-db_objects = table.query()
-db_objects[0]._id  # Returns data_file_1.faa  
-db_objects[0].column_1  # Returns 25
-db_objects[1].column_2  # Returns 12.5
-getattr(db_objects[1], "_id")  # Returns data_file_2.fna
+table.query()
+table[0]._id  # Returns data_file_1.faa  
+table[0].column_1  # Returns 25
+table[1].column_2  # Returns 12.5
+getattr(table[1], "_id")  # Returns data_file_2.fna
 </code></pre>
 
 Notice that column names are automatically adjusted to match typical SQL requirements. This system translates column 
@@ -93,47 +93,40 @@ data storage, which allows for more centralized data tracking.
 
 #### Additional functionality 
 
-- All database records generated using the values returned by `get_table` have functions available for common database 
-operations
-    - `__repr__()`: Prints all database table data for record in a three-column format
-    - `full_path()`: Returns the complete path to the record's associated file in the project 
-    - `print()`: Prints the entire contents of the file to screen
-    - `write()`: Writes the contents of the file to a temporary file, with this location stored in the 
-    `self.temp_filename` attribute
-    - `clear()`: Deletes the temporary file created with `write()`
-    - `get()`: Returns entire file contents
-    - `get_records()`: Returns data file contents as a list of `BioPython` objects
+[TODO: Write Additional functionality available through RecordList]
 
 ## Usage Best Practices
 
 #### SQLAlchemy
 
-- **BioMetaDB** uses this powerful library to generate and use databases, in this case SQLite3.
+- **BioMetadatabase** uses this powerful library to generate and use databases, in this case SQLite3.
 - SQLAlchemy is a powerful Python package that makes working with SQL easy and fairly uniform between relational 
-database management systems (RDBMSs).
+database management systems (RdatabaseMSs).
 - Read more about SQLAlchemy, its functionality, and its limitations:
 <https://docs.sqlalchemy.org/en/latest/orm/tutorial.html>
 
 #### Data file integrity
 
-- **BioMetaDB** uses .tsv files to generate names and data types of columns in the RDBMS tables.
+- **BioMetadatabase** uses .tsv files to generate names and data types of columns in the RdatabaseMS tables.
 - Before running this software, ensure that data file column names are adequately formatted, with no trailing `\n` 
 or `\t` in the file.
     - Columns named `Column.1` and `column_1` will both override to `column_1`.
 - Data types are automatically predicted based on a randomly selected value within the column.
     - Ensure that all values in a given column store the same kind of data (e.g. Integer, Float, VARCHAR, etc).
-- **BioMetaDB** matches names of data files (e.g. file_1.fasta) to record ids in the .tsv files, so make sure that
+- **BioMetadatabase** matches names of data files (e.g. file_1.fasta) to record ids in the .tsv files, so make sure that
 they match.
 
 #### Modifiying project structure or source code
 
-- **BioMetaDB** relies on the integrity of this file system that it creates when `dbdm INIT` is first called. It is 
+- **BioMetadatabase** relies on the integrity of this file system that it creates when `dbdm INIT` is first called. It is 
 ill-advised to manually delete files or records from the database or project, respectively. Updating records using 
-`sess.commit()` is still supported (and recommended), but removing files from the project should be done using `dbdm 
-DELETE`.
+`table.save()` is the preferred method for updating database table values within code, but records themselves should
+only be removed using `dbdm DELETE`
 - Certain portions of the source code can be modified to better fit a user's needs.
-    - `BioMetaDB/Models/functions.py` holds the class `DBUserClass`, which is the parent class of all database objects 
+    - `BioMetadatabase/Models/functions.py` holds the class `databaseUserClass`, which is the parent class of all database objects 
     generated using `get_table()`. Any additional functions added to this class will be available to your records.
+    - `BioMetadatabase/DataStructures/record_list.pyx` holds the class `RecordList`, which is a simple container class for 
+    handling database records. Currently, this class functions as a quasi-dictionary-and-list data structure.
 
 ## dbdm
 
@@ -141,12 +134,12 @@ DELETE`.
 when first creating your database or when making large updates, such as when adding/removing tables or updating/removing
 values or columns.
 
-<pre><code>usage: dbdm.py [-h] [-n DB_NAME] [-t TABLE_NAME] [-d DIRECTORY_NAME]
+<pre><code>usage: dbdm.py [-h] [-n database_NAME] [-t TABLE_NAME] [-d DIRECTORY_NAME]
                [-f DATA_FILE] [-l LIST_FILE] [-c CONFIG_FILE] [-a ALIAS] [-s]
                [-v] [-q QUERY]
                program
 
-dbdm:   Manage BioMetaDB project
+dbdm:   Manage BioMetadatabase project
 
 Available Programs:
 
@@ -154,7 +147,7 @@ CREATE: Create a new table in an existing database, optionally populate using da
                 (Req:  --config_file --table_name --directory_name --data_file --alias --silent)
 DELETE: Delete list of ids from database tables, remove associated files
                 (Req:  --config_file --table_name --list_file --alias --silent)
-FIX: Repairs errors in DB structure using .fix file
+FIX: Repairs errors in database structure using .fix file
                 (Req:  --data_file --silent)
 INIT: Initialize database with starting table, fasta directory, and/or data files
                 (Req:  --db_name --table_name --directory_name --data_file --alias --silent)
@@ -174,7 +167,7 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -n DB_NAME, --db_name DB_NAME
+  -n database_NAME, --db_name database_NAME
                         Name of database
   -t TABLE_NAME, --table_name TABLE_NAME
                         Name of database table
@@ -193,10 +186,10 @@ optional arguments:
   -q QUERY, --query QUERY
                         Query to pass to SUMMARIZE</code></pre>
 
-The typical workflow for initializing **BioMetaDB** is straightforward. Many options exist for updating, adding to, 
+The typical workflow for initializing **BioMetadatabase** is straightforward. Many options exist for updating, adding to, 
 and removing from the existing project structure. You may also choose to assign an alternate name to a table within a
 database in the form of an alias. Depending on the number of entries involved, these commands can result in voluminous
-output, which can either be silenced by passing `-s y` as parameters in your command, or by redirecting standard output
+output, which can either be silenced by passing `-s` as parameters in your command, or by redirecting standard output
 to a text file. 
 
 
@@ -212,7 +205,7 @@ project.
     - --table_name (-t): Name to give table in database (for example, Genomic)
 - Optional flags
     - --directory_name (-d): Path to directory with files to add to the database.
-    - --data_file (-f): Path to .tsv file to use to generate DB table schema
+    - --data_file (-f): Path to .tsv file to use to generate database table schema
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
@@ -228,8 +221,6 @@ project.
             # Files from /path/to/data/directory/
     migrations/
 </code></pre>
-- Possible exceptions:
-    - AssertionError: The prefix provided for the working directory already exists 
 
 At this point, the project is available to use in scripts in the manner mentioned in the **About** section.
 
@@ -245,12 +236,12 @@ project-level `migrations` folder.
     - --table_name (-t): Name of table to update
 - Optional flags
     - --directory_name (-d):- Path to directory with files to add to the database.
-    - --data_file (-f): Path to .tsv file to use to generate DB table schema
+    - --data_file (-f): Path to .tsv file to use to generate database table schema
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm UPDATE -c /path/to/DB -t db_table_1 -f /path/to/data_file.tsv -d /path/to/data_dir/`
-    - This command will update the table named `db_table_1`, which is part of the database in the project `DB`. This 
+    - `dbdm UPDATE -c /path/to/ -t db_table_1 -f /path/to/data_file.tsv -d /path/to/data_dir/`
+    - This command will update the table named `db_table_1`, which is part of the database in the project `database`. This 
     command will add new column data from the file `/path/to/data_file.tsv` and will add new data files from the 
     directory `/path/to/data_dir/`. A copy of the database is stored in the project-directory `migrations`, 
     named using the date that the command was run.
@@ -268,9 +259,9 @@ is regenerated using existing data.
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm REMOVECOL -c /path/to/DB -t db_table_1 -l /path/to/list_to_remove.list`
+    - `dbdm REMOVECOL -c /path/to/database -t db_table_1 -l /path/to/list_to_remove.list`
     - This command will remove all columns provided in the newline-separated file `list_to_remove.list` from 
-    `db_table_1` within the project `DB`.
+    `db_table_1` within the project `database`.
 - Possible exceptions
     - ListFileNotProvidedError:   List file not provided, pass path to a list
 
@@ -286,9 +277,9 @@ is regenerated using existing data.
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm REMOVECOL -c /path/to/DB -t db_table_1 -l /path/to/list_to_remove.list`
+    - `dbdm REMOVECOL -c /path/to/database -t db_table_1 -l /path/to/list_to_remove.list`
     - This command will remove all record ids provided in the newline-separated file `list_to_remove.list` from 
-    `db_table_1` within the project `DB`.
+    `db_table_1` within the project `database`.
 - Possible exceptions
     - ListFileNotProvidedError:   List file not provided, pass path to a list
 
@@ -302,14 +293,14 @@ project structure.
     - --table_name (-t): Name of table to create
 - Optional flags
     - --directory_name (-d): Path to directory with files to add to the database. 
-    - --data_file (-f): Path to .tsv file to use to generate DB table schema
+    - --data_file (-f): Path to .tsv file to use to generate database table schema
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm CREATE -c /path/to/DB -t db_table_2 -d /path/to/data/directory/ 
+    - `dbdm CREATE -c /path/to/database -t db_table_2 -d /path/to/data/directory/ 
     -f /path/to/data_file.tsv -a table_2`
-    - This command will update the project structure `DB` to include the new table:
-<pre><code>DB/
+    - This command will update the project structure `database` to include the new table:
+<pre><code>database/
     classes/
         db_table_1.json
         db_table_2.json  # Generated from data_file.tsv 
@@ -335,8 +326,12 @@ your data as a .tsv file.
     - --alias (-a): Alias (short name) for table in database
     - --silent (-s): Silence standard output
 - Example
-    - `dbdm REMOVE -c /path/to/DB/config/database.ini -t db_table_2`
-    - This command will remove the table `db_table_2` from the project `DB`.
+    - `dbdm REMOVE -c /path/to/database/config/database.ini -t db_table_2`
+    - This command will remove the table `db_table_2` from the project `database`.
+    
+### SUMMARIZE
+
+**SUMMARIZE** is used to display information about the project or a table within the project.
 
 ## Other Information
 
@@ -352,12 +347,6 @@ your data as a .tsv file.
 - `BioMetaBD/Accessories/program_caller.py`
 - **ProgramCaller** is a script made for handling flags and errors in a moderately complex program (such as this one), 
 and is highly useful for fast script-making.
-
-### Planned updates
-
-- `BioMetaDB/DataStructures/record_list.py`
-    - `RecordList` is a simple class that inherits from *list*, but focuses on displaying averages, standard deviations,
-    etc., about records in the list.
 
 ### Contact
 

@@ -216,7 +216,7 @@ cdef class RecordList:
         cdef str punct
         cdef str tmp = possible_column
 
-        r = re.compile(possible_column)
+        r = re.compile(r"%s" % possible_column)
         # Exact matches
         possible_columns = set(filter(r.findall, cols_in_db))
         # Stored column name has punctuation, user value does not
