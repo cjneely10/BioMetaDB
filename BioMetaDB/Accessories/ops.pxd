@@ -1,0 +1,5 @@
+cdef char** to_cstring_array(list list_str)
+cdef free_cstring_array(char **cstring_array)
+cdef char* to_cstring(str py_string)
+cdef free_cstring(char* cstring)
+cdef str to_pystring(char* cstring)

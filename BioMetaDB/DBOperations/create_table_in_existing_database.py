@@ -1,5 +1,6 @@
 import os
 from BioMetaDB.Config.directory_manager import Directories
+from BioMetaDB.Exceptions.config_manager_exceptions import ConfigAssertString
 from BioMetaDB.Serializers.count_table import CountTable
 from BioMetaDB.Config.config_manager import ConfigManager
 from BioMetaDB.Config.config_manager import ConfigKeys
@@ -61,6 +62,7 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     :return:
     """
     assert table_name != "None", CreateDBAssertString.TABLE_NAME_NOT_SET
+    assert config_file is not None, ConfigAssertString.CONFIG_FILE_NOT_PASSED
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if table_name in config.keys():
         print("!! Table exists, exiting. To update table, use UPDATE !!")

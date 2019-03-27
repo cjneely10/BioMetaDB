@@ -6,25 +6,27 @@ from BioMetaDB.Indexers.index_extensions import IndexExtensions
 
 class BioOps:
     @staticmethod
-    def get_type(file_name):
+    def get_type(str file_name):
         """ Method for parsing file extension to determine data type
         Uses dictionary of valid extensions to return "fasta" or "fastq"
 
         :param file_name: (str)	User-passed name of file
         """
+        cdef str _f, file_type
         _f, file_type = os.path.splitext(file_name)
         if file_type == ".gz":
             _f, file_type = os.path.splitext(_f)
         return BioOps._get_corrected_data_format(file_type.strip("."))
 
     @staticmethod
-    def calculate_phred(scores):
+    def calculate_phred(list scores):
         """ Determines phred quality scores based on presence of lowercase letters
 
         :param scores: (List[str])	List of nucleotide scores
         :return List[int]:
         """
         is_phred_33 = True
+        cdef str score
         for score in scores:
             # Determines phred based on presence of lowercase characters
             if score.islower():
@@ -36,7 +38,7 @@ class BioOps:
             return [ord(score) - 64 for score in scores]
 
     @staticmethod
-    def _get_corrected_data_format(dt):
+    def _get_corrected_data_format(str dt):
         """ Protected method returns corrected data type to make it easier on user
 
         :param dt: (str)	Inferred data type based on file extension
@@ -64,7 +66,7 @@ class BioOps:
                 raise KeyError
 
     @staticmethod
-    def parse_large(file_name, data_type, batch_size=10000):
+    def parse_large(str file_name, str data_type, int batch_size=10000):
         """
 
         :param file_name:	(str)	Name of fasta or fastq file

@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from BioMetaDB.Exceptions.config_manager_exceptions import TableNameAssertString
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.Config.config_manager import ConfigManager
@@ -50,6 +52,7 @@ def remove_columns_from_table(config_file, table_name, list_file, alias, silent)
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
+        assert table_name is not None, TableNameAssertString.TABLE_NOT_FOUND
     if list_file == "None":
         raise ListFileNotProvidedError
     cfg = ConfigManager(config, table_name)

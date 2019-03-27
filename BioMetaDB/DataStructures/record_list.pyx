@@ -16,7 +16,7 @@ And will provide info about most frequently occurring characters/words in charac
 
 cdef class RecordList:
 
-    def __init__(self, db_session, table_class, cfg, bint compute_metadata=False, str query=None):
+    def __init__(self, object db_session, object table_class, object cfg, bint compute_metadata=False, str query=None):
         """ Class for handling (mostly) user interfacing to inner classes
 
         :param db_session:
@@ -167,11 +167,10 @@ cdef class RecordList:
                         summary_data[column][2] += float(getattr(record, column) ** 2)
         # Determine standard deviation values
         if num_records > 1:
-            for record in self.results:
-                for column in self.columns():
-                    # print(summary_data[column][1], summary_data[column][2])
-                    summary_data[column][3] = sqrt((summary_data[column][2] -
-                                                    ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
+            for column in self.columns():
+                # print(summary_data[column][1], summary_data[column][2])
+                summary_data[column][3] = sqrt((summary_data[column][2] -
+                                                ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
         return summary_data, num_records
 
     def query(self, *args):
