@@ -140,7 +140,7 @@ cdef class RecordList:
         cdef object record
         summary_data = {}
         if self.results is None:
-             self.results = self.query()
+             self.query()
         num_records = self.num_records
         column_keys = list(self.columns())
         for record in self.results:
