@@ -1,7 +1,7 @@
 from sqlalchemy.orm import mapper
 from BioMetaDB.DataStructures.record_list import RecordList
 from BioMetaDB.Models.models import BaseData
-from BioMetaDB.Models.functions import DBUserClass
+from BioMetaDB.Models.functions import Record
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Config.config_manager import ConfigManager, ConfigKeys
 from BioMetaDB.Exceptions.summarize_database_exceptions import SummarizeDBAssertString
@@ -51,7 +51,7 @@ def summarize_database(config_file, view, query, table_name, alias):
         engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
         sess = BaseData.get_session_from_engine(engine)
         TableClass = ClassManager.get_class_orm(tbl_name, engine)
-        UserClass = type(tbl_name, (DBUserClass,), {})
+        UserClass = type(tbl_name, (Record,), {})
         # Map to SQL orm
         mapper(UserClass, TableClass)
         # Display queried info for single table and break

@@ -7,7 +7,7 @@ from sqlalchemy.orm import mapper
 from sqlalchemy import Column, Table, Integer, String, MetaData
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Accessories.bio_ops import BioOps
-from BioMetaDB.Models.functions import DBUserClass
+from BioMetaDB.Models.functions import Record
 from BioMetaDB.DBManagers.type_mapper import TypeMapper
 from BioMetaDB.Accessories.ops import print_if_not_silent
 from BioMetaDB.Config.directory_manager import Directories
@@ -123,7 +123,7 @@ class ClassManager:
             TableClass = UpdatedDBClass
             print_if_not_silent(silent, " ..Complete!\n")
         to_add = []
-        UserClass = type(alias or table_name, (DBUserClass,), {})
+        UserClass = type(alias or table_name, (Record,), {})
         mapper(UserClass, TableClass)
         try:
             corrected_header = ClassManager.correct_iterable(count_table_object.header)
@@ -227,7 +227,7 @@ class ClassManager:
         :return:
         """
         metadata = MetaData(bind=engine, reflect=True)
-        UserClass = type(table_name, (DBUserClass,), {})
+        UserClass = type(table_name, (Record,), {})
         mapper(UserClass, metadata.tables[table_name])
         return UserClass
 
@@ -244,11 +244,11 @@ class ClassManager:
         :return:
         """
         metadata = metadata or MetaData(bind=engine or BaseData.get_engine(db_dir, db_name), reflect=True)
-        t = Table(table_name, metadata, Column('id', Integer, primary_key=True),
-                  Column("_id", String, unique=True, index=True),
-                  Column("data_type", String, index=True),
-                  Column("location", String, index=True),
-                  *(Column(key, TypeMapper.string_to_loaded_sql_type[value], index=True,
+        t = Record(table_name, metadata, Column('id', Integer, primary_key=True),
+                   Column("_id", String, unique=True, index=True),
+                   Column("data_type", String, index=True),
+                   Column("location", String, index=True),
+                   *(Column(key, TypeMapper.string_to_loaded_sql_type[value], index=True,
                            default=ClassManager.default_data[value]) for
                     key, value in class_as_dict.items() if key not in ("_id", "data_type", "location")))
         setattr(t, "basedir", table_dir)

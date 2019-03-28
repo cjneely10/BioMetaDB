@@ -30,7 +30,7 @@ def _remove_columns_display_message_prelude(db_name, working_directory, table_na
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t%s" % db_name)
     print(" Name of table:\t\t%s" % table_name)
-    print(" Table aliases:\t\t%s" % alias, "\n")
+    print(" Record aliases:\t\t%s" % alias, "\n")
     print("DATA:\tRemove columns from schema")
     print(" Do not include columns:\t%s" % ",".join(cols_to_remove).strip(","), "\n")
 

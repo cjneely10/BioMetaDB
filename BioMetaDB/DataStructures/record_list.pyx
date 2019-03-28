@@ -48,7 +48,7 @@ cdef class RecordList:
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
         summary_string = ("*" * (longest_key + 30)) + "\n"
-        summary_string += "\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name, longest_key=longest_key)
+        summary_string += "\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Record Name:", self.cfg.table_name, longest_key=longest_key)
         summary_string += "\t\t{:>{longest_key}s}\n\n".format("Column Name", longest_key=longest_key)
         # Get all columns
         for key in sorted_keys:
@@ -81,7 +81,7 @@ cdef class RecordList:
         # Display multiple records
         if self.num_records > 1:
             summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<10d}\n\n".format(
-                "Table Name:",
+                "Record Name:",
                 self.cfg.table_name,
                 "Number of Records:",
                 self.num_records,
@@ -91,14 +91,14 @@ cdef class RecordList:
             # Long name
             if len(self.results[0]._id) > 30:
                 summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}...\n\n".format(
-                    "Table Name:",
+                    "Record Name:",
                     self.cfg.table_name,
                     "ID:",
                     self.results[0]._id,
                     longest_key=longest_key)
             else:
                 summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}\n\n".format(
-                    "Table Name:",
+                    "Record Name:",
                     self.cfg.table_name,
                     "ID:",
                     self.results[0]._id,

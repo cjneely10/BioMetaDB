@@ -8,7 +8,7 @@ Script holds superclass from which all user-created classes will inherit
 """
 
 
-class DBUserClass:
+class Record:
 
     def full_path(self):
         """ Method returns full path of bio storage location
@@ -101,13 +101,6 @@ class DBUserClass:
 
         """
         print(open(self.full_path(), "r").read())
-
-    def get(self):
-        """ Method for retrieving file contents
-
-        :return str:
-        """
-        return open(self.full_path(), "r").read()
 
     def get_records(self):
         """ Method returns contents of record's file as a list of BioPython SeqRecord objects

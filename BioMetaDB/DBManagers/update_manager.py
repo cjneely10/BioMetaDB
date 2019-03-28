@@ -1,7 +1,7 @@
 import os
 import csv
 import glob
-from BioMetaDB.Models.functions import DBUserClass
+from BioMetaDB.Models.functions import Record
 from sqlalchemy.orm import mapper
 from BioMetaDB.Accessories.ops import print_if_not_silent
 
@@ -69,7 +69,7 @@ class UpdateManager:
             # List of columns in table
             col_list = cols[table_name]
             # Write name of table as first line
-            W.write('"Table","' + table_name + '"' + "," + "\n")
+            W.write('"Record","' + table_name + '"' + "," + "\n")
             # Write comma-separated names of each column
             W.write(",".join(['"{}"'.format(col) for col in col_list]) + "\n")
             # Iterate over every entry
@@ -120,7 +120,7 @@ class UpdateManager:
         cols = {}
         # Load each table data into cols and tables variables
         for row in csv_reader:
-            if row[0] == "Table":
+            if row[0] == "Record":
                 dept = row[1]
                 tables[dept] = []
                 row = next(csv_reader)
@@ -147,7 +147,7 @@ class UpdateManager:
         for name, Table in tables.items():
             db_objects[name] = []
             # Create DB object using json data stored in file
-            DBClass = type(name, (DBUserClass,), {})
+            DBClass = type(name, (Table,), {})
             mapper(DBClass, Table)
             if name in csv_data.keys():
                 # Skip certain fields

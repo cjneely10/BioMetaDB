@@ -1,6 +1,6 @@
 from sqlalchemy.orm import mapper
 from BioMetaDB.Models.models import BaseData
-from BioMetaDB.Models.functions import DBUserClass
+from BioMetaDB.Models.functions import Record
 from BioMetaDB.Config.config_manager import ConfigManager, Config
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Config.config_manager import ConfigKeys
@@ -31,7 +31,7 @@ def get_table(config_path, table_name=None, alias=None):
     sess = BaseData.get_session_from_engine(engine)
     # Generate table class and name based on presence of alias
     TableClass = ClassManager.get_class_orm(table_name, engine)
-    UserClass = type(table_name, (DBUserClass,), {})
+    UserClass = type(table_name, (Record,), {})
     # Map to SQL orm
     mapper(UserClass, TableClass)
     return RecordList(sess, UserClass, config)

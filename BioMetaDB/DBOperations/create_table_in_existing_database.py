@@ -20,7 +20,7 @@ def _create_table_display_message_prelude(db_name, working_directory, table_name
 
     :param db_name: (str)   Name of db
     :param working_directory: (str) Path to working directory
-    :param table_name: (str)    Table that will be created
+    :param table_name: (str)    Record that will be created
     :param directory_name: (str)    Directory with files to add
     :param data_file: (str)     File with metadata for storing in database
     :return:
@@ -29,7 +29,7 @@ def _create_table_display_message_prelude(db_name, working_directory, table_name
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t\t%s.db" % db_name.strip(".db"))
     print(" Name of table:\t\t\t%s" % table_name)
-    print(" Table aliases:\t\t\t%s" % alias, "\n")
+    print(" Record aliases:\t\t\t%s" % alias, "\n")
     print("DATA:\tPopulate table")
     print(" Get metadata from\t\t%s" % data_file)
     print(" Copy fastx files from\t\t%s" % directory_name, "\n")
@@ -65,7 +65,7 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     assert config_file is not None, ConfigAssertString.CONFIG_FILE_NOT_PASSED
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if table_name in config.keys():
-        print("!! Table exists, exiting. To update table, use UPDATE !!")
+        print("!! Record exists, exiting. To update table, use UPDATE !!")
         exit(1)
     if not silent:
         _create_table_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name],

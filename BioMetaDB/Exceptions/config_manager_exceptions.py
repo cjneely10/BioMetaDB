@@ -11,4 +11,4 @@ class ConfigAssertString:
 
 
 class TableNameAssertString:
-    TABLE_NOT_FOUND = "Table not found"
+    TABLE_NOT_FOUND = "Record not found"

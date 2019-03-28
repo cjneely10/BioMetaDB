@@ -88,7 +88,7 @@ if __name__ == "__main__":
         [["-f", "--file_path"],
          {"help": ".faa, .fna, or .fq file"}],
         [["-c", "--class_name"],
-         {"help": "Name of Table"}],
+         {"help": "Name of Record"}],
         [["-s", "--seq_type"],
          {"help": "Sequence type (example GEN)"}],
         [["-g", "--genome_id"],
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     errors = {
         IOError: "Error moving file to location, rolling back changes",
         AttributeError: "Database name not found",
-        KeyError: "Table name not found",
+        KeyError: "Record name not found",
         sqlite3.IntegrityError: "Sequence exists in database matching file's genome id, exiting",
         sqlalchemy.exc.IntegrityError: "Sequence exists in database matching file's genome id, exiting",
     }

@@ -2,7 +2,7 @@ from sqlalchemy.orm import mapper
 from random import randint
 from datetime import datetime
 from BioMetaDB.Models.models import BaseData
-from BioMetaDB.Models.functions import DBUserClass
+from BioMetaDB.Models.functions import Record
 from BioMetaDB.Config.config_manager import ConfigManager, ConfigKeys
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.DBManagers.integrity_manager import IntegrityManager
@@ -65,7 +65,7 @@ def integrity_check(config_file, table_name, alias):
         engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
         sess = BaseData.get_session_from_engine(engine)
         TableClass = ClassManager.get_class_orm(table, engine)
-        UserClass = type(table, (DBUserClass,), {})
+        UserClass = type(table, (Record,), {})
         # Map to SQL orm
         mapper(UserClass, TableClass)
         im.record_check(sess, UserClass, table)

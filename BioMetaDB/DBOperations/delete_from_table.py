@@ -3,7 +3,7 @@ from sqlalchemy.orm import mapper
 
 from BioMetaDB.Exceptions.config_manager_exceptions import TableNameAssertString
 from BioMetaDB.Models.models import BaseData
-from BioMetaDB.Models.functions import DBUserClass
+from BioMetaDB.Models.functions import Record
 from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.Accessories.ops import print_if_not_silent
 from BioMetaDB.Config.config_manager import ConfigManager
@@ -30,7 +30,7 @@ def _delete_records_display_message_prelude(db_name, working_directory, table_na
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t%s" % db_name)
     print(" Name of table:\t\t%s" % table_name)
-    print(" Table aliases:\t\t%s" % alias, "\n")
+    print(" Record aliases:\t\t%s" % alias, "\n")
     print("DATA:\tRemove records from database")
     print(" Records:\t%s" % ",".join(records_to_remove).strip(","), "\n")
 
@@ -69,7 +69,7 @@ def delete_from_table(config_file, table_name, list_file, alias, silent):
     engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
     sess = BaseData.get_session_from_engine(engine)
     TableClass = ClassManager.get_class_orm(table_name, engine)
-    UserClass = type(table_name, (DBUserClass,), {})
+    UserClass = type(table_name, (Record,), {})
     mapper(UserClass, TableClass)
     for _id in ids_to_remove:
         print_if_not_silent(silent, " ..Removing record %s" % _id)

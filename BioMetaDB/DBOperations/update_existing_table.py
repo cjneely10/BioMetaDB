@@ -16,7 +16,7 @@ def _update_display_message_prelude(db_name, working_directory, table_name, dire
 
     :param db_name: (str)   Name of db
     :param working_directory: (str) Path to working directory
-    :param table_name: (str)    Table that will be created
+    :param table_name: (str)    Record that will be created
     :param directory_name: (str)    Directory with files to add
     :param data_file: (str)     File with metadata for storing in database
     :return:
@@ -25,7 +25,7 @@ def _update_display_message_prelude(db_name, working_directory, table_name, dire
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t\t%s.db" % db_name.strip(".db"))
     print(" Name of table:\t\t\t%s" % table_name)
-    print(" Table aliases:\t\t\t%s" % alias, "\n")
+    print(" Record aliases:\t\t\t%s" % alias, "\n")
     print("DATA:\tPopulate table")
     print(" Get metadata from\t\t%s" % data_file)
     print(" Copy fastx files from\t\t%s" % directory_name, "\n")
@@ -51,11 +51,11 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
         table_name = ConfigManager.get_name_by_alias(alias, config)
         if table_name is None:
             print(
-                "!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!"
+                "!! Record does not exist! Run CREATE to add to existing database, or INIT to create in new database !!"
             )
             exit(1)
     if table_name != "None" and table_name not in config.keys():
-        print("!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!")
+        print("!! Record does not exist! Run CREATE to add to existing database, or INIT to create in new database !!")
         exit(1)
     cfg = ConfigManager(config, table_name)
     if not silent:

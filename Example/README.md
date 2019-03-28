@@ -121,7 +121,7 @@ quick glance at a particular table or database, as well as to test queries on th
  Name of database:              ModelOrganisms.db
 
 **********************************************************************
-                 Table Name:    prokaryotes
+                 Record Name:    prokaryotes
           Number of Records:    8
 
                  Column Name    Average         Std Dev
@@ -137,7 +137,7 @@ quick glance at a particular table or database, as well as to test queries on th
 ----------------------------------------------------------------------
 
 **********************************************************************
-                 Table Name:    plants
+                 Record Name:    plants
           Number of Records:    3
 
                  Column Name    Average         Std Dev
