@@ -35,7 +35,7 @@ cdef class RecordList:
         elif query:
             self.query(query)
 
-    def get_column_summary(self):
+    def columns_summary(self):
         """ Wrapper for returning columns in class as simple dictionary Name: SQLType
 
         :return:
@@ -235,6 +235,8 @@ cdef class RecordList:
         if type(item) == int:
             assert item < self.num_records, "Index must be less than length"
             return self.results[item]
+        elif type(item) == slice:
+            return self.results[item.start : item.stop : item.step]
         elif type(item) == str:
             for record in self.results:
                 if record._id == item:
@@ -254,7 +256,9 @@ cdef class RecordList:
         :return:
         """
         cdef object record
-        return [record._id for record in self.results]
+        if self.results:
+            return [record._id for record in self.results]
+        return None
 
     def values(self):
         """ Returns list of records

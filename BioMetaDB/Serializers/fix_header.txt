@@ -1,0 +1,60 @@
+@ All header lines are statically generated and are preceded by '@'
+@
+@   This file was created by using `dbdm INTEGRITY`
+@
+@   .fix file structure identifies issues in your project and displays them as:
+@
+@       ISSUE
+@       <LEVEL>:    <ID or Name>
+@       <ISSUE_TYPE>  <FIX_TYPE>
+@       ---
+@
+@   Note that all .fix files are tab delimited
+@   Depending on the issues identified, your .fix file may contain the following:
+@
+@       PROJECT:    <PROJECT_NAME>
+@       INVALID_PATH    NONE
+@
+@
+@       TABLE:    <TABLE_NAME>
+@       BAD_TABLE    DELETE
+@
+@
+@       RECORD:    <RECORD_ID>
+@       BAD_TYPE    NONE
+@
+@
+@       RECORD:    <RECORD_ID>
+@       BAD_FILE    DELETE
+@
+@
+@       FILE:    <FILE_ID>
+@       BAD_RECORD    DELETE
+@
+@   For each issue, default actions are presented. The following fixes are available:
+@
+@       PROJECT:    <PROJECT_NAME>
+@       INVALID_PATH    PATH    /path/to/project_directory
+@
+@
+@       TABLE:    <TABLE_NAME>
+@       BAD_TABLE    TSV    /path/to/tsv_file.tsv
+@
+@       TABLE:    <TABLE_NAME>
+@       BAD_TABLE    MGT    /path/to/db_migration_file.migration.mgt
+@
+@
+@       RECORD:    <RECORD_ID>
+@       BAD_TYPE    SET     data_type(e.g. fasta/fastq)
+@
+@
+@       RECORD:    <RECORD_ID>
+@       BAD_FILE    FILE    /path/to/data_file.fna
+@
+@
+@       FILE:    <FILE_ID>
+@       BAD_RECORD    RECORD    record_id_in_database
+@
+@   If you do not wish to fix a particular issue, simple delete the entire entry,
+@   starting from "ISSUE" until "---"
+@

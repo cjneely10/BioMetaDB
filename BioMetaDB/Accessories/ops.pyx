@@ -1,5 +1,6 @@
 from itertools import chain, islice
 from libc.stdlib cimport malloc, free
+from libc.string cimport strcmp
 
 """
 Script holds functions for optimizing speed (e.g. chunking, splitting at line, etc)
@@ -92,9 +93,8 @@ cdef char** to_cstring_array(list list_str):
 
 
 cdef free_cstring_array(char **cstring_array):
-    """
+    """ Frees array of character arrays
     
-    :param length: 
     :param cstring_array: 
     :return: 
     """
@@ -102,7 +102,7 @@ cdef free_cstring_array(char **cstring_array):
 
 
 cdef char* to_cstring(str py_string):
-    """
+    """ Converts str to char*
     
     :param py_string: 
     :return: 
@@ -113,7 +113,7 @@ cdef char* to_cstring(str py_string):
 
 
 cdef free_cstring(char* cstring):
-    """
+    """ Frees memory from char array
     
     :param cstring: 
     :return: 
@@ -122,15 +122,39 @@ cdef free_cstring(char* cstring):
 
 
 cdef str to_pystring(char* cstring):
-    """
+    """ Converts char array to pystring
     
     :param cstring: 
     :return: 
     """
     cdef str s = ""
-    cdef int length = sizeof(cstring) / sizeof(cstring[0])
+    cdef size_t length = sizeof(cstring) / sizeof(cstring[0])
     cdef int i
     for i in range(length):
         s += chr(cstring[i])
     return s
 
+
+cdef int count_characters(char* cstring, char search_val):
+    """ Counts number of occurrences of search_val
+    
+    :param cstring: 
+    :param search_val: 
+    :return: 
+    """
+    cdef int count = 0
+    cdef size_t cstring_size = sizeof(cstring) / sizeof(cstring[0])
+    cdef size_t i
+    for i in range(cstring_size):
+        if cstring[i] == search_val:
+            count += 1
+    return count
+
+
+cdef int stringarray_contains(char** list_of_strings, char* string_to_find):
+    cdef size_t list_length = sizeof(list_of_strings) / sizeof(list_of_strings[0])
+    cdef size_t i
+    for i in range(list_length):
+        if strcmp(list_of_strings[i], string_to_find) == 0:
+            return 0
+    return 1

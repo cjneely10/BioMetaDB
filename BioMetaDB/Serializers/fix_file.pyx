@@ -1,47 +1,35 @@
-from libc.stdio cimport FILE
+import os
+from libc.stdio cimport fputs, fprintf
 from BioMetaDB.Accessories.ops cimport to_cstring
 from BioMetaDB.Accessories.ops cimport free_cstring
-from libc.stdlib cimport malloc, free
+from BioMetaDB.Accessories.ops cimport count_characters
 
 cdef extern from "stdio.h":
     FILE *fopen(const char *, const char *)
     int fclose(FILE *)
     size_t getline(char **, size_t *, FILE*)
-
-
-cdef class Issue:
-    def __init__(self, char* data_type, char* issue_type, char* fix_type):
-        cdef Issue_s issue
-        issue.data_type = <char *>malloc(sizeof(data_type) / sizeof(data_type[0]))
-        issue.issue_type = <char *>malloc(sizeof(issue_type) / sizeof(issue_type[0]))
-        issue.data_type = data_type
-        issue.issue_type = issue_type
-        self.issue = issue
-
-    def __del__(self):
-        free(self.issue.data_type)
-        free(self.issue.issue_type)
+    int fprintf  (FILE *stream, const char *template, ...)
 
 
 cdef class FixFile:
-    def __init__(self, str file_name):
+    def __init__(self, char* file_name):
         """ FixFile writes and reads .fix files from project integrity checks
 
         :param file_name:
         """
-        self.file_name = to_cstring(file_name)
+        self.file_name = file_name
         self.fp = NULL
-        self._initialize_file()
 
     def __del__(self):
-        """ Clear memory when deleted
+        """ Clear memory when deleted, close any open file pointers
 
         :return:
         """
+        fclose(self.fp)
         free_cstring(self.file_name)
 
-    cdef _initialize_file(self):
-        """ Creates file
+    cdef initialize_file(self):
+        """ Creates fix file using template in module
 
         :return:
         """
@@ -49,7 +37,42 @@ cdef class FixFile:
         cfile = fopen(self.file_name, "w")
         if cfile == NULL:
             raise FileNotFoundError(2, "No such file or directory: %s" % self.file_name)
+        cdef str py_header_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                               "fix_header.txt")
+        cdef char* fix_header_path = to_cstring(py_header_path)
+        cdef FILE* fix_header_ptr = fopen(fix_header_path, "r")
+        cdef char* line = NULL
+        cdef ssize_t read
+        cdef size_t l = 0
+        fprintf(cfile, "@ %s\n@\n", self.file_name)
+        while True:
+            read = getline(&line, &l, fix_header_ptr)
+            if read == -1:
+                break
+            fputs(line, cfile)
         self.fp = cfile
 
-    cdef write_issue(self, str data_type, str issue_type, str fix_type):
-        cdef Issue issue = Issue(to_cstring(data_type), to_cstring(issue_type), to_cstring(fix_type))
+    cdef load_file(self):
+        """ Loads file generated in INTEGRITY
+        
+        :return: 
+        """
+        cdef FILE* cfile
+        cfile = fopen(self.file_name, "r")
+        if cfile == NULL:
+            raise FileNotFoundError(2, "No such file or directory: %s" % self.file_name)
+        self.fp = cfile
+
+    cdef char* read_issue(self):
+        pass
+
+    cdef write_issue(self, char* issue_id, char* data_type, char* issue_type, char* fix_type):
+        """
+        
+        :param issue_id:
+        :param data_type:
+        :param issue_type: 
+        :param fix_type: 
+        :return: 
+        """
+        fprintf(self.fp, "ISSUE:\n%s:\t%s\n%s\t%s\n---\n", data_type, issue_id, issue_type, fix_type)
