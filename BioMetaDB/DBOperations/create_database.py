@@ -32,7 +32,7 @@ def _initialization_display_message_prelude(db_name, working_directory, table_na
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t\t%s.db" % db_name.strip(".db"))
     print(" Name of table:\t\t\t%s" % table_name)
-    print(" Record aliases:\t\t\t%s" % alias, "\n")
+    print(" Table aliases:\t\t\t%s" % alias, "\n")
     print("DATA:\tPopulate table")
     print(" Get metadata from\t\t%s" % data_file)
     print(" Copy fastx files from\t\t%s" % directory_name, "\n")

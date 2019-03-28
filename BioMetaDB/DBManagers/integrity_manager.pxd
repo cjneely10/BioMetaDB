@@ -8,6 +8,7 @@ cdef class IntegrityManager:
     cdef char** tables
     cdef FunctionHash _create_function_hash(self)
     cdef FunctionHash function_hash
+    cdef public int issues_found
 
 
 cdef int record_bad_file_delete(char* arg, void* sess, void* UserClass)

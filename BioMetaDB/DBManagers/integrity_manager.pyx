@@ -1,6 +1,5 @@
 import os
 from libc.stdio cimport printf
-from libc.stdlib cimport malloc, free
 from sqlalchemy import MetaData
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Accessories.ops cimport to_cstring
@@ -55,6 +54,7 @@ cdef class IntegrityManager:
         self.config = config
         self.function_hash = self._create_function_hash()
         self.tables = to_cstring_array(tables)
+        self.issues_found = 0
         self.fix_file = FixFile(to_cstring(fix_file_name))
 
     def __del__(self):
@@ -108,9 +108,11 @@ cdef class IntegrityManager:
                 # Check that config classes exist as directories
                 if not os.path.exists(os.path.join(value[ConfigKeys.class_dir], "%s.json" % key)):
                     self.fix_file.write_issue(to_cstring(key), "TABLE", "BAD_TABLE", "DELETE")
+                    self.issues_found = 1
                 # Check that config classes exist in database
                 if not key.lower() in tables_in_db:
                     self.fix_file.write_issue(to_cstring(key), "TABLE", "BAD_TABLE", "DELETE")
+                    self.issues_found = 1
 
     def record_check(self, object sess, object UserClass, str table_name):
         """ Method will check consistency of each individual record
@@ -135,12 +137,15 @@ cdef class IntegrityManager:
             # Data type of record is not known
             if record.data_type == "unknown":
                 self.fix_file.write_issue(to_cstring(record._id), "RECORD", "BAD_TYPE", "NONE")
+                self.issues_found = 1
             # File for record, as stored in db, does not exist
             elif record_full_path is None or not os.path.exists(record_full_path):
                 self.fix_file.write_issue(to_cstring(record._id), "RECORD", "BAD_FILE", "DELETE")
+                self.issues_found = 1
         for _file in records_in_table_dir.difference(record_paths):
             # File is in db directory but not in database table
             self.fix_file.write_issue(to_cstring(_file), "FILE", "BAD_RECORD", "DELETE")
+            self.issues_found = 1
 
     cdef FunctionHash _create_function_hash(self):
         cdef FunctionHash function_hash = FunctionHash(11)

@@ -84,7 +84,9 @@ class ClassManager:
         print_if_not_silent(silent, " ..Determining updates")
         # Or operation on sets to get all ids to add
         try:
-            ids_to_add = set(count_table_object.file_contents.keys()) | set(genome_files_to_add)
+            ids_to_add = set(count_table_object.file_contents.keys()) | \
+                         set([os.path.splitext(_file)[0] for _file in genome_files_to_add if _file != ""])
+            print(ids_to_add)
         except AttributeError:
             ids_to_add = set(genome_files_to_add)
         table_class_attrs_keys = set(ClassManager.correct_iterable(ClassManager.get_class_as_dict(config).keys()))
@@ -157,7 +159,12 @@ class ClassManager:
                                     os.path.join(config.table_dir, _id_))
                         new_records += 1
                     except FileNotFoundError:
-                        new_records_no_files += 1
+                        try:
+                            shutil.copy(os.path.join(directory_name, _id_ + ".gz"),
+                                        os.path.join(config.table_dir, _id_ + ".gz"))
+                            new_records += 1
+                        except FileNotFoundError:
+                            new_records_no_files += 1
                 else:
                     new_records_no_files += 1
                 db_object = UserClass()
@@ -244,7 +251,7 @@ class ClassManager:
         :return:
         """
         metadata = metadata or MetaData(bind=engine or BaseData.get_engine(db_dir, db_name), reflect=True)
-        t = Record(table_name, metadata, Column('id', Integer, primary_key=True),
+        t = Table(table_name, metadata, Column('id', Integer, primary_key=True),
                    Column("_id", String, unique=True, index=True),
                    Column("data_type", String, index=True),
                    Column("location", String, index=True),

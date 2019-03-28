@@ -1,3 +1,4 @@
+import os
 from sqlalchemy.orm import mapper
 from random import randint
 from datetime import datetime
@@ -29,11 +30,15 @@ def _integrity_check_display_message_prelude(db_name, working_directory, tables_
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t\t%s" % db_name)
     print(" Tables in check:\t\t%s" % ", ".join(tables_to_search).rstrip(", "))
-    print(" Fix file generated:\t\t%s" % fixfile_prefix, "\n")
+    print(" Fix file generated:\t\t%s" % fixfile_prefix)
+    print(" Note: .fix file will auto-delete if no issues are found", "\n")
 
 
-def _integrity_check_display_message_epilogue():
-    print("Integrity check complete!", "\n")
+def _integrity_check_display_message_epilogue(passed, fix_file):
+    if passed == 0:
+        print("Integrity check complete with no errors!", "\n")
+    else:
+        print("Integrity check complete, see %s for errors!" % fix_file, "\n")
 
 
 def integrity_check(config_file, table_name, alias):
@@ -69,5 +74,7 @@ def integrity_check(config_file, table_name, alias):
         # Map to SQL orm
         mapper(UserClass, TableClass)
         im.record_check(sess, UserClass, table)
+    if im.issues_found == 0:
+        os.remove(py_fixfile_name)
+    _integrity_check_display_message_epilogue(im.issues_found, py_fixfile_name)
     del im
-    _integrity_check_display_message_epilogue()
