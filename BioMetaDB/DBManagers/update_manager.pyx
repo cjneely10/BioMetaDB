@@ -27,15 +27,14 @@ class UpdateManager:
         return self._write_to_file(*self._query_table(DBClass), outfile_prefix)
 
     @staticmethod
-    def delete_old_table_and_populate(object engine, object TableClass, object UpdatedClass, str data_table, str table_name, object sess, silent,
+    def delete_old_table_and_populate(object engine, object TableClass, object UpdatedClass, object data_table, str table_name, object sess, bint silent,
                                       list ignore_fields=[]):
         print_if_not_silent(silent, " ..Deleting old table schema")
         TableClass.drop(engine)
         print_if_not_silent(silent, " ..Creating new table and filling with existing data")
         UpdatedClass.create(engine)
-        cdef dict records
-        cdef object record
         records = UpdateManager.create_from_csv(data_table, {table_name: UpdatedClass}, ignore_fields)
+        cdef object record
         for record in records[table_name]:
             sess.add(record)
         sess.commit()
@@ -46,8 +45,7 @@ class UpdateManager:
         :param DBClass:
         :return: (Dict[str, List[db_objects]])      DB data
         """
-        cdef list data
-        data = self.session.query(DBClass).all()
+        cdef list data = self.session.query(DBClass).all()
         # Return list of columns and dict with name of table as key and queried data as value
         try:
             return {self.cfg.table_name: [col for col in data[0].keys() if col != "_sa_instance_state"], }, \
@@ -65,10 +63,10 @@ class UpdateManager:
         :return:
         """
         # Iterate over tables
+        cdef str outfile_path = UpdateManager._check_migration_file_number(
+            os.path.join(self.cfg.migrations_dir, outfile_prefix + UpdateManager.MGMT_EXT))
         cdef str table_name
         cdef object record
-        outfile_path = UpdateManager._check_migration_file_number(
-            os.path.join(self.cfg.migrations_dir, outfile_prefix + UpdateManager.MGMT_EXT))
         W = open(os.path.join(self.cfg.migrations_dir, outfile_path), "w")
         for table_name in data.keys():
             # List of columns in table
@@ -94,8 +92,8 @@ class UpdateManager:
         :param simple_migration_path:   (str) template migration string as ########.migrations.mgt
         :return:
         """
-        cdef list possible_migrations
         cdef str path_prefix
+        cdef list possible_migrations
         if os.path.isfile(simple_migration_path):
             possible_migrations = sorted(glob.glob("%s*" % simple_migration_path.rstrip(UpdateManager.MGMT_EXT)))
             if len(possible_migrations) > 1:
@@ -115,7 +113,7 @@ class UpdateManager:
         return simple_migration_path
 
     @staticmethod
-    def _load_from_csv(str csv_file):
+    def _load_from_csv(object csv_file):
         """ Protected method to load csv data and dictionaries of columns and data
 
         :param csv_file:
@@ -139,7 +137,7 @@ class UpdateManager:
         return cols, tables
 
     @staticmethod
-    def create_from_csv(str csv_file, dict tables, list ignore_fields):
+    def create_from_csv(object csv_file, dict tables, list ignore_fields):
         """ Create database objects using new schema.
         This is to be completed once all data has been backed up from the server
 
@@ -149,6 +147,10 @@ class UpdateManager:
         :return:
         """
         # Load data from .csv file
+        cdef dict cols
+        cdef dict csv_data
+        cdef object db_object
+        cdef int i
         cols, csv_data = UpdateManager._load_from_csv(csv_file)
         cdef dict db_objects = {}
         cdef str name
@@ -156,7 +158,7 @@ class UpdateManager:
         for name, Table in tables.items():
             db_objects[name] = []
             # Create DB object using json data stored in file
-            DBClass = type(name, (Table,), {})
+            DBClass = type(name, (Record,), {})
             mapper(DBClass, Table)
             if name in csv_data.keys():
                 # Skip certain fields

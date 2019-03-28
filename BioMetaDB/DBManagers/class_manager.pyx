@@ -44,6 +44,7 @@ class ClassManager:
         :return:
         """
         cdef object engine
+        cdef object metadata, t
         cdef str db_dir = os.path.join(working_dir, Directories.DATABASE)
         cdef str table_dir = os.path.join(db_dir, table_name)
         cdef str classes_dir = os.path.join(working_dir, Directories.CLASSES)
@@ -77,7 +78,7 @@ class ClassManager:
         :param config: (object)  ConfigManager object
         :return:
         """
-        cdef object engine, sess
+        # cdef object engine, sess
         cdef set ids_to_add
         cdef set table_class_attrs_keys
         cdef set data_file_attrs_keys
@@ -88,6 +89,7 @@ class ClassManager:
         cdef int new_records_no_files = 0
         cdef int new_records_no_data_type = 0
         cdef str _id_
+        cdef object metadata, UpdatedDBClass
         print_if_not_silent(silent, "\nPopulating schema")
         print_if_not_silent(silent, " ..Loading database")
         engine = BaseData.get_engine(config.db_dir, config.db_name + ".db")
@@ -260,7 +262,7 @@ class ClassManager:
         :return:
         """
         metadata = metadata or MetaData(bind=engine or BaseData.get_engine(db_dir, db_name), reflect=True)
-        t = Table(table_name, metadata, Column('id', Integer, primary_key=True),
+        cdef object t = Table(table_name, metadata, Column('id', Integer, primary_key=True),
                    Column("_id", String, unique=True, index=True),
                    Column("data_type", String, index=True),
                    Column("location", String, index=True),
