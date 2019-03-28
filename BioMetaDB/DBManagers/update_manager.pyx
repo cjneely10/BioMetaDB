@@ -10,12 +10,12 @@ class UpdateManager:
     IGNORE = ("BaseData", "DataTypes", "FileLocations", "DBManager", "Base")
     MGMT_EXT = ".migrations.mgt"
 
-    def __init__(self, config_manager_object, class_as_dict, session):
+    def __init__(self, object config_manager_object, dict class_as_dict, object session):
         self.cfg = config_manager_object
         self.class_as_dict = class_as_dict
         self.session = session
 
-    def create_table_copy(self, outfile_prefix, DBClass, silent):
+    def create_table_copy(self, str outfile_prefix, object DBClass, bint silent):
         """ Function writes a copy of data currently stored in the DB table
 
         :param silent:
@@ -27,23 +27,26 @@ class UpdateManager:
         return self._write_to_file(*self._query_table(DBClass), outfile_prefix)
 
     @staticmethod
-    def delete_old_table_and_populate(engine, TableClass, UpdatedClass, data_table, table_name, sess, silent,
-                                      ignore_fields=[]):
+    def delete_old_table_and_populate(object engine, object TableClass, object UpdatedClass, str data_table, str table_name, object sess, silent,
+                                      list ignore_fields=[]):
         print_if_not_silent(silent, " ..Deleting old table schema")
         TableClass.drop(engine)
         print_if_not_silent(silent, " ..Creating new table and filling with existing data")
         UpdatedClass.create(engine)
+        cdef dict records
+        cdef object record
         records = UpdateManager.create_from_csv(data_table, {table_name: UpdatedClass}, ignore_fields)
         for record in records[table_name]:
             sess.add(record)
         sess.commit()
 
-    def _query_table(self, DBClass):
+    def _query_table(self, object DBClass):
         """ Queries single table in database based on class
 
         :param DBClass:
         :return: (Dict[str, List[db_objects]])      DB data
         """
+        cdef list data
         data = self.session.query(DBClass).all()
         # Return list of columns and dict with name of table as key and queried data as value
         try:
@@ -53,7 +56,7 @@ class UpdateManager:
             return {self.cfg.table_name: self.class_as_dict.keys(), }, {
                 self.cfg.table_name: data, }
 
-    def _write_to_file(self, cols, data, outfile_prefix):
+    def _write_to_file(self, dict cols, dict data, str outfile_prefix):
         """ Protected method that writes or prints query data. Called when write_to_file or print_all is called.
 
         :param outfile_prefix: (str) Prefix to give stored data
@@ -62,6 +65,8 @@ class UpdateManager:
         :return:
         """
         # Iterate over tables
+        cdef str table_name
+        cdef object record
         outfile_path = UpdateManager._check_migration_file_number(
             os.path.join(self.cfg.migrations_dir, outfile_prefix + UpdateManager.MGMT_EXT))
         W = open(os.path.join(self.cfg.migrations_dir, outfile_path), "w")
@@ -83,12 +88,14 @@ class UpdateManager:
         return W.name
 
     @staticmethod
-    def _check_migration_file_number(simple_migration_path):
+    def _check_migration_file_number(str simple_migration_path):
         """ Protected method will determine the most recent migration and will write new copy
 
         :param simple_migration_path:   (str) template migration string as ########.migrations.mgt
         :return:
         """
+        cdef list possible_migrations
+        cdef str path_prefix
         if os.path.isfile(simple_migration_path):
             possible_migrations = sorted(glob.glob("%s*" % simple_migration_path.rstrip(UpdateManager.MGMT_EXT)))
             if len(possible_migrations) > 1:
@@ -108,16 +115,16 @@ class UpdateManager:
         return simple_migration_path
 
     @staticmethod
-    def _load_from_csv(csv_file):
+    def _load_from_csv(str csv_file):
         """ Protected method to load csv data and dictionaries of columns and data
 
         :param csv_file:
         :return Tuple[Dict[str, List[str]], Dict[str, List[List[str]]]]:
         """
-        tables = {}
+        cdef dict tables = {}
         csv_file = open(csv_file, newline='')
         csv_reader = csv.reader(csv_file, delimiter=",")
-        cols = {}
+        cdef dict cols = {}
         # Load each table data into cols and tables variables
         for row in csv_reader:
             if row[0] == "Record":
@@ -132,7 +139,7 @@ class UpdateManager:
         return cols, tables
 
     @staticmethod
-    def create_from_csv(csv_file, tables, ignore_fields):
+    def create_from_csv(str csv_file, dict tables, list ignore_fields):
         """ Create database objects using new schema.
         This is to be completed once all data has been backed up from the server
 
@@ -143,7 +150,9 @@ class UpdateManager:
         """
         # Load data from .csv file
         cols, csv_data = UpdateManager._load_from_csv(csv_file)
-        db_objects = {}
+        cdef dict db_objects = {}
+        cdef str name
+        cdef object Table
         for name, Table in tables.items():
             db_objects[name] = []
             # Create DB object using json data stored in file

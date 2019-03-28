@@ -32,9 +32,10 @@ class ClassManager:
     }
 
     @staticmethod
-    def create_initial_table_in_db(db_name, working_dir, table_name, data_types, silent, initial=True):
+    def create_initial_table_in_db(str db_name, str working_dir, str table_name, dict data_types, bint silent, bint initial=True):
         """ Creates initial database and tables
 
+        :param silent: (bool)
         :param initial: (bool)      Initial table or not
         :param db_name: (str)       Name of database to create
         :param working_dir: (str)   Path to project folder
@@ -42,9 +43,10 @@ class ClassManager:
         :param data_types: (Dict[str, str) Attributes of class as dictionary
         :return:
         """
-        db_dir = os.path.join(working_dir, Directories.DATABASE)
-        table_dir = os.path.join(db_dir, table_name)
-        classes_dir = os.path.join(working_dir, Directories.CLASSES)
+        cdef object engine
+        cdef str db_dir = os.path.join(working_dir, Directories.DATABASE)
+        cdef str table_dir = os.path.join(db_dir, table_name)
+        cdef str classes_dir = os.path.join(working_dir, Directories.CLASSES)
         print_if_not_silent(silent, " ..Generating table class from data file")
         data_types = ClassManager.correct_dict(data_types)
         engine = None
@@ -62,8 +64,8 @@ class ClassManager:
         ClassManager.write_class(data_types, classes_out_file)
 
     @staticmethod
-    def populate_data_to_existing_table(table_name, count_table_object, config, genome_files_to_add, directory_name,
-                                        silent, alias=None):
+    def populate_data_to_existing_table(str table_name, object count_table_object, object config, object genome_files_to_add, str directory_name,
+                                        bint silent, str alias=None):
         """ Method will load data from CountTable into database
 
         :param silent:
@@ -75,6 +77,17 @@ class ClassManager:
         :param config: (object)  ConfigManager object
         :return:
         """
+        cdef object engine, sess
+        cdef set ids_to_add
+        cdef set table_class_attrs_keys
+        cdef set data_file_attrs_keys
+        cdef dict combined_attrs
+        cdef list to_add = []
+        cdef int existing_records = 0
+        cdef int new_records = 0
+        cdef int new_records_no_files = 0
+        cdef int new_records_no_data_type = 0
+        cdef str _id_
         print_if_not_silent(silent, "\nPopulating schema")
         print_if_not_silent(silent, " ..Loading database")
         engine = BaseData.get_engine(config.db_dir, config.db_name + ".db")
@@ -85,8 +98,7 @@ class ClassManager:
         # Or operation on sets to get all ids to add
         try:
             ids_to_add = set(count_table_object.file_contents.keys()) | \
-                         set([os.path.splitext(_file)[0] for _file in genome_files_to_add if _file != ""])
-            print(ids_to_add)
+                         set([os.path.splitext(_file)[0] for _file in genome_files_to_add if _file != "" and os.path.splitext(_file)[1] == ".gz"])
         except AttributeError:
             ids_to_add = set(genome_files_to_add)
         table_class_attrs_keys = set(ClassManager.correct_iterable(ClassManager.get_class_as_dict(config).keys()))
@@ -124,16 +136,12 @@ class ClassManager:
                                                          sess, silent)
             TableClass = UpdatedDBClass
             print_if_not_silent(silent, " ..Complete!\n")
-        to_add = []
         UserClass = type(alias or table_name, (Record,), {})
         mapper(UserClass, TableClass)
         try:
             corrected_header = ClassManager.correct_iterable(count_table_object.header)
         except AttributeError:
             corrected_header = None
-        existing_records = 0
-        new_records = 0
-        new_records_no_files = 0
         print_if_not_silent(silent, "\nGathering data by record:")
         if '' in ids_to_add:
             ids_to_add.remove('')
@@ -154,17 +162,16 @@ class ClassManager:
                 if directory_name != "None":
                     print_if_not_silent(silent, " ....Moving new record from %s to %s" % (directory_name,
                                                                                           config.rel_db_dir))
-                    try:
+                    if os.path.isfile(os.path.join(directory_name, _id_)):
                         shutil.copy(os.path.join(directory_name, _id_),
                                     os.path.join(config.table_dir, _id_))
                         new_records += 1
-                    except FileNotFoundError:
-                        try:
-                            shutil.copy(os.path.join(directory_name, _id_ + ".gz"),
-                                        os.path.join(config.table_dir, _id_ + ".gz"))
-                            new_records += 1
-                        except FileNotFoundError:
-                            new_records_no_files += 1
+                    elif os.path.isfile(os.path.join(directory_name, _id_ + ".gz")):
+                        shutil.copy(os.path.join(directory_name, _id_ + ".gz"),
+                                    os.path.join(config.table_dir, _id_ + ".gz"))
+                        new_records += 1
+                    else:
+                        new_records_no_files += 1
                 else:
                     new_records_no_files += 1
                 db_object = UserClass()
@@ -175,6 +182,7 @@ class ClassManager:
                     setattr(db_object, "data_type", BioOps.get_type(_id_))
                 except KeyError:
                     setattr(db_object, "data_type", "unknown")
+                    new_records_no_data_type += 1
                 try:
                     if corrected_header:
                         for attr in corrected_header:
@@ -185,14 +193,15 @@ class ClassManager:
         for val in to_add:
             sess.add(val)
         sess.commit()
-        print_if_not_silent(silent, " %i existing records updated" % existing_records)
-        print_if_not_silent(silent, " %i new records added" % new_records)
-        print_if_not_silent(silent, " %i new records without data files added\n" % new_records_no_files)
+        print_if_not_silent(silent, " %i existing record(s) updated" % existing_records)
+        print_if_not_silent(silent, " %i new record(s) added" % new_records)
+        print_if_not_silent(silent, " %i new record(s) without data files added" % new_records_no_files)
+        print_if_not_silent(silent, "  %i new record(s) did not have a valid file extension\n" % new_records_no_data_type)
         print_if_not_silent(silent, "Complete!\n")
         return combined_attrs
 
     @staticmethod
-    def write_class(data_types, class_output_file):
+    def write_class(dict data_types, str class_output_file):
         """ Member writes python class as json object to file for loading
 
         :param data_types:
@@ -203,7 +212,7 @@ class ClassManager:
             json.dump(data_types, W)
 
     @staticmethod
-    def get_class_as_dict(cfg):
+    def get_class_as_dict(object cfg):
         """ Primary method for loading a class from the database
 
         :param cfg:
@@ -214,18 +223,18 @@ class ClassManager:
         return class_as_dict
 
     @staticmethod
-    def get_class_orm(table_name, engine):
+    def get_class_orm(str table_name, object engine):
         """ Method for loading a class' ORM from the database
 
         :param engine:
         :param table_name:
         :return:
         """
-        metadata = MetaData(bind=engine, reflect=True)
+        cdef object metadata = MetaData(bind=engine, reflect=True)
         return metadata.tables[table_name]
 
     @staticmethod
-    def get_class(table_name, engine):
+    def get_class(str table_name, object engine):
         """ Primary method for loading a class from the database
 
         :param alias:
@@ -233,13 +242,13 @@ class ClassManager:
         :param table_name:
         :return:
         """
-        metadata = MetaData(bind=engine, reflect=True)
+        cdef object metadata = MetaData(bind=engine, reflect=True)
         UserClass = type(table_name, (Record,), {})
         mapper(UserClass, metadata.tables[table_name])
         return UserClass
 
     @staticmethod
-    def generate_class(table_name, class_as_dict, db_dir, db_name, table_dir, metadata=None, engine=None):
+    def generate_class(str table_name, dict class_as_dict, str db_dir, str db_name, str table_dir, object metadata=None, object engine=None):
         """ Method generates class from dictionary and returns class
 
         :param metadata:
@@ -264,13 +273,16 @@ class ClassManager:
         return t, metadata
 
     @staticmethod
-    def correct_dict(class_as_dict):
+    def correct_dict(dict class_as_dict):
         """
 
         :param class_as_dict:
         :return:
         """
-        corrected_dict = {}
+        cdef dict corrected_dict = {}
+        cdef str key
+        cdef str new_key
+        cdef str bad_char
         for key in class_as_dict.keys():
             new_key = str(key).lower()
             for bad_char in unusable_punctuation:
@@ -286,8 +298,10 @@ class ClassManager:
         :param iterable:
         :return:
         """
-        new_iter = []
-
+        cdef list new_iter = []
+        cdef str _iter
+        cdef str new_val
+        cdef str bad_char
         for _iter in iterable:
             new_val = _iter.lower()
             for bad_char in unusable_punctuation:

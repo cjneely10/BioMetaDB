@@ -30,7 +30,7 @@ def _delete_records_display_message_prelude(db_name, working_directory, table_na
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t%s" % db_name)
     print(" Name of table:\t\t%s" % table_name)
-    print(" Record aliases:\t\t%s" % alias, "\n")
+    print(" Table aliases:\t\t\t%s" % alias, "\n")
     print("DATA:\tRemove records from database")
     print(" Records:\t%s" % ",".join(records_to_remove).strip(","), "\n")
 
