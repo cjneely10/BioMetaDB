@@ -5,9 +5,10 @@ cdef extern from "stdio.h":
 
 
 cdef class FixFile:
-    cdef char* file_name
-    cdef FILE* fp
     cdef initialize_file(self)
     cdef load_file(self)
-    cdef write_issue(self, char* issue_id, char* data_type, char* issue_type, char* fix_type)
-    cdef char* read_issue(self)
+    cdef read_issue(self)
+    cdef object file_name
+    cdef object fp
+    cdef list issues
+    cdef int num_issues

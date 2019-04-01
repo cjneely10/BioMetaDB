@@ -1,6 +1,6 @@
 from itertools import chain, islice
 from libc.stdlib cimport malloc, free
-from libc.string cimport strcmp
+from libc.string cimport strcmp, strlen
 
 """
 Script holds functions for optimizing speed (e.g. chunking, splitting at line, etc)
@@ -21,14 +21,15 @@ def chunk(iterable, int n):
         yield chain([next(iterable)], islice(iterable, n - 1))
 
 
-def read_until(line, delim):
+def read_until(str line, str delim):
     """ Return value before delimiter
 
     :param line: (str)	Line to read
     :param delim: (str)	Break at char (non-inclusive)
     :return str:
     """
-    char_count = 0
+    cdef int char_count = 0
+    cdef str _c
     for _c in line:
         if _c != delim:
             char_count += 1
@@ -101,6 +102,15 @@ cdef free_cstring_array(char **cstring_array):
     free(cstring_array)
 
 
+cdef str to_pystring(char* cstring):
+    cdef str to_return = ""
+    cdef size_t cstring_length = strlen(cstring)
+    cdef size_t i
+    for i in range(cstring_length):
+        to_return += chr(cstring[i])
+    return to_return
+
+
 cdef char* to_cstring(str py_string):
     """ Converts str to char*
     
@@ -121,21 +131,7 @@ cdef free_cstring(char* cstring):
     free(cstring)
 
 
-cdef str to_pystring(char* cstring):
-    """ Converts char array to pystring
-    
-    :param cstring: 
-    :return: 
-    """
-    cdef str s = ""
-    cdef size_t length = sizeof(cstring) / sizeof(cstring[0])
-    cdef int i
-    for i in range(length):
-        s += chr(cstring[i])
-    return s
-
-
-cdef int count_characters(char* cstring, char search_val):
+cdef int count_characters(char* cstring, const char* search_val):
     """ Counts number of occurrences of search_val
     
     :param cstring: 
@@ -143,10 +139,10 @@ cdef int count_characters(char* cstring, char search_val):
     :return: 
     """
     cdef int count = 0
-    cdef size_t cstring_size = sizeof(cstring) / sizeof(cstring[0])
+    cdef size_t cstring_size = strlen(cstring)
     cdef size_t i
     for i in range(cstring_size):
-        if cstring[i] == search_val:
+        if cstring[i] == search_val[0]:
             count += 1
     return count
 

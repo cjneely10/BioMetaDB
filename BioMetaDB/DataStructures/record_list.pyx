@@ -1,3 +1,4 @@
+# cython: language_level=3
 import re
 from math import sqrt
 from string import punctuation
@@ -90,18 +91,22 @@ cdef class RecordList:
         elif self.num_records == 1:
             # Long name
             if len(self.results[0]._id) > 30:
-                summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}...\n\n".format(
+                summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}...\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
                     "Record Name:",
                     self.cfg.table_name,
                     "ID:",
                     self.results[0]._id,
+                    "Data Type:",
+                    self.results[0].data_type,
                     longest_key=longest_key)
             else:
-                summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}\n\n".format(
+                summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
                     "Record Name:",
                     self.cfg.table_name,
                     "ID:",
                     self.results[0]._id,
+                    "Data Type:",
+                    self.results[0].data_type,
                     longest_key=longest_key)
         # No records found
         else:
@@ -185,7 +190,7 @@ cdef class RecordList:
             # Attempt query
             try:
                 self.results = self.sess.query(self.TableClass).filter(text(*args)).all()
-            # Column name not founc
+            # Column name not found
             except OperationalError:
                 raise ColumnNameNotFoundError
         # Default get all

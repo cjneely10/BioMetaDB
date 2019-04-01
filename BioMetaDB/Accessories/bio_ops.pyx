@@ -1,3 +1,4 @@
+# cython: language_level=3
 import os
 from Bio import SeqIO
 from BioMetaDB.Accessories.ops import chunk

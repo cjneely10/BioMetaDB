@@ -97,7 +97,6 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     config[table_name] = {
         ConfigKeys.rel_classes_dir: os.path.join(config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir],
                                                  Directories.CLASSES),
-        ConfigKeys.class_dir: os.path.join(config[ConfigKeys.DATABASES][ConfigKeys.working_dir], Directories.CLASSES),
     }
     config.set(ConfigKeys.TABLES_TO_DB, table_name, config[ConfigKeys.DATABASES][ConfigKeys.db_name])
     config.set(ConfigKeys.TABLES_TO_ALIAS, "{}|{}".format(alias, table_name), table_name)

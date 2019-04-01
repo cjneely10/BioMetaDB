@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# cython: language_level=3
 
 import argparse
 from argparse import RawTextHelpFormatter
@@ -65,12 +65,3 @@ class ArgParse:
                          "\t(Req: {})".format(" --" + " --".join(flag_dict[program])) + "\n"
         to_return += "\n"
         return to_return
-
-
-if __name__ == '__main__':
-    args_list = [
-        [["required_argument"], {"help": "Help string for argument"}],
-        [["-o", "--optional"], {"help": "Optional argument"}],
-        [["-r", "--required"], {"help": "Required argument", "required": "True"}]
-    ]
-    ap = ArgParse(args_list, description="Sample ArgParse program!")

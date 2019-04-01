@@ -1,35 +1,37 @@
 @ All header lines are statically generated and are preceded by '@'
 @
 @   This file was created by using `dbdm INTEGRITY`
-@
 @   .fix file structure identifies issues in your project and displays them as:
 @
 @       ISSUE
 @       <LEVEL>:    <ID or Name>
 @       <ISSUE_TYPE>  <FIX_TYPE>
 @       ---
-@
 @   Note that all .fix files are tab delimited
-@   Depending on the issues identified, your .fix file may contain the following:
+@
+@
+@ Depending on the issues identified, your .fix file may contain the following:
 @
 @       PROJECT:    <PROJECT_NAME>
 @       INVALID_PATH    NONE
 @
 @
-@       TABLE:    <TABLE_NAME>
-@       BAD_TABLE    DELETE
-@
-@
-@       RECORD:    <RECORD_ID>
+@       RECORD:    <RECORD_ID>:  <TABLE_NAME>
 @       BAD_TYPE    NONE
 @
+@       RECORD:    <RECORD_ID>:  <TABLE_NAME>
+@       BAD_LOCATION    DELETE
 @
-@       RECORD:    <RECORD_ID>
-@       BAD_FILE    DELETE
 @
+@       FILE:    <FILE_ID>:  <TABLE_NAME>
+@       BAD_RECORD    NONE
 @
-@       FILE:    <FILE_ID>
-@       BAD_RECORD    DELETE
+@       Each issue is defined as:
+@
+@       PROJECT INVALID_PATH:   working_dir path stored in config file is invalid
+@       RECORD  BAD_TYPE:       data type for record could not be determined
+@       RECORD  BAD_LOCATION:       stored file path for record does not exist
+@       FILE    BAD_RECORD:     file exists in project directory with no assigned database id
 @
 @   For each issue, default actions are presented. The following fixes are available:
 @
@@ -37,24 +39,18 @@
 @       INVALID_PATH    PATH    /path/to/project_directory
 @
 @
-@       TABLE:    <TABLE_NAME>
-@       BAD_TABLE    TSV    /path/to/tsv_file.tsv
-@
-@       TABLE:    <TABLE_NAME>
-@       BAD_TABLE    MGT    /path/to/db_migration_file.migration.mgt
-@
-@
-@       RECORD:    <RECORD_ID>
+@       RECORD:    <RECORD_ID>: <TABLE_NAME>
 @       BAD_TYPE    SET     data_type(e.g. fasta/fastq)
 @
+@       RECORD:    <RECORD_ID>: <TABLE_NAME>
+@       BAD_LOCATION    FILE    /path/to/data_file.fna
 @
-@       RECORD:    <RECORD_ID>
-@       BAD_FILE    FILE    /path/to/data_file.fna
 @
-@
-@       FILE:    <FILE_ID>
+@       FILE:    <FILE_ID>: <TABLE_NAME>
 @       BAD_RECORD    RECORD    record_id_in_database
 @
 @   If you do not wish to fix a particular issue, simple delete the entire entry,
 @   starting from "ISSUE" until "---"
+@
+@   Do NOT add additional characters, newline or otherwise
 @

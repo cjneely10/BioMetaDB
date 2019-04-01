@@ -51,11 +51,11 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
         table_name = ConfigManager.get_name_by_alias(alias, config)
         if table_name is None:
             print(
-                "!! Record does not exist! Run CREATE to add to existing database, or INIT to create in new database !!"
+                "!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!"
             )
             exit(1)
     if table_name != "None" and table_name not in config.keys():
-        print("!! Record does not exist! Run CREATE to add to existing database, or INIT to create in new database !!")
+        print("!! Table does not exist! Run CREATE to add to existing database, or INIT to create in new database !!")
         exit(1)
     cfg = ConfigManager(config, table_name)
     if not silent:

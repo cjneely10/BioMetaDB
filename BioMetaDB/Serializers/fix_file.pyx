@@ -1,8 +1,5 @@
+# cython: language_level=3
 import os
-from libc.stdio cimport fputs, fprintf
-from BioMetaDB.Accessories.ops cimport to_cstring
-from BioMetaDB.Accessories.ops cimport free_cstring
-from BioMetaDB.Accessories.ops cimport count_characters
 
 cdef extern from "stdio.h":
     FILE *fopen(const char *, const char *)
@@ -12,61 +9,81 @@ cdef extern from "stdio.h":
 
 
 cdef class FixFile:
-    def __init__(self, char* file_name):
+    def __init__(self, object file_name):
         """ FixFile writes and reads .fix files from project integrity checks
 
         :param file_name:
         """
         self.file_name = file_name
-        self.fp = NULL
-
-    def __del__(self):
-        """ Clear memory when deleted, close any open file pointers
-
-        :return:
-        """
-        fclose(self.fp)
-        free_cstring(self.file_name)
+        self.fp = None
+        self.issues = []
+        self.num_issues = 0
 
     cdef initialize_file(self):
         """ Creates fix file using template in module
 
         :return:
         """
-        cdef FILE* cfile
-        cfile = fopen(self.file_name, "w")
-        if cfile == NULL:
+        cdef object cfile = open(self.file_name, "w")
+        if cfile is None:
             raise FileNotFoundError(2, "No such file or directory: %s" % self.file_name)
         cdef str py_header_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                                "fix_header.txt")
-        cdef char* fix_header_path = to_cstring(py_header_path)
-        cdef FILE* fix_header_ptr = fopen(fix_header_path, "r")
-        cdef char* line = NULL
-        cdef ssize_t read
-        cdef size_t l = 0
-        fprintf(cfile, "@ %s\n@\n", self.file_name)
-        while True:
-            read = getline(&line, &l, fix_header_ptr)
-            if read == -1:
-                break
-            fputs(line, cfile)
+        cdef object fix_header_ptr = open(py_header_path, "rb")
+        for line in fix_header_ptr:
+            cfile.write(line.decode())
         self.fp = cfile
+        fix_header_ptr.close()
 
     cdef load_file(self):
         """ Loads file generated in INTEGRITY
         
         :return: 
         """
-        cdef FILE* cfile
-        cfile = fopen(self.file_name, "r")
-        if cfile == NULL:
+        cdef object cfile = open(self.file_name, "r")
+        if cfile is None:
             raise FileNotFoundError(2, "No such file or directory: %s" % self.file_name)
         self.fp = cfile
 
-    cdef char* read_issue(self):
-        pass
+    cdef read_issue(self):
+        cdef object line
+        cdef str data_type, issue_type, fix_type, fix_data = "NONE", location, parsed_issue
+        for line in self.fp:
+            while line.startswith("@"):
+                line = next(self.fp)
+            line = line.rstrip("\r\n")
+            if line == "ISSUE:":
+                line = next(self.fp)
+                self.num_issues += 1
+                line = line.rstrip("\r\n").split(":")
+                data_type = line[0]
+                _id = line[1].lstrip("\t")
+                if len(line) == 3:
+                    location = line[2].lstrip("\t")
+                line = next(self.fp)
+                line = line.rstrip("\r\n").split("\t")
+                issue_type = line[0]
+                fix_type = line[1]
+                if len(line) == 3:
+                    fix_data = line[2]
+                parsed_issue = "%s|%s|%s" % (data_type, issue_type, fix_type)
+                self.issues.append((_id, location, parsed_issue, fix_data,))
 
-    cdef write_issue(self, char* issue_id, char* data_type, char* issue_type, char* fix_type):
+
+    def write_issue_with_location(self, str issue_id, str data_type, str issue_type, str fix_type, str location):
+        """
+        
+        :param location: 
+        :param issue_id:
+        :param data_type:
+        :param issue_type: 
+        :param fix_type: 
+        :return: 
+        """
+        self.fp.write("ISSUE:\n%s:\t%s:\t%s\n%s\t%s\n---\n" % (data_type, issue_id, location, issue_type, fix_type))
+
+
+    def write_issue(self, str issue_id, str data_type, str issue_type, str fix_type):
         """
         
         :param issue_id:
@@ -75,4 +92,5 @@ cdef class FixFile:
         :param fix_type: 
         :return: 
         """
-        fprintf(self.fp, "ISSUE:\n%s:\t%s\n%s\t%s\n---\n", data_type, issue_id, issue_type, fix_type)
+        self.fp.write("ISSUE:\n%s:\t%s\n%s\t%s\n---\n" % (data_type, issue_id, issue_type, fix_type))
+

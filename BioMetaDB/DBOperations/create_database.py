@@ -122,7 +122,6 @@ def create_database(db_name, table_name, directory_name, data_file, alias, silen
     }
     config[table_name] = {
         ConfigKeys.rel_classes_dir:     os.path.join(db_name, Directories.CLASSES),
-        ConfigKeys.class_dir:    os.path.join(abs_path_working_dir, Directories.CLASSES),
     }
     config[ConfigKeys.TABLES_TO_DB] = {
         table_name: db_name,

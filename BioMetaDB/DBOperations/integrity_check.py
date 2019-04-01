@@ -1,3 +1,4 @@
+# cython: language_level=3
 import os
 from sqlalchemy.orm import mapper
 from random import randint
@@ -21,9 +22,8 @@ def _integrity_check_display_message_prelude(db_name, working_directory, tables_
 
     :param db_name:
     :param working_directory:
-    :param table_name:
-    :param alias:
     :param fixfile_prefix:
+    :param tables_to_search:
     :return:
     """
     print("INTEGRITY:\tCheck project for data issues")
@@ -41,12 +41,12 @@ def _integrity_check_display_message_epilogue(passed, fix_file):
         print("Integrity check complete, see %s for errors!" % fix_file, "\n")
 
 
-def integrity_check(config_file, table_name, alias):
-    """
+def integrity_check(config_file, table_name, alias, silent):
+    """  Function called from dbdm that checks integrity and issues in project at all levels
 
     :param config_file:
     :param table_name:
-    :param alias:
+    :param alias:l
     :return:
     """
     config, config_file = ConfigManager.confirm_config_set(config_file)
@@ -55,16 +55,19 @@ def integrity_check(config_file, table_name, alias):
     if table_name is None or (table_name == "None" and alias == "None"):
         tables_to_search = list(config[ConfigKeys.TABLES_TO_DB].keys())
     else:
-        tables_to_search = [table_name,]
-    py_fixfile_name = "{}.{}.{}.fix".format(datetime.today().strftime("%Y%m%d"),
-                                            str(randint(1, 1001)), "_".join(tables_to_search))
-    _integrity_check_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name],
-                                             config[ConfigKeys.DATABASES][ConfigKeys.working_dir],
-                                             tables_to_search,
-                                             py_fixfile_name)
+        tables_to_search = [table_name, ]
+    py_fixfile_name = "%s.%s.%s.fix" % (datetime.today().strftime("%Y%m%d"),
+                                        str(randint(1, 1001)), "_".join(tables_to_search))
+    if not silent:
+        _integrity_check_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name],
+                                                 config[ConfigKeys.DATABASES][ConfigKeys.working_dir],
+                                                 tables_to_search,
+                                                 py_fixfile_name)
     im = IntegrityManager(config, py_fixfile_name, tables_to_search)
+    # TODO: Implement table-level checks
+    im.initialize_fix_file()
     im.initial_project_check()
-    im.table_check()
+    # im.table_check()
     for table in tables_to_search:
         cfg = ConfigManager(config, table)
         engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
@@ -76,5 +79,6 @@ def integrity_check(config_file, table_name, alias):
         im.record_check(sess, UserClass, table)
     if im.issues_found == 0:
         os.remove(py_fixfile_name)
-    _integrity_check_display_message_epilogue(im.issues_found, py_fixfile_name)
+    if not silent:
+        _integrity_check_display_message_epilogue(im.issues_found, py_fixfile_name)
     del im
