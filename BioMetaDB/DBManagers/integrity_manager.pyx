@@ -1,5 +1,6 @@
 # cython: language_level=3
 import os
+import shutil
 from sqlalchemy.orm import mapper
 from sqlalchemy import text
 from BioMetaDB.Accessories.ops cimport to_cstring_array, free_cstring_array
@@ -26,9 +27,17 @@ def record_bad_location_file(**kwargs):
     :param kwargs:
     :return:
     """
-    assert_kwargs_loaded(kwargs, "_id", "sess", "UserClass", "fix_data")
+    assert_kwargs_loaded(kwargs, "_id", "sess", "UserClass", "fix_data", "config", "table_name")
+    try:
+        shutil.copy(
+            kwargs["fix_data"],
+            os.path.join(kwargs["config"][ConfigKeys.DATABASES][ConfigKeys.db_dir], kwargs["table_name"])
+        )
+    except FileNotFoundError:
+        return "Unable to set location for %s" % kwargs["_id"]
     record = (kwargs["sess"]).query(kwargs["UserClass"]).filter(text("_id == '%s'" % kwargs["_id"])).first()
-    setattr(record, "location", kwargs["fix_data"])
+    setattr(record, "location", os.path.join(kwargs["config"][ConfigKeys.DATABASES][ConfigKeys.db_dir], kwargs["table_name"]))
+    setattr(record, "_id", os.path.basename(kwargs['fix_data']))
     return "Info <location> set to %s for %s" % (kwargs["fix_data"], kwargs["_id"])
 
 def file_bad_record_delete(**kwargs):
@@ -293,7 +302,8 @@ cdef class IntegrityManager:
                                                               fix_data=issues[i][3],
                                                               engine=engine,
                                                               cfg=self.config,
-                                                              silent=silent)
+                                                              silent=silent,
+                                                              table_name=current_table_name)
             else:
                 print("Invalid fix data passed for %s" % issues[i][0])
             # Print results of each fix
