@@ -4,7 +4,7 @@
 @   .fix file structure identifies issues in your project and displays them as:
 @
 @       ISSUE
-@       <LEVEL>:    <ID or Name>
+@       <DATA_TYPE>:    <ID>
 @       <ISSUE_TYPE>  <FIX_TYPE>
 @       ---
 @   Note that all .fix files are tab delimited

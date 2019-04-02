@@ -17,12 +17,6 @@ def issue_match(search_params_set, issue_info, replace_dict):
     :return:
     """
     # Issue matches search criteria passed by user
-    # sys.stderr.write("search_params\n")
-    # for key in search_params_set:
-    #     sys.stderr.write("%s\n" % key)
-    # sys.stderr.write("issue_info\n")
-    # for key, val in issue_info.items():
-    #     sys.stderr.write("%s\t%s\n" % (key, val))
     set_values = set(issue_info.values())
     for key in search_params_set:
         if key not in set_values:
