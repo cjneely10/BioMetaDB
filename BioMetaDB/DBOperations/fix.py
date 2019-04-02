@@ -2,6 +2,7 @@ import os
 from BioMetaDB.Config.config_manager import ConfigManager, ConfigKeys
 from BioMetaDB.Exceptions.fix_exceptions import FixAssertString
 from BioMetaDB.DBManagers.integrity_manager import IntegrityManager
+from BioMetaDB.DBOperations.integrity_check import integrity_check
 
 
 def _fix_display_message_prelude(db_name, working_directory, fixfile_prefix):
@@ -22,7 +23,7 @@ def _fix_display_message_epilogue():
     print("\nProject fix complete! Re-run INTEGRITY to confirm!", "\n")
 
 
-def fix(config_file, data_file, silent):
+def fix(config_file, data_file, silent, integrity_check):
     """ Function called from dbdm that commits all fixes listed in .fix file to project
 
     :param config_file:
@@ -30,6 +31,7 @@ def fix(config_file, data_file, silent):
     :param silent:
     :return:
     """
+    _cfg, _sil = config_file, silent
     config, config_file = ConfigManager.confirm_config_set(config_file)
     assert os.path.exists(data_file) and os.path.splitext(data_file)[1] == ".fix", FixAssertString.FIX_NOT_FOUND
     if not silent:
@@ -43,3 +45,5 @@ def fix(config_file, data_file, silent):
     im.parse_and_fix(silent)
     if not silent:
         _fix_display_message_epilogue()
+    if not integrity_check:
+        integrity_check(_cfg, "None", "None", _sil)

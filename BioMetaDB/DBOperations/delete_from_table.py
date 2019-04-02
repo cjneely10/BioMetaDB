@@ -1,6 +1,6 @@
 import os
 from sqlalchemy.orm import mapper
-
+from BioMetaDB.DBOperations.integrity_check import integrity_check
 from BioMetaDB.Exceptions.config_manager_exceptions import TableNameAssertString
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Models.functions import Record
@@ -39,7 +39,7 @@ def _remove_columns_display_message_epilogue():
     print("Records removed from database!", "\n")
 
 
-def delete_from_table(config_file, table_name, list_file, alias, silent):
+def delete_from_table(config_file, table_name, list_file, alias, silent, integrity_check):
     """
 
     :param silent:
@@ -49,6 +49,7 @@ def delete_from_table(config_file, table_name, list_file, alias, silent):
     :param alias:
     :return:
     """
+    _cfg, _tbl, _sil, _al = config_file, table_name, silent, alias
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
@@ -81,3 +82,5 @@ def delete_from_table(config_file, table_name, list_file, alias, silent):
     sess.commit()
     if not silent:
         _remove_columns_display_message_epilogue()
+    if not integrity_check:
+        integrity_check(_cfg, _tbl, _al, _sil)

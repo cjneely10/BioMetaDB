@@ -9,6 +9,7 @@ from BioMetaDB.DBManagers.type_mapper import TypeMapper
 from BioMetaDB.Config.config_manager import Config
 from BioMetaDB.Config.config_manager import ConfigManager
 from BioMetaDB.Config.config_manager import ConfigKeys
+from BioMetaDB.DBOperations.integrity_check import integrity_check
 
 
 """
@@ -62,7 +63,7 @@ def _create_all_directories(working_directory, table_name):
     return classes_dir, config_dir, db_dir, table_dir
 
 
-def create_database(db_name, table_name, directory_name, data_file, alias, silent):
+def create_database(db_name, table_name, directory_name, data_file, alias, silent, integrity_check):
     """ Function called from dbdm initializes project/module
 
     :param silent:
@@ -144,3 +145,5 @@ def create_database(db_name, table_name, directory_name, data_file, alias, silen
                                                          genomic_files_to_add, directory_name, silent)
     if not silent:
         _initialization_display_message_epilogue()
+    if not integrity_check:
+        integrity_check(directory_name, table_name, "None", silent)

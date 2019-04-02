@@ -1,7 +1,7 @@
 import os
 import shutil
 from sqlalchemy.orm import mapper
-
+from BioMetaDB.DBOperations.integrity_check import integrity_check
 from BioMetaDB.Exceptions.config_manager_exceptions import TableNameAssertString
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Models.functions import Record
@@ -39,7 +39,7 @@ def _remove_columns_display_message_epilogue():
     print("Record removed from database!", "\n")
 
 
-def remove_table_from_database(config_file, table_name, alias, silent):
+def remove_table_from_database(config_file, table_name, alias, silent, integrity_check):
     """ Function removes a given table from a database
 
     :param silent:
@@ -48,6 +48,7 @@ def remove_table_from_database(config_file, table_name, alias, silent):
     :param alias:
     :return:
     """
+    _cfg, _tbl, _sil, _al = config_file, table_name, silent, alias
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
@@ -80,3 +81,5 @@ def remove_table_from_database(config_file, table_name, alias, silent):
     shutil.rmtree(cfg.table_dir)
     if not silent:
         _remove_columns_display_message_epilogue()
+    if not integrity_check:
+        integrity_check(_cfg, _tbl, _al, _sil)

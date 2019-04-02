@@ -41,6 +41,8 @@ if __name__ == "__main__":
          {"help": "Display column names only with SUMMARIZE", "action": "store_true", "default": False}),
         (("-q", "--query"),
          {"help": "Query to pass to SUMMARIZE", "default": "None"}),
+        (("-i", "--integrity_cancel"),
+         {"help": "Cancel integrity check", "default": False, "action": "store_true"}),
     )
     programs = {
         "INIT":                     create_database,
@@ -54,15 +56,15 @@ if __name__ == "__main__":
         "FIX":                      fix,
     }
     flags = {
-        "INIT":                 ("db_name", "table_name", "directory_name", "data_file", "alias", "silent"),
-        "CREATE":               ("config_file", "table_name", "directory_name", "data_file", "alias", "silent"),
-        "UPDATE":               ("config_file", "table_name", "directory_name", "data_file", "alias", "silent"),
-        "REMOVECOL":            ("config_file", "table_name", "list_file", "alias", "silent"),
-        "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent"),
-        "REMOVE":               ("config_file", "table_name", "alias", "silent"),
+        "INIT":                 ("db_name", "table_name", "directory_name", "data_file", "alias", "silent", "integrity_cancel"),
+        "CREATE":               ("config_file", "table_name", "directory_name", "data_file", "alias", "silent", "integrity_cancel"),
+        "UPDATE":               ("config_file", "table_name", "directory_name", "data_file", "alias", "silent", "integrity_cancel"),
+        "REMOVECOL":            ("config_file", "table_name", "list_file", "alias", "silent", "integrity_cancel"),
+        "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent", "integrity_cancel"),
+        "REMOVE":               ("config_file", "table_name", "alias", "silent", "integrity_cancel"),
         "SUMMARIZE":            ("config_file", "view", "query", "table_name", "alias"),
         "INTEGRITY":            ("config_file", "table_name", "alias", "silent"),
-        "FIX":                  ("config_file", "data_file", "silent"),
+        "FIX":                  ("config_file", "data_file", "silent", "integrity_cancel"),
     }
     errors = {
         TableNameNotFoundError:     "Name of table not found",

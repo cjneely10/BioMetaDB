@@ -3,6 +3,7 @@ from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.Config.config_manager import ConfigManager
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Serializers.count_table import CountTable
+from BioMetaDB.DBOperations.integrity_check import integrity_check
 
 """
 Script holds functionality for UPDATE, which updates existing/adds new records to database
@@ -35,7 +36,7 @@ def _update_table_display_message_epilogue():
     print("Update complete!", "\n")
 
 
-def update_existing_table(config_file, table_name, directory_name, data_file, alias, silent):
+def update_existing_table(config_file, table_name, directory_name, data_file, alias, silent, integrity_check):
     """
 
     :param alias:
@@ -46,6 +47,7 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     :param data_file:
     :return:
     """
+    _cfg, _tbl, _al, _sil = config_file, table_name, alias, silent
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
@@ -84,3 +86,5 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     ClassManager.write_class(new_attrs, cfg.classes_file)
     if not silent:
         _update_table_display_message_epilogue()
+    if not integrity_check:
+        integrity_check(_cfg, _tbl, _al, _sil)

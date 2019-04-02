@@ -7,6 +7,7 @@ from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.DBManagers.type_mapper import TypeMapper
 from BioMetaDB.Exceptions.create_database_exceptions import CreateDBAssertString
+from BioMetaDB.DBOperations.integrity_check import integrity_check
 
 """
 Script will hold functionality for CREATE, to create new tables when in existing database
@@ -50,7 +51,7 @@ def _create_all_directories(working_directory, table_name):
     os.makedirs(os.path.join(db_dir, table_name), exist_ok=True)
 
 
-def create_table_in_existing_database(config_file, table_name, directory_name, data_file, alias, silent):
+def create_table_in_existing_database(config_file, table_name, directory_name, data_file, alias, silent, integrity_check):
     """
 
     :param silent:
@@ -63,6 +64,7 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
     """
     assert table_name != "None", CreateDBAssertString.TABLE_NAME_NOT_SET
     assert config_file is not None, ConfigAssertString.CONFIG_FILE_NOT_PASSED
+    _cfg, _tbl, _sil, _al = config_file, table_name, silent, alias
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if table_name in config.keys():
         print("!! Record exists, exiting. To update table, use UPDATE !!")
@@ -113,3 +115,5 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
                                                          genomic_files_to_add, directory_name, silent)
     if not silent:
         _create_table_display_message_epilogue()
+    if not integrity_check:
+        integrity_check(_cfg, _tbl, _al, _sil)

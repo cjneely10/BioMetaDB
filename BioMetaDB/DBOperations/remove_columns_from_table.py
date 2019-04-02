@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from BioMetaDB.DBOperations.integrity_check import integrity_check
 from BioMetaDB.Exceptions.config_manager_exceptions import TableNameAssertString
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Config.config_manager import ConfigKeys
@@ -39,7 +39,7 @@ def _remove_columns_display_message_epilogue():
     print("Columns removed from database!", "\n")
 
 
-def remove_columns_from_table(config_file, table_name, list_file, alias, silent):
+def remove_columns_from_table(config_file, table_name, list_file, alias, silent, integrity_check):
     """
 
     :param silent:
@@ -49,6 +49,7 @@ def remove_columns_from_table(config_file, table_name, list_file, alias, silent)
     :param alias:
     :return:
     """
+    _cfg, _tbl, _sil, _al = config_file, table_name, silent, alias
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
@@ -95,3 +96,5 @@ def remove_columns_from_table(config_file, table_name, list_file, alias, silent)
     )
     if not silent:
         _remove_columns_display_message_epilogue()
+    if not integrity_check:
+        integrity_check(_cfg, _tbl, _al, _sil)
