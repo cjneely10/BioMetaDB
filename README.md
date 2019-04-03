@@ -157,9 +157,9 @@ only be removed using `dbdm DELETE`
 when first creating your database or when making large updates, such as when adding/removing tables or updating/removing
 values or columns.
 
-<pre><code>usage: dbdm.py [-h] [-n database_NAME] [-t TABLE_NAME] [-d DIRECTORY_NAME]
+<pre><code>usage: dbdm.py [-h] [-n DB_NAME] [-t TABLE_NAME] [-d DIRECTORY_NAME]
                [-f DATA_FILE] [-l LIST_FILE] [-c CONFIG_FILE] [-a ALIAS] [-s]
-               [-v] [-q QUERY]
+               [-v] [-q QUERY] [-i]
                program
 
 dbdm:   Manage BioMetaDB project
@@ -167,30 +167,30 @@ dbdm:   Manage BioMetaDB project
 Available Programs:
 
 CREATE: Create a new table in an existing database, optionally populate using data files
-                (Req:  --config_file --table_name --directory_name --data_file --alias --silent)
+                (Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 DELETE: Delete list of ids from database tables, remove associated files
-                (Req:  --config_file --table_name --list_file --alias --silent)
-FIX: Repairs errors in database structure using .fix file
-                (Req:  --data_file --silent)
+                (Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
+FIX: Repairs errors in DB structure using .fix file
+                (Req:  --config_file --data_file --silent --integrity_cancel)
 INIT: Initialize database with starting table, fasta directory, and/or data files
-                (Req:  --db_name --table_name --directory_name --data_file --alias --silent)
+                (Req:  --db_name --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 INTEGRITY: Queries project database and structure to generate .fix file for possible issues
-                (Req:  --config_file --table_name --alias)
-REMOVE: Remove table and all associated data from database
                 (Req:  --config_file --table_name --alias --silent)
+REMOVE: Remove table and all associated data from database
+                (Req:  --config_file --table_name --alias --silent --integrity_cancel)
 REMOVECOL: Remove column list (including data) from table
-                (Req:  --config_file --table_name --list_file --alias --silent)
+                (Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
 SUMMARIZE: Quick summary of project
                 (Req:  --config_file --view --query --table_name --alias)
 UPDATE: Update values in existing table or add new sequences
-                (Req:  --config_file --table_name --directory_name --data_file --alias --silent)
+                (Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 
 positional arguments:
   program               Program to run
 
 optional arguments:
   -h, --help            show this help message and exit
-  -n database_NAME, --db_name database_NAME
+  -n DB_NAME, --db_name DB_NAME
                         Name of database
   -t TABLE_NAME, --table_name TABLE_NAME
                         Name of database table
@@ -207,14 +207,28 @@ optional arguments:
   -s, --silent          Silence all standard output (Standard error still displays to screen)
   -v, --view            Display column names only with SUMMARIZE
   -q QUERY, --query QUERY
-                        Query to pass to SUMMARIZE</code></pre>
+                        Query to pass to SUMMARIZE
+  -i, --integrity_cancel
+                        Cancel integrity check</code></pre>
 
 The typical workflow for initializing **BioMetaDB** is straightforward. Many options exist for updating, adding to, 
 and removing from the existing project structure. You may also choose to assign an alternate name to a table within a
 database in the form of an alias. Depending on the number of entries involved, these commands can result in voluminous
 output, which can either be silenced by passing `-s` as parameters in your command, or by redirecting standard output
-to a text file. 
+to a text file.
 
+After every major change to the project, `dbdm` will run an integrity check. This default can be cancelled by passing `-i`
+with each command. However, integrity checks are optimized and useful, so users are advised not to cancel standard checks.
+
+Currently, the following issues are identified in a tab-delimited `.fix` file with each integrity check:
+
+- PROJECT INVALID_PATH:   working_dir path stored in config file is invalid
+- RECORD  BAD_TYPE:       data type for record could not be determined
+- RECORD  BAD_LOCATION:       stored file path for record does not exist
+- FILE    BAD_RECORD:       file exists in project directory with no assigned database id
+
+More information on using this `.fix` file to repair issues can be found in the generated `.fix` file, in the `Accessory 
+Scripts` section in this README, and in the provided `Example/` directory.
 
 ### INIT
 
@@ -404,12 +418,24 @@ file for instructions on setting values.
     - This script will look for issues that match all user-passed filtering criteria and will replace the default fix value
     with the user-passed value. Users can reference other fields in ISSUE (see the header in a generated `.fix`
     file).
+    - Issues are written as:
+    <pre><code>  ISSUE
+    DATA_TYPE:    ID[:  LOCATION]
+    ISSUE_TYPE  FIX_TYPE[   FIX_DATA]
+    ---</code></pre>
     - Required flags
         - --match (-m): Comma-separated list of strings that must be found in issue to make edit
         - --replace (-r): Comma-separated list of strings with FIX_TYPE and value to use 
         - --fix_file (-f): `.fix` file output by `dbdm INTEGRITY`
     - Example
         - `edit_fix_file.py -m RECORD,BAD_TYPE,table_name -r SET,fasta -f /path/to/########.###.fix`
+        - This command will replace the default fix value for issues with descriptions matching `RECORD`, `BAD_TYPE`, and
+         `table_name`. This fix value will be replaced with `SET    fasta`.
+    - Another (more complex) example
+        - `edit_fix_file.py -m RECORD,BAD_LOCATION,genomic -r "FILE,/path/to/<ID>.fna" -f /path/to/########.###.fix`
+        -  This command will replace the file locations for records with issues in the genomic table. It will replace
+        the default fix value with a file location whose value is created using the ID field of that particular issue.
+        Notice that the argument passed with `-r` is surrounded by double-quotes.
 
 ### Other scripts
 
