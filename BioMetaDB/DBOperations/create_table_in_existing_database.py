@@ -51,7 +51,7 @@ def _create_all_directories(working_directory, table_name):
     os.makedirs(os.path.join(db_dir, table_name), exist_ok=True)
 
 
-def create_table_in_existing_database(config_file, table_name, directory_name, data_file, alias, silent, integrity_check):
+def create_table_in_existing_database(config_file, table_name, directory_name, data_file, alias, silent, integrity_cancel):
     """
 
     :param silent:
@@ -115,5 +115,5 @@ def create_table_in_existing_database(config_file, table_name, directory_name, d
                                                          genomic_files_to_add, directory_name, silent)
     if not silent:
         _create_table_display_message_epilogue()
-    if not integrity_check:
+    if not integrity_cancel:
         integrity_check(_cfg, _tbl, _al, _sil)

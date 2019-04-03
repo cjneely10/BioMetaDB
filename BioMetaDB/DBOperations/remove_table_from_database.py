@@ -39,7 +39,7 @@ def _remove_columns_display_message_epilogue():
     print("Record removed from database!", "\n")
 
 
-def remove_table_from_database(config_file, table_name, alias, silent, integrity_check):
+def remove_table_from_database(config_file, table_name, alias, silent, integrity_cancel):
     """ Function removes a given table from a database
 
     :param silent:
@@ -81,5 +81,5 @@ def remove_table_from_database(config_file, table_name, alias, silent, integrity
     shutil.rmtree(cfg.table_dir)
     if not silent:
         _remove_columns_display_message_epilogue()
-    if not integrity_check:
+    if not integrity_cancel:
         integrity_check(_cfg, _tbl, _al, _sil)

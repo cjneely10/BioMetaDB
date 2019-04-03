@@ -39,7 +39,7 @@ def _remove_columns_display_message_epilogue():
     print("Columns removed from database!", "\n")
 
 
-def remove_columns_from_table(config_file, table_name, list_file, alias, silent, integrity_check):
+def remove_columns_from_table(config_file, table_name, list_file, alias, silent, integrity_cancel):
     """
 
     :param silent:
@@ -96,5 +96,5 @@ def remove_columns_from_table(config_file, table_name, list_file, alias, silent,
     )
     if not silent:
         _remove_columns_display_message_epilogue()
-    if not integrity_check:
+    if not integrity_cancel:
         integrity_check(_cfg, _tbl, _al, _sil)

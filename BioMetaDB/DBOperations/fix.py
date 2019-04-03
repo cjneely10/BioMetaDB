@@ -23,7 +23,7 @@ def _fix_display_message_epilogue():
     print("\nProject fix complete! Re-run INTEGRITY to confirm!", "\n")
 
 
-def fix(config_file, data_file, silent, integrity_check):
+def fix(config_file, data_file, silent, integrity_cancel):
     """ Function called from dbdm that commits all fixes listed in .fix file to project
 
     :param config_file:
@@ -45,5 +45,5 @@ def fix(config_file, data_file, silent, integrity_check):
     im.parse_and_fix(silent)
     if not silent:
         _fix_display_message_epilogue()
-    if not integrity_check:
+    if not integrity_cancel:
         integrity_check(_cfg, "None", "None", _sil)

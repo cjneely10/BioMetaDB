@@ -63,7 +63,7 @@ def _create_all_directories(working_directory, table_name):
     return classes_dir, config_dir, db_dir, table_dir
 
 
-def create_database(db_name, table_name, directory_name, data_file, alias, silent, integrity_check):
+def create_database(db_name, table_name, directory_name, data_file, alias, silent, integrity_cancel):
     """ Function called from dbdm initializes project/module
 
     :param silent:
@@ -145,5 +145,5 @@ def create_database(db_name, table_name, directory_name, data_file, alias, silen
                                                          genomic_files_to_add, directory_name, silent)
     if not silent:
         _initialization_display_message_epilogue()
-    if not integrity_check:
+    if not integrity_cancel:
         integrity_check(directory_name, table_name, "None", silent)

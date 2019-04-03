@@ -36,7 +36,7 @@ def _update_table_display_message_epilogue():
     print("Update complete!", "\n")
 
 
-def update_existing_table(config_file, table_name, directory_name, data_file, alias, silent, integrity_check):
+def update_existing_table(config_file, table_name, directory_name, data_file, alias, silent, integrity_cancel):
     """
 
     :param alias:
@@ -86,5 +86,5 @@ def update_existing_table(config_file, table_name, directory_name, data_file, al
     ClassManager.write_class(new_attrs, cfg.classes_file)
     if not silent:
         _update_table_display_message_epilogue()
-    if not integrity_check:
+    if not integrity_cancel:
         integrity_check(_cfg, _tbl, _al, _sil)
