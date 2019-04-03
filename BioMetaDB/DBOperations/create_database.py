@@ -146,4 +146,4 @@ def create_database(db_name, table_name, directory_name, data_file, alias, silen
     if not silent:
         _initialization_display_message_epilogue()
     if not integrity_cancel:
-        integrity_check(directory_name, table_name, "None", silent)
+        integrity_check(db_name, table_name, "None", silent)
