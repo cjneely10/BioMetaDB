@@ -1,5 +1,4 @@
 import os
-from math import ceil
 from BioMetaDB.Accessories.bio_ops import BioOps
 
 """
@@ -9,6 +8,11 @@ Script holds superclass from which all user-created classes will inherit
 
 
 class Record:
+
+    def __init__(self):
+        self._id = None
+        self.location = None
+        self.temp_filename = None
 
     def full_path(self):
         """ Method returns full path of bio storage location
@@ -53,28 +57,13 @@ class Record:
         # Get all columns
         for key, val in attrs.items():
             if type(val) == str:
-                summary_string += "\t{:>{longest_key}}\n".format("Text entry", longest_key=longest_key)
+                summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, val, longest_key=longest_key)
             else:
                 summary_string += "\t{:>{longest_key}}\t{:<12.3f}\n".format(
                     key,
                     val,
                     longest_key=longest_key)
         summary_string += ("-" * (longest_key + 30) + "\n")
-        # for i in range(len(first_vals)):
-        #     return_string += "%s:\t%s\n" % (first_vals[i], self.__dict__[first_vals[i]])
-        # return_string += "\n"
-        # sorted_keys = sorted(attrs.keys())
-        # num_rows = int(ceil(len(sorted_keys) / 3))
-        # # Organized printing, rows of 3
-        # for j in range(num_rows + 1):
-        #     for i in range(3):
-        #         if i + 3 * j < len(sorted_keys):
-        #             return_string += "{:40s}".format(
-        #                     "%s: %s" % (sorted_keys[i + 3 * j], attrs[sorted_keys[i + 3 * j]]))
-        #             return_string += "\t"
-        #         else:
-        #             break
-        #     return_string += "\n"
         return summary_string
 
     def write(self):
@@ -96,7 +85,7 @@ class Record:
             os.remove(self.temp_filename)
             self.temp_filename = None
 
-    def print(self):
+    def Print(self):
         """ Method calls print function on file contents
 
         """

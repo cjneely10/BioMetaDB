@@ -123,7 +123,7 @@ cdef class RecordList:
         # Build summary string
         for key in sorted_keys:
             if type(self._summary[key]) == str:
-                summary_string += "\t{:>{longest_key}}\n".format("Text entry", longest_key=longest_key)
+                summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, "Text entry", longest_key=longest_key)
             else:
                 summary_string += "\t{:>{longest_key}}\t{:<12.3f}\t{:<12.3f}\n".format(
                     key,
@@ -173,9 +173,10 @@ cdef class RecordList:
         # Determine standard deviation values
         if num_records > 1:
             for column in self.columns():
+                if summary_data[column] != "s":
                 # print(summary_data[column][1], summary_data[column][2])
-                summary_data[column][3] = sqrt((summary_data[column][2] -
-                                                ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
+                    summary_data[column][3] = sqrt((summary_data[column][2] -
+                                                    ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
         return summary_data, num_records
 
     def query(self, *args):
