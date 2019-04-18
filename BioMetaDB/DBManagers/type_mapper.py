@@ -1,5 +1,5 @@
 import random
-from sqlalchemy import Float, Integer, String, VARCHAR
+from sqlalchemy import Float, Integer, String, VARCHAR, Boolean
 
 
 """
@@ -13,36 +13,43 @@ class TypeMapper:
         float:      "Float",
         int:        "Integer",
         str:        "String",
+        bool:       "Boolean",
     }
     sql_type_to_string = {
         Float:      "Float",
         Integer:    "Integer",
         String:     "String",
+        Boolean:    "Boolean",
     }
     string_to_sql_type = {
         "Float": Float,
         "Integer": Integer,
         "String": String,
+        "Boolean": Boolean,
     }
     string_to_loaded_sql_type = {
         "Float": Float,
         "Integer": Integer,
         "String": VARCHAR,
+        "Boolean": Boolean,
     }
     string_to_py_type = {
         "Float": float,
         "Integer": int,
         "String": str,
+        "Boolean": bool,
     }
     py_type_to_sql_type = {
         float:      Float,
         int:        Integer,
-        str:        String
+        str:        String,
+        bool:       Boolean,
     }
     sql_type_to_py_type = {
         Float:      float,
         Integer:    int,
         String:     str,
+        Boolean:    bool,
     }
 
     @staticmethod

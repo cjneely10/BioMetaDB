@@ -58,6 +58,8 @@ class Record:
         for key, val in attrs.items():
             if type(val) == str:
                 summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, val, longest_key=longest_key)
+            elif type(val) == bool:
+                summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, str(val), longest_key=longest_key)
             else:
                 summary_string += "\t{:>{longest_key}}\t{:<12.3f}\n".format(
                     key,

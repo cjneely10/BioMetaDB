@@ -77,6 +77,10 @@ class CountTable:
         :param value: (str) Value from count table
         :return:
         """
+        if value == "True":
+            return True
+        elif value == "False":
+            return False
         try:
             return int(value)
         except ValueError:

@@ -124,6 +124,8 @@ cdef class RecordList:
         for key in sorted_keys:
             if type(self._summary[key]) == str:
                 summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, "Text entry", longest_key=longest_key)
+            elif type(self._summary[key]) == bool:
+                summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, str(self._summary[key]), longest_key=longest_key)
             else:
                 summary_string += "\t{:>{longest_key}}\t{:<12.3f}\t{:<12.3f}\n".format(
                     key,
