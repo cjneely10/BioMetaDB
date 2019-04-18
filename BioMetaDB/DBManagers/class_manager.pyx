@@ -111,12 +111,13 @@ class ClassManager:
         else:
             data_file_attrs_keys = set()
         # Get combined values for writing to final JSON file
-        try:
-            combined_attrs = {**ClassManager.correct_dict(ClassManager.get_class_as_dict(config)),
+        # try:
+        combined_attrs = {**ClassManager.correct_dict(ClassManager.get_class_as_dict(config)),
                               **ClassManager.correct_dict(TypeMapper.get_translated_types(count_table_object,
                                                                                           TypeMapper.py_type_to_string))}
-        except AttributeError:
-            combined_attrs = ClassManager.correct_dict(ClassManager.get_class_as_dict(config))
+        # except AttributeError:
+        #     combined_attrs = ClassManager.correct_dict(ClassManager.get_class_as_dict(config))
+        print(combined_attrs)
         # Update manager
         # Initialize with DB class name, ConfigManager instance
         # Will create csv file of all existing data,
