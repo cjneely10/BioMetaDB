@@ -177,8 +177,10 @@ cdef class RecordList:
             for column in self.columns():
                 if summary_data[column] != "s":
                 # print(summary_data[column][1], summary_data[column][2])
-                    summary_data[column][3] = sqrt((summary_data[column][2] -
-                                                    ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
+                    try:
+                        summary_data[column][3] = sqrt((summary_data[column][2] - ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
+                    except ValueError:
+                        summary_data[column][3] = -1
         return summary_data, num_records
 
     def query(self, *args):
