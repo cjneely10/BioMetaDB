@@ -58,7 +58,10 @@ def summarize_database(config_file, view, query, table_name, alias):
         if query != "None" and not view and table_name == tbl_name:
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             rl.query(query)
-            print(rl.summarize())
+            if len(rl) != 1:
+                print(rl.summarize())
+            else:
+                print(rl[0])
             break
         # Display column info for table
         elif query == "None" and view:
@@ -69,5 +72,8 @@ def summarize_database(config_file, view, query, table_name, alias):
         elif query == "None" and not view:
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             rl.query()
-            print(rl.summarize())
+            if len(rl) != 1:
+                print(rl.summarize())
+            else:
+                print(rl[0])
 
