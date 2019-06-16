@@ -144,7 +144,7 @@ class ClassManager:
         try:
             ids_to_add = set(count_table_object.file_contents.keys()) | \
                          set([os.path.splitext(_file)[0] for _file in genome_files_to_add if _file != "" and os.path.splitext(_file)[1] == ".gz"]) | \
-                         set([val._id for val in sess.query(UserClass).all()])
+                         set([val._id for val in sess.query(UserClass).all()]) | set(genome_files_to_add)
         except AttributeError:
             ids_to_add = set(genome_files_to_add)
         if '' in ids_to_add:
