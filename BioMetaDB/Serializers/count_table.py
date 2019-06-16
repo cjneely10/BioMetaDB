@@ -87,4 +87,7 @@ class CountTable:
             try:
                 return float(value)
             except ValueError:
-                return value
+                if value != '':
+                    return value
+                else:
+                    return "None"

@@ -98,12 +98,6 @@ class ClassManager:
         print_if_not_silent(silent, " ..Collecting class data")
         TableClass = ClassManager.get_class_orm(table_name, engine)
         print_if_not_silent(silent, " ..Determining updates")
-        # Or operation on sets to get all ids to add
-        try:
-            ids_to_add = set(count_table_object.file_contents.keys()) | \
-                         set([os.path.splitext(_file)[0] for _file in genome_files_to_add if _file != "" and os.path.splitext(_file)[1] == ".gz"])
-        except AttributeError:
-            ids_to_add = set(genome_files_to_add)
         table_class_attrs_keys = set(ClassManager.correct_iterable(ClassManager.get_class_as_dict(config).keys()))
         if count_table_object is not None:
             data_file_attrs_keys = set(ClassManager.correct_iterable(
@@ -146,6 +140,13 @@ class ClassManager:
         except AttributeError:
             corrected_header = None
         print_if_not_silent(silent, "\nGathering data by record:")
+        # Or operation on sets to get all ids to add
+        try:
+            ids_to_add = set(count_table_object.file_contents.keys()) | \
+                         set([os.path.splitext(_file)[0] for _file in genome_files_to_add if _file != "" and os.path.splitext(_file)[1] == ".gz"]) | \
+                         set([val._id for val in sess.query(UserClass).all()])
+        except AttributeError:
+            ids_to_add = set(genome_files_to_add)
         if '' in ids_to_add:
             ids_to_add.remove('')
         for _id_ in ids_to_add:
@@ -160,7 +161,7 @@ class ClassManager:
                         try:
                             setattr(record, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
                         except KeyError:
-                            continue
+                            setattr(record, attr, "None")
             else:
                 if directory_name != "None":
                     print_if_not_silent(silent, " ....Moving new record from %s to %s" % (directory_name,
@@ -191,7 +192,7 @@ class ClassManager:
                         for attr in corrected_header:
                             setattr(db_object, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
                 except KeyError:
-                    continue
+                    setattr(db_object, attr, "None")
                 to_add.append(db_object)
         for val in to_add:
             sess.add(val)
