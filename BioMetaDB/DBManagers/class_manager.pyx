@@ -161,7 +161,7 @@ class ClassManager:
                         try:
                             setattr(record, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
                         except KeyError:
-                            setattr(record, attr, "None")
+                            continue
             else:
                 if directory_name != "None":
                     print_if_not_silent(silent, " ....Moving new record from %s to %s" % (directory_name,
@@ -192,7 +192,7 @@ class ClassManager:
                         for attr in corrected_header:
                             setattr(db_object, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
                 except KeyError:
-                    setattr(db_object, attr, "None")
+                    continue
                 to_add.append(db_object)
         for val in to_add:
             sess.add(val)
