@@ -60,6 +60,7 @@ table = get_table("/path/to/database", table_name="db_table_1")
 table.query()  # Returns all values
 table.query("n50 >= 100000")  # Simple filter query
 table.query("n50 >= 100000 AND n75 <= 1000000")  # More complex filter query
+table.query("_id == '%genome%'") # Has genome in name of record
 # Additional SQLAlchemy operations...
 </code></pre>
 

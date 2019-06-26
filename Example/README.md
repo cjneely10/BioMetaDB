@@ -116,41 +116,43 @@ quick glance at a particular table or database, as well as to test queries on th
         2. `-t/--table_name`    View only for given table
         3. `-a/--alias`     View only for given alias
         4. `-q/--query`     Attach SQL query to summarize select records only. Must be combined with `-t` or `-a` flags
-<pre><code>SUMMARIZE:      View summary of all tables in database
- Project root directory:        ModelOrganisms
- Name of database:              ModelOrganisms.db
+<pre><code>*********************************************************************************
+	          Table Name:	prokaryotes 
+	   Number of Records:	8         
 
-**********************************************************************
-                 Record Name:    prokaryotes
-          Number of Records:    8
+	          Column Name	Average             	Std Dev     
 
-                 Column Name    Average         Std Dev
+	                   gc	53.751              	14.849      
+	                  l50	1.000               	0.000       
+	                  l75	1.125               	0.354       
+	       largest_contig	4653940.750         	2440726.993 
+	                  n50	4653940.750         	2440726.993 
+	                  n75	4458040.375         	2655302.860 
+        (...)      
+	         total_length	4874381.000         	2438681.143 
+	    total_length_gt_0	4874381.000         	2438681.143 
+	 total_length_gt_1000	4874381.000         	2438681.143 
+	total_length_gt_25000	4874381.000         	2438681.143 
+---------------------------------------------------------------------------------
 
-                          gc    53.751          14.849
-    (...)
-                         n50    4653940.750     2440726.993
-                         n75    4458040.375     2655302.860
-    (...)
-                total_length    4874381.000     2438681.143
-    (...)
-        total_length_gt_1000    4874381.000     2438681.143
-----------------------------------------------------------------------
+*********************************************************************************
+	          Table Name:	plants      
+	   Number of Records:	3         
 
-**********************************************************************
-                 Record Name:    plants
-          Number of Records:    3
+	          Column Name	Average             	Std Dev     
 
-                 Column Name    Average         Std Dev
-
-                          gc    42.560          5.660
-    (...)
-                         n50    28113428.000    28972021.833
-                         n75    23065659.000    24023210.450
-    (...)
-                total_length    201093640.333   76435013.348
-    (...)
-        total_length_gt_1000    201090333.333   76434285.411
-----------------------------------------------------------------------</code></pre>
+	                   gc	42.560              	5.660       
+	                  l50	14.667              	20.207      
+	                  l75	29.000              	43.301      
+	       largest_contig	102892753.667       	146315339.139
+	                  n50	28113428.000        	28972021.833
+	                  n75	23065659.000        	24023210.450
+        (...)     
+	         total_length	201093640.333       	76435013.348
+	    total_length_gt_0	201094225.333       	76435142.162
+	 total_length_gt_1000	201090333.333       	76434285.411
+	total_length_gt_25000	199912924.333       	76181566.822
+---------------------------------------------------------------------------------</code></pre>
 
 ## Simple scripting: Get assemblies with an n50 value that is less than its length
 
