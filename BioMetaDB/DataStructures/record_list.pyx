@@ -155,9 +155,9 @@ cdef class RecordList:
                     out_key = _out_key = max((self._summary[key].items() or {"1":0}.items()), key=lambda x : x[1])[0]
                     if out_key and len(out_key) > 16:
                         out_key = out_key[:17] + "..."
-                    val = self._summary[key].get(_out_key, None)
+                    val = self._summary[key].get(out_key, None)
                     summary_string += "\t{:>{longest_key}}\t\t{:<20s}\t{:<10.0f}\t{:<12.0f}\n".format(
-                        key, out_key or "nil", val or "nil", self.num_records - num_none, longest_key=longest_key)
+                        str(key), out_key or "nil", val or "nil", self.num_records - num_none, longest_key=longest_key)
             summary_string += ("-" * (longest_key + 75)) + "\n"
         return summary_string
 
@@ -182,7 +182,7 @@ cdef class RecordList:
                 try:
                     found_type = type(getattr(record, column))
                 except AttributeError:
-                    found_type = None
+                    found_type = type(None)
                 if column not in summary_data.keys():
                     if found_type != type(None) and found_type != str:
                         summary_data[column] = []
@@ -196,12 +196,13 @@ cdef class RecordList:
                     else:
                         has_text = True
                         # Gather count
-                        if found_type is not None:
+                        if found_type != type(None):
                             val = getattr(record, column)
                         else:
-                            val = ""
+                            val = "None"
+                        val = self._correct_value(val)
                         summary_data[column] = {}
-                        summary_data[column][(val if val != "" else "None")] = 0
+                        summary_data[column][(val if val != '' else "None")] = 0
                 else:
                     if found_type != type(None) and type(summary_data[column]) != dict:
                         # Gather portion for average calculation
@@ -212,12 +213,13 @@ cdef class RecordList:
                         summary_data[column][2] += float(getattr(record, column) ** 2)
                     else:
                         # Gather count
-                        if found_type:
+                        if found_type != type(None):
                             val = getattr(record, column)
                         else:
-                            val = ""
-                        count = summary_data[column].get((val if val != "" else "None"), 0)
-                        summary_data[column][(val if val != "" else "None")] = count + 1
+                            val = "None"
+                        val = self._correct_value(val)
+                        count = summary_data[column].get(val, 0)
+                        summary_data[column][(val if val != '' else "None")] = count + 1
         # Determine standard deviation values
         if num_records > 1:
             for column in self.columns():
@@ -373,3 +375,13 @@ cdef class RecordList:
             possible_columns = possible_columns.union(set(filter(r.findall, cols_in_db)))
         # Return all possible values
         return list(possible_columns)
+
+    def _correct_value(self, str value):
+        """ Protected member function will split off annotation from %s-%s:%s paradigm
+
+        :param value:
+        :return:
+        """
+        if ":" in value:
+            return value.split(":")[1].rstrip(";")
+        return value
