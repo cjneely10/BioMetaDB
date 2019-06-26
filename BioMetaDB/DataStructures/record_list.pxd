@@ -5,3 +5,4 @@ cdef class RecordList:
     cdef dict _summary
     cdef int num_records
     cdef list results
+    cdef bint has_text

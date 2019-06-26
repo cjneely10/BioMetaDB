@@ -1,8 +1,8 @@
 # cython: language_level=3
 import re
 from math import sqrt
-from string import punctuation
 from sqlalchemy import text
+from string import punctuation
 from sqlalchemy.exc import OperationalError
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Exceptions.record_list_exceptions import ColumnNameNotFoundError
@@ -30,9 +30,10 @@ cdef class RecordList:
         self._summary = None
         self.num_records = 0
         self.results = None
+        self.has_text = False
         if compute_metadata and query:
             self.query(query)
-            self._summary, self.num_records = self._gather_metadata()
+            self._summary, self.num_records, self.has_text = self._gather_metadata()
         elif query:
             self.query(query)
 
@@ -64,6 +65,9 @@ cdef class RecordList:
         """
         return ClassManager.get_class_as_dict(self.cfg).keys()
 
+    def __str__(self):
+        return self.summarize()
+
     def summarize(self):
         """ Returns metadata for list of records queried in list
 
@@ -71,18 +75,18 @@ cdef class RecordList:
         """
         cdef str summary_string
         cdef list sorted_keys
-        cdef str key
+        cdef str key, out_key
         cdef int longest_key
         if self._summary is None:
-            self._summary, self.num_records = self._gather_metadata()
+            self._summary, self.num_records, self.has_text = self._gather_metadata()
         sorted_keys = sorted(self.columns())
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
-        summary_string = ("*" * (longest_key + 50)) + "\n"
+        summary_string = ("*" * (longest_key + 60)) + "\n"
         # Display multiple records
         if self.num_records > 1:
             summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<10d}\n\n".format(
-                "Record Name:",
+                "Table Name:",
                 self.cfg.table_name,
                 "Number of Records:",
                 self.num_records,
@@ -114,7 +118,7 @@ cdef class RecordList:
             # Do not create summary info
             return summary_string
         # Metadata display column headers
-        summary_string += "\t{:>{longest_key}}\t{:<12s}\t{:<10s}\n\n".format(
+        summary_string += "\t{:>{longest_key}}\t{:<20s}\t{:<12s}\n\n".format(
             "Column Name",
             "Average",
             "Std Dev",
@@ -122,17 +126,32 @@ cdef class RecordList:
         )
         # Build summary string
         for key in sorted_keys:
-            if type(self._summary[key]) == str:
-                summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, "Text entry", longest_key=longest_key)
-            elif type(self._summary[key]) == bool:
-                summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, str(self._summary[key]), longest_key=longest_key)
-            else:
-                summary_string += "\t{:>{longest_key}}\t{:<12.3f}\t{:<12.3f}\n".format(
+            if type(self._summary[key]) == bool:
+                summary_string += "\t{:>{longest_key}}\t{:<20s}\n".format(key, str(self._summary[key]), longest_key=longest_key)
+            elif type(self._summary[key]) == list:
+                summary_string += "\t{:>{longest_key}}\t{:<20.3f}\t{:<12.3f}\n".format(
                     key,
                     self._summary[key][0],
                     self._summary[key][3],
                 longest_key=longest_key)
-        summary_string += ("-" * (longest_key + 50)) + "\n"
+        summary_string += ("-" * (longest_key + 60)) + "\n"
+        if self.has_text:
+            summary_string += "\n\t{:>{longest_key}}\t{:<20s}\t{:<12s}\n\n".format(
+                "Column Name",
+                "Most Frequent",
+                "Count Non-Null",
+                longest_key=longest_key
+            )
+            for key in sorted_keys:
+                if type(self._summary[key]) == dict:
+                    out_key = max(self._summary[key].items(), key=lambda x : x[1])[0]
+                    if len(out_key) > 16:
+                        out_key = out_key[:17] + "..."
+                    summary_string += "\t{:>{longest_key}}\t{:<20s}\t{:<12.0f}\n".format(key,
+                                                                                         out_key,
+                                                                                         self.num_records - len(self._summary[key].get("None", [])),
+                                                                                         longest_key=longest_key)
+            summary_string += ("-" * (longest_key + 60)) + "\n"
         return summary_string
 
     def _gather_metadata(self):
@@ -140,12 +159,13 @@ cdef class RecordList:
 
         :return:
         """
-        cdef dict summary_data
-        cdef int num_records
-        cdef str column
+        cdef dict summary_data = {}, string_data = {}
+        cdef int num_records, count
+        cdef str column, val
         cdef list column_keys
         cdef object record
-        summary_data = {}
+        cdef bint has_text = False
+
         if self.results is None:
              self.query()
         num_records = self.num_records
@@ -163,7 +183,11 @@ cdef class RecordList:
                         summary_data[column].append(float(getattr(record, column) ** 2))
                         summary_data[column].append(0.0)
                     else:
-                        summary_data[column] = "s"
+                        has_text = True
+                        # Gather count
+                        val = getattr(record, column)
+                        summary_data[column] = {}
+                        summary_data[column][(val if val != '' else "None")] = 0
                 else:
                     if type(getattr(record, column)) != str:
                         # Gather portion for average calculation
@@ -172,16 +196,21 @@ cdef class RecordList:
                         summary_data[column][1] += float(getattr(record, column))
                         # Gather portion for running sq sum
                         summary_data[column][2] += float(getattr(record, column) ** 2)
+                    else:
+                        # Gather count
+                        val = getattr(record, column)
+                        count = summary_data[column].get((val if val != '' else "None"), 0)
+                        summary_data[column][(val if val != '' else "None")] = count + 1
         # Determine standard deviation values
         if num_records > 1:
             for column in self.columns():
-                if summary_data[column] != "s":
+                if type(summary_data[column]) != dict:
                 # print(summary_data[column][1], summary_data[column][2])
                     try:
                         summary_data[column][3] = sqrt((summary_data[column][2] - ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
                     except ValueError:
                         summary_data[column][3] = -1
-        return summary_data, num_records
+        return summary_data, num_records, has_text
 
     def query(self, *args):
         """ Wrapper function for querying database. Converts text argument to query statement

@@ -36,6 +36,7 @@ class Record:
         first_cor_vals = ("ID", "Data Type", "File Location")
         attrs = {key: val for key, val in self.__dict__.items() if key != "_sa_instance_state"
                  and key not in first_vals and key != "id"}
+        sorted_keys = sorted(list(attrs.keys()))
         longest_key = max([len(key) for key in attrs])
         # Pretty formatting
         summary_string = ("*" * (longest_key + 30)) + "\n"
@@ -55,15 +56,18 @@ class Record:
             longest_key=longest_key
         )
         # Get all columns
-        for key, val in attrs.items():
-            if type(val) == str:
-                summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, val, longest_key=longest_key)
-            elif type(val) == bool:
-                summary_string += "\t{:>{longest_key}}\t{:<12s}\n".format(key, str(val), longest_key=longest_key)
+        for key in sorted_keys:
+            if type(attrs[key]) == str:
+                val = attrs[key]
+                if len(val) > 50:
+                    val = val[:47] + "..."
+                summary_string += "\t{:>{longest_key}}\t{:<50s}\n".format(key, val, longest_key=longest_key)
+            elif type(attrs[key]) == bool:
+                summary_string += "\t{:>{longest_key}}\t{:<50s}\n".format(key, str(attrs[key]), longest_key=longest_key)
             else:
-                summary_string += "\t{:>{longest_key}}\t{:<12.3f}\n".format(
+                summary_string += "\t{:>{longest_key}}\t{:<50.3f}\n".format(
                     key,
-                    val,
+                    attrs[key],
                     longest_key=longest_key)
         summary_string += ("-" * (longest_key + 30) + "\n")
         return summary_string
