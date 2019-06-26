@@ -140,6 +140,7 @@ cdef class RecordList:
                 longest_key=longest_key)
         summary_string += ("-" * (longest_key + 75)) + "\n"
         if self.has_text:
+            longest_key = max([len(key) for key in sorted_keys if type(self._summary[key]) == dict])
             summary_string += "\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}\n\n".format(
                 "Column Name",
                 "Most Frequent",
@@ -152,12 +153,12 @@ cdef class RecordList:
                     num_none = self._summary[key].get("None", 0)
                     if num_none > 0:
                         del self._summary[key]["None"]
-                    out_key = _out_key = max((self._summary[key].items() or {"1":0}.items()), key=lambda x : x[1])[0]
+                    out_key = _out_key = max((self._summary[key].items() or {"111111111":0}.items()), key=lambda x : x[1])[0]
                     if out_key and len(out_key) > 16:
                         out_key = out_key[:17] + "..."
                     val = self._summary[key].get(out_key, None)
-                    summary_string += "\t{:>{longest_key}}\t\t{:<20s}\t{:<10.0f}\t{:<12.0f}\n".format(
-                        str(key), out_key or "nil", val or "nil", self.num_records - num_none, longest_key=longest_key)
+                    summary_string += "\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
+                        str(key), (out_key if out_key != "111111111" else 'nil'), (val if val else  1), self.num_records - num_none, longest_key=longest_key)
             summary_string += ("-" * (longest_key + 75)) + "\n"
         return summary_string
 
@@ -184,7 +185,7 @@ cdef class RecordList:
                 except AttributeError:
                     found_type = type(None)
                 if column not in summary_data.keys():
-                    if found_type != type(None) and found_type != str:
+                    if found_type in (int, float):
                         summary_data[column] = []
                         # Gather portion for average calculation
                         summary_data[column].append(float(getattr(record, column)) / num_records)
@@ -193,31 +194,35 @@ cdef class RecordList:
                         # Gather portion for running sq sum
                         summary_data[column].append(float(getattr(record, column) ** 2))
                         summary_data[column].append(0.0)
-                    else:
+                    elif found_type in (str, bool):
                         has_text = True
                         # Gather count
-                        if found_type != type(None):
-                            val = getattr(record, column)
-                        else:
-                            val = "None"
+                        val = str(getattr(record, column))
+                        val = self._correct_value(val)
+                        summary_data[column] = {}
+                        summary_data[column][(val if val != '' else "None")] = 0
+                    elif found_type == type(None):
+                        has_text = True
+                        val = "None"
                         val = self._correct_value(val)
                         summary_data[column] = {}
                         summary_data[column][(val if val != '' else "None")] = 0
                 else:
-                    if found_type != type(None) and type(summary_data[column]) != dict:
+                    if type(summary_data[column]) == list:
                         # Gather portion for average calculation
-                        summary_data[column][0] += float(getattr(record, column) / num_records)
+                        summary_data[column][0] += float(float(getattr(record, column)) / num_records)
                         # Gather portion for running sum
                         summary_data[column][1] += float(getattr(record, column))
                         # Gather portion for running sq sum
                         summary_data[column][2] += float(getattr(record, column) ** 2)
-                    else:
+                    elif found_type != type(None) and type(summary_data[column]) == dict:
                         # Gather count
-                        if found_type != type(None):
-                            val = getattr(record, column)
-                        else:
-                            val = "None"
+                        val = str(getattr(record, column))
                         val = self._correct_value(val)
+                        count = summary_data[column].get(val, 0)
+                        summary_data[column][(val if val != '' else "None")] = count + 1
+                    elif found_type == type(None):
+                        val = "None"
                         count = summary_data[column].get(val, 0)
                         summary_data[column][(val if val != '' else "None")] = count + 1
         # Determine standard deviation values
