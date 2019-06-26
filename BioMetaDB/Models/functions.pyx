@@ -57,17 +57,20 @@ class Record:
         )
         # Get all columns
         for key in sorted_keys:
-            if type(attrs[key]) == str:
+            attr = attrs.get(key, "None")
+            if type(attr) == str:
                 val = attrs[key]
                 if len(val) > 50:
                     val = val[:47] + "..."
                 summary_string += "\t{:>{longest_key}}\t{:<50s}\n".format(key, val, longest_key=longest_key)
-            elif type(attrs[key]) == bool:
-                summary_string += "\t{:>{longest_key}}\t{:<50s}\n".format(key, str(attrs[key]), longest_key=longest_key)
+            elif type(attr) == bool:
+                summary_string += "\t{:>{longest_key}}\t{:<50s}\n".format(key, str(attr), longest_key=longest_key)
+            elif type(attr) == type(None):
+                summary_string += "\t{:>{longest_key}}\t{:<50s}\n".format(key, "None", longest_key=longest_key)
             else:
                 summary_string += "\t{:>{longest_key}}\t{:<50.3f}\n".format(
                     key,
-                    attrs[key],
+                    attr,
                     longest_key=longest_key)
         summary_string += ("-" * (longest_key + 30) + "\n")
         return summary_string

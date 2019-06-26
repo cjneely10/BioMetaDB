@@ -115,7 +115,7 @@ class ClassManager:
         # Initialize with DB class name, ConfigManager instance
         # Will create csv file of all existing data,
         # If differences found between what is in database table and what is in datafile
-        if len(table_class_attrs_keys - data_file_attrs_keys) > 1:
+        if len(table_class_attrs_keys - data_file_attrs_keys) != 0:
             print_if_not_silent(silent, "\n!! New column data detected, calling update manager !!")
             update_manager = UpdateManager(config, ClassManager.get_class_as_dict(config), sess)
             table_copy_csv = update_manager.create_table_copy(datetime.today().strftime("%Y%m%d"), TableClass, silent)
@@ -161,7 +161,7 @@ class ClassManager:
                         try:
                             setattr(record, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
                         except KeyError:
-                            continue
+                            setattr(record, attr, None)
             else:
                 if directory_name != "None":
                     print_if_not_silent(silent, " ....Moving new record from %s to %s" % (directory_name,
@@ -192,7 +192,7 @@ class ClassManager:
                         for attr in corrected_header:
                             setattr(db_object, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
                 except KeyError:
-                    continue
+                    setattr(record, attr, None)
                 to_add.append(db_object)
         for val in to_add:
             sess.add(val)

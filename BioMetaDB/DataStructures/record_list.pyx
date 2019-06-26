@@ -68,6 +68,9 @@ cdef class RecordList:
     def __str__(self):
         return self.summarize()
 
+    def __repr__(self):
+        return self.summarize()
+
     def summarize(self):
         """ Returns metadata for list of records queried in list
 
@@ -75,14 +78,15 @@ cdef class RecordList:
         """
         cdef str summary_string
         cdef list sorted_keys
-        cdef str key, out_key
-        cdef int longest_key
+        cdef str key, out_key, _out_key
+        cdef int longest_key, num_none
+        cdef object val
         if self._summary is None:
             self._summary, self.num_records, self.has_text = self._gather_metadata()
         sorted_keys = sorted(self.columns())
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
-        summary_string = ("*" * (longest_key + 60)) + "\n"
+        summary_string = ("*" * (longest_key + 75)) + "\n"
         # Display multiple records
         if self.num_records > 1:
             summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<10d}\n\n".format(
@@ -134,24 +138,27 @@ cdef class RecordList:
                     self._summary[key][0],
                     self._summary[key][3],
                 longest_key=longest_key)
-        summary_string += ("-" * (longest_key + 60)) + "\n"
+        summary_string += ("-" * (longest_key + 75)) + "\n"
         if self.has_text:
-            summary_string += "\n\t{:>{longest_key}}\t{:<20s}\t{:<12s}\n\n".format(
+            summary_string += "\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}\n\n".format(
                 "Column Name",
                 "Most Frequent",
+                "Num",
                 "Count Non-Null",
                 longest_key=longest_key
             )
             for key in sorted_keys:
                 if type(self._summary[key]) == dict:
-                    out_key = max(self._summary[key].items(), key=lambda x : x[1])[0]
-                    if len(out_key) > 16:
+                    num_none = self._summary[key].get("None", 0)
+                    if num_none > 0:
+                        del self._summary[key]["None"]
+                    out_key = _out_key = max((self._summary[key].items() or {"1":0}.items()), key=lambda x : x[1])[0]
+                    if out_key and len(out_key) > 16:
                         out_key = out_key[:17] + "..."
-                    summary_string += "\t{:>{longest_key}}\t{:<20s}\t{:<12.0f}\n".format(key,
-                                                                                         out_key,
-                                                                                         self.num_records - self._summary[key].get("None", 0),
-                                                                                         longest_key=longest_key)
-            summary_string += ("-" * (longest_key + 60)) + "\n"
+                    val = self._summary[key].get(_out_key, None)
+                    summary_string += "\t{:>{longest_key}}\t\t{:<20s}\t{:<10.0f}\t{:<12.0f}\n".format(
+                        key, out_key or "nil", val or "nil", self.num_records - num_none, longest_key=longest_key)
+            summary_string += ("-" * (longest_key + 75)) + "\n"
         return summary_string
 
     def _gather_metadata(self):
@@ -165,14 +172,19 @@ cdef class RecordList:
         cdef list column_keys
         cdef object record
         cdef bint has_text = False
+        cdef object found_type
         if self.results is None:
              self.query()
         num_records = self.num_records
         column_keys = list(self.columns())
         for record in self.results:
             for column in column_keys:
+                try:
+                    found_type = type(getattr(record, column))
+                except AttributeError:
+                    found_type = None
                 if column not in summary_data.keys():
-                    if type(getattr(record, column)) != str:
+                    if found_type != type(None) and found_type != str:
                         summary_data[column] = []
                         # Gather portion for average calculation
                         summary_data[column].append(float(getattr(record, column)) / num_records)
@@ -184,11 +196,14 @@ cdef class RecordList:
                     else:
                         has_text = True
                         # Gather count
-                        val = getattr(record, column)
+                        if found_type is not None:
+                            val = getattr(record, column)
+                        else:
+                            val = ""
                         summary_data[column] = {}
                         summary_data[column][(val if val != "" else "None")] = 0
                 else:
-                    if type(getattr(record, column)) != str:
+                    if found_type != type(None) and type(summary_data[column]) != dict:
                         # Gather portion for average calculation
                         summary_data[column][0] += float(getattr(record, column) / num_records)
                         # Gather portion for running sum
@@ -197,7 +212,10 @@ cdef class RecordList:
                         summary_data[column][2] += float(getattr(record, column) ** 2)
                     else:
                         # Gather count
-                        val = getattr(record, column)
+                        if found_type:
+                            val = getattr(record, column)
+                        else:
+                            val = ""
                         count = summary_data[column].get((val if val != "" else "None"), 0)
                         summary_data[column][(val if val != "" else "None")] = count + 1
         # Determine standard deviation values
