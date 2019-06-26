@@ -165,7 +165,6 @@ cdef class RecordList:
         cdef list column_keys
         cdef object record
         cdef bint has_text = False
-
         if self.results is None:
              self.query()
         num_records = self.num_records
@@ -187,7 +186,7 @@ cdef class RecordList:
                         # Gather count
                         val = getattr(record, column)
                         summary_data[column] = {}
-                        summary_data[column][(val if val != '' else "None")] = 0
+                        summary_data[column][(val if val != "" else "None")] = 0
                 else:
                     if type(getattr(record, column)) != str:
                         # Gather portion for average calculation
@@ -199,8 +198,8 @@ cdef class RecordList:
                     else:
                         # Gather count
                         val = getattr(record, column)
-                        count = summary_data[column].get((val if val != '' else "None"), 0)
-                        summary_data[column][(val if val != '' else "None")] = count + 1
+                        count = summary_data[column].get((val if val != "" else "None"), 0)
+                        summary_data[column][(val if val != "" else "None")] = count + 1
         # Determine standard deviation values
         if num_records > 1:
             for column in self.columns():
