@@ -170,7 +170,7 @@ cdef class RecordList:
         cdef dict summary_data = {}, string_data = {}
         cdef int num_records, count
         cdef str column, val
-        cdef list column_keys
+        cdef list column_keys, vals
         cdef object record
         cdef bint has_text = False
         cdef object found_type
@@ -198,15 +198,14 @@ cdef class RecordList:
                         has_text = True
                         # Gather count
                         val = str(getattr(record, column))
-                        val = self._correct_value(val)
+                        vals = self._correct_value(val)
                         summary_data[column] = {}
-                        summary_data[column][(val if val != '' else "None")] = 0
+                        for _v in vals:
+                            summary_data[column][_v] = 0
                     elif found_type == type(None):
                         has_text = True
-                        val = "None"
-                        val = self._correct_value(val)
                         summary_data[column] = {}
-                        summary_data[column][(val if val != '' else "None")] = 0
+                        summary_data[column]["None"] = 0
                 else:
                     if type(summary_data[column]) == list:
                         # Gather portion for average calculation
@@ -218,13 +217,13 @@ cdef class RecordList:
                     elif found_type != type(None) and type(summary_data[column]) == dict:
                         # Gather count
                         val = str(getattr(record, column))
-                        val = self._correct_value(val)
-                        count = summary_data[column].get(val, 0)
-                        summary_data[column][(val if val != '' else "None")] = count + 1
+                        vals = self._correct_value(val)
+                        for _v in vals:
+                            count = summary_data[column].get(_v, 0)
+                            summary_data[column][_v] = count + 1
                     elif found_type == type(None):
-                        val = "None"
-                        count = summary_data[column].get(val, 0)
-                        summary_data[column][(val if val != '' else "None")] = count + 1
+                        count = summary_data[column].get("None", 0)
+                        summary_data[column]["None"] = count + 1
         # Determine standard deviation values
         if num_records > 1:
             for column in self.columns():
@@ -387,6 +386,13 @@ cdef class RecordList:
         :param value:
         :return:
         """
-        if ":" in value:
-            return value.split(":")[1].rstrip(";")
-        return value
+        cdef list return_list = [], vals
+        cdef str val, _v
+        if ";;;" in value:
+            vals = [_v for _v in value.split(";;;") if _v != '']
+            for val in vals:
+                _v = val.split(":::")[1]
+                if _v != '':
+                    return_list.append(_v)
+            return return_list
+        return [value,]
