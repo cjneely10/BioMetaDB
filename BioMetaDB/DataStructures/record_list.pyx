@@ -198,14 +198,14 @@ cdef class RecordList:
                         has_text = True
                         # Gather count
                         val = str(getattr(record, column))
-                        vals = self._correct_value(val)
+                        vals = self._correct_value((val if val != '' else "None"))
                         summary_data[column] = {}
                         for _v in vals:
-                            summary_data[column][_v] = 0
+                            summary_data[column][_v] = 1
                     elif found_type == type(None):
                         has_text = True
                         summary_data[column] = {}
-                        summary_data[column]["None"] = 0
+                        summary_data[column]["None"] = 1
                 else:
                     if type(summary_data[column]) == list:
                         # Gather portion for average calculation
@@ -217,7 +217,7 @@ cdef class RecordList:
                     elif found_type != type(None) and type(summary_data[column]) == dict:
                         # Gather count
                         val = str(getattr(record, column))
-                        vals = self._correct_value(val)
+                        vals = self._correct_value((val if val != '' else "None"))
                         for _v in vals:
                             count = summary_data[column].get(_v, 0)
                             summary_data[column][_v] = count + 1
