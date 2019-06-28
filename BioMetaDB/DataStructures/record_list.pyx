@@ -131,17 +131,18 @@ cdef class RecordList:
         )
         # Build summary string
         for key in sorted_keys:
-            if type(self._summary[key]) == bool:
-                summary_string += "\t{:>{longest_key}}\t{:<20s}\n".format(key, str(self._summary[key]), longest_key=longest_key)
-            elif type(self._summary[key]) == list:
-                summary_string += "\t{:>{longest_key}}\t{:<20.3f}\t{:<12.3f}\n".format(
-                    key,
-                    self._summary[key][0],
-                    self._summary[key][3],
-                longest_key=longest_key)
+            if key in self._summary.keys():
+                if type(self._summary[key]) == bool:
+                    summary_string += "\t{:>{longest_key}}\t{:<20s}\n".format(key, str(self._summary[key]), longest_key=longest_key)
+                elif type(self._summary[key]) == list:
+                    summary_string += "\t{:>{longest_key}}\t{:<20.3f}\t{:<12.3f}\n".format(
+                        key,
+                        self._summary[key][0],
+                        self._summary[key][3],
+                    longest_key=longest_key)
         summary_string += ("-" * (longest_key + 75)) + "\n"
         if self.has_text:
-            longest_key = max([len(key) for key in sorted_keys if type(self._summary[key]) == dict])
+            longest_key = max([len(key) for key in sorted_keys if key in self._summary.keys() and type(self._summary[key]) == dict])
             summary_string += "\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}\n\n".format(
                 "Column Name",
                 "Most Frequent",
@@ -150,7 +151,7 @@ cdef class RecordList:
                 longest_key=longest_key
             )
             for key in sorted_keys:
-                if type(self._summary[key]) == dict:
+                if key in self._summary.keys() and type(self._summary[key]) == dict:
                     num_none = self._summary[key].get("None", 0)
                     if num_none > 0:
                         del self._summary[key]["None"]
@@ -185,7 +186,7 @@ cdef class RecordList:
                 found_type = data_types[column]
                 obj = getattr(record, column, None)
                 if column not in summary_data.keys():
-                    if found_type in (int, float):
+                    if obj is not None and obj != "None" and found_type in (int, float):
                         summary_data[column] = []
                         # Gather portion for average calculation
                         summary_data[column].append(float(float(obj) / num_records))
@@ -203,7 +204,7 @@ cdef class RecordList:
                         for _v in vals:
                             summary_data[column][_v] = 1
                 else:
-                    if obj != "None" and found_type in (int, float):
+                    if obj is not None and obj != "None" and found_type in (int, float):
                         # Gather portion for average calculation
                         summary_data[column][0] += float(float(obj) / num_records)
                         # Gather portion for running sum
@@ -219,7 +220,7 @@ cdef class RecordList:
                             summary_data[column][_v] = count + 1
         # Determine standard deviation values
         if num_records > 1:
-            for column in self.columns():
+            for column in summary_data.keys():
                 if type(summary_data[column]) != dict:
                 # print(summary_data[column][1], summary_data[column][2])
                     try:
