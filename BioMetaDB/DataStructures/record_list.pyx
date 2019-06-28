@@ -5,6 +5,7 @@ from sqlalchemy import text
 from string import punctuation
 from sqlalchemy.exc import OperationalError
 from BioMetaDB.DBManagers.class_manager import ClassManager
+from BioMetaDB.DBManagers.type_mapper import TypeMapper
 from BioMetaDB.Exceptions.record_list_exceptions import ColumnNameNotFoundError
 
 """
@@ -46,7 +47,7 @@ cdef class RecordList:
         cdef list sorted_keys
         cdef str key
         cdef int longest_key
-        sorted_keys = sorted(ClassManager.get_class_as_dict(self.cfg))
+        sorted_keys = sorted(ClassManager.get_class_as_dict(self.cfg).keys())
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
         summary_string = ("*" * (longest_key + 30)) + "\n"
@@ -173,23 +174,25 @@ cdef class RecordList:
         cdef list column_keys, vals
         cdef object record
         cdef bint has_text = False
-        cdef object found_type
+        cdef object found_type, obj
+        cdef dict data_types = {_k: TypeMapper.string_to_py_type[v] for _k,v in ClassManager.get_class_as_dict(self.cfg).items()}
         if self.results is None:
              self.query()
         num_records = self.num_records
         column_keys = list(self.columns())
         for record in self.results:
             for column in column_keys:
-                found_type = type(getattr(record, column, None))
+                found_type = data_types[column]
+                obj = getattr(record, column, None)
                 if column not in summary_data.keys():
                     if found_type in (int, float):
                         summary_data[column] = []
                         # Gather portion for average calculation
-                        summary_data[column].append(float(getattr(record, column)) / num_records)
+                        summary_data[column].append(float(float(obj) / num_records))
                         # Gather portion for running sum
-                        summary_data[column].append(float(getattr(record, column)))
+                        summary_data[column].append(float(obj))
                         # Gather portion for running sq sum
-                        summary_data[column].append(float(getattr(record, column) ** 2))
+                        summary_data[column].append(float(obj ** 2))
                         summary_data[column].append(0.0)
                     elif found_type in (str, bool):
                         has_text = True
@@ -199,28 +202,21 @@ cdef class RecordList:
                         summary_data[column] = {}
                         for _v in vals:
                             summary_data[column][_v] = 1
-                    elif found_type == type(None):
-                        has_text = True
-                        summary_data[column] = {}
-                        summary_data[column]["None"] = 1
                 else:
-                    if type(summary_data[column]) == list:
+                    if obj != "None" and found_type in (int, float):
                         # Gather portion for average calculation
-                        summary_data[column][0] += float(float(getattr(record, column)) / num_records)
+                        summary_data[column][0] += float(float(obj) / num_records)
                         # Gather portion for running sum
-                        summary_data[column][1] += float(getattr(record, column))
+                        summary_data[column][1] += float(float(obj) / num_records)
                         # Gather portion for running sq sum
-                        summary_data[column][2] += float(getattr(record, column) ** 2)
-                    elif found_type != type(None) and type(summary_data[column]) == dict:
+                        summary_data[column][2] += float(float(obj) ** 2)
+                    elif found_type in (str, bool):
                         # Gather count
                         val = str(getattr(record, column))
                         vals = self._correct_value((val if val != '' else "None"))
                         for _v in vals:
                             count = summary_data[column].get(_v, 0)
                             summary_data[column][_v] = count + 1
-                    elif found_type == type(None):
-                        count = summary_data[column].get("None", 0)
-                        summary_data[column]["None"] = count + 1
         # Determine standard deviation values
         if num_records > 1:
             for column in self.columns():

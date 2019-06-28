@@ -25,11 +25,11 @@ unusable_punctuation = set(punctuation) - set("_")
 
 class ClassManager:
     default_data = {
-        "Float": 0.0,
-        "Integer": 0,
-        "String": "",
-        "VARCHAR": "",
-        "Boolean": False,
+        "Float": None,
+        "Integer": None,
+        "String": None,
+        "VARCHAR": None,
+        "Boolean": None,
     }
 
     @staticmethod

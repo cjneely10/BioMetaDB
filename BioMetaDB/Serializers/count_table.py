@@ -90,4 +90,4 @@ class CountTable:
                 if value != '':
                     return value
                 else:
-                    return "None"
+                    return None
