@@ -143,10 +143,9 @@ class ClassManager:
         # Or operation on sets to get all ids to add
         try:
             ids_to_add = set(count_table_object.file_contents.keys()) | \
-                         set([os.path.splitext(_file)[0] for _file in genome_files_to_add if _file != "" and os.path.splitext(_file)[1] == ".gz"]) | \
-                         set([val._id for val in sess.query(UserClass).all()]) | set(genome_files_to_add)
+                         set([os.path.splitext(_file)[0] for _file in genome_files_to_add if _file != "" and os.path.splitext(_file)[1] == ".gz"])
         except AttributeError:
-            ids_to_add = set(genome_files_to_add) | set([val._id for val in sess.query(UserClass).all()])
+            ids_to_add = set(count_table_object.file_contents.keys())
         if '' in ids_to_add:
             ids_to_add.remove('')
         for _id_ in ids_to_add:
