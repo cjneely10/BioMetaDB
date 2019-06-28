@@ -160,7 +160,7 @@ cdef class RecordList:
                         out_key = out_key[:17] + "..."
                     val = self._summary[key].get(_out_key, None)
                     summary_string += "\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
-                        str(key), (out_key if out_key != "111111111" else 'nil'), (val if val else  1), self.num_records - num_none + 1, longest_key=longest_key)
+                        str(key), (out_key if out_key != "111111111" else 'nil'), (val + 1 if val else  1), self.num_records - num_none, longest_key=longest_key)
             summary_string += ("-" * (longest_key + 75)) + "\n"
         return summary_string
 
