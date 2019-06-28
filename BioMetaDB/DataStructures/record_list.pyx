@@ -156,7 +156,7 @@ cdef class RecordList:
                     out_key = _out_key = max((self._summary[key].items() or {"111111111":0}.items()), key=lambda x : x[1])[0]
                     if out_key and len(out_key) > 16:
                         out_key = out_key[:17] + "..."
-                    val = self._summary[key].get(out_key, None)
+                    val = self._summary[key].get(_out_key, None)
                     summary_string += "\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
                         str(key), (out_key if out_key != "111111111" else 'nil'), (val if val else  1), self.num_records - num_none, longest_key=longest_key)
             summary_string += ("-" * (longest_key + 75)) + "\n"
@@ -180,10 +180,7 @@ cdef class RecordList:
         column_keys = list(self.columns())
         for record in self.results:
             for column in column_keys:
-                try:
-                    found_type = type(getattr(record, column))
-                except AttributeError:
-                    found_type = type(None)
+                found_type = type(getattr(record, column, None))
                 if column not in summary_data.keys():
                     if found_type in (int, float):
                         summary_data[column] = []

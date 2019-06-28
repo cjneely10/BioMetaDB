@@ -75,7 +75,7 @@ class Record:
         summary_string += ("-" * (longest_key + 30) + "\n")
         return summary_string
 
-    def write(self):
+    def write_temp(self):
         """ Method writes file contents to temporary file and stores file name as instance attribute
 
         """
@@ -86,7 +86,7 @@ class Record:
         W.close()
         self.temp_filename = filename
 
-    def clear(self):
+    def clear_temp(self):
         """ Method for deleting instance temporary file
 
         """
@@ -94,13 +94,7 @@ class Record:
             os.remove(self.temp_filename)
             self.temp_filename = None
 
-    def Print(self):
-        """ Method calls print function on file contents
-
-        """
-        print(open(self.full_path(), "r").read())
-
-    def get_records(self):
+    def records(self):
         """ Method returns contents of record's file as a list of BioPython SeqRecord objects
 
         :return List[SeqRecord]
