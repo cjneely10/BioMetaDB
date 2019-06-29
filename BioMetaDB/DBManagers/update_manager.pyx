@@ -67,6 +67,7 @@ class UpdateManager:
         cdef str outfile_path = UpdateManager._check_migration_file_number(
             os.path.join(self.cfg.migrations_dir, outfile_prefix + UpdateManager.MGMT_EXT))
         cdef str table_name
+        cdef list col_list
         cdef object record
         W = open(os.path.join(self.cfg.migrations_dir, outfile_path), "w")
         for table_name in data.keys():
@@ -114,16 +115,17 @@ class UpdateManager:
         return simple_migration_path
 
     @staticmethod
-    def _load_from_csv(object csv_file):
+    def _load_from_csv(str csv_file):
         """ Protected method to load csv data and dictionaries of columns and data
 
         :param csv_file:
         :return Tuple[Dict[str, List[str]], Dict[str, List[List[str]]]]:
         """
         cdef dict tables = {}
-        csv_file = open(csv_file, newline='')
-        csv_reader = csv.reader(csv_file, delimiter=",")
+        cdef object _csv_file = open(csv_file, newline='')
+        cdef object csv_reader = csv.reader(_csv_file, delimiter=",")
         cdef dict cols = {}
+        cdef str dept
         # Load each table data into cols and tables variables
         for row in csv_reader:
             if row[0] == "Record":
