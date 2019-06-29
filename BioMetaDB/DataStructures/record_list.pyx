@@ -132,9 +132,7 @@ cdef class RecordList:
         # Build summary string
         for key in sorted_keys:
             if key in self._summary.keys():
-                if type(self._summary[key]) == bool:
-                    summary_string += "\t{:>{longest_key}}\t{:<20s}\n".format(key, str(self._summary[key]), longest_key=longest_key)
-                elif type(self._summary[key]) == list:
+                if type(self._summary[key]) == list:
                     summary_string += "\t{:>{longest_key}}\t{:<20.3f}\t{:<12.3f}\n".format(
                         key,
                         self._summary[key][0],
@@ -160,7 +158,7 @@ cdef class RecordList:
                         out_key = out_key[:17] + "..."
                     val = self._summary[key].get(_out_key, None)
                     summary_string += "\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
-                        str(key), (out_key if out_key != "111111111" else 'nil'), (val + 1 if val else  1), self.num_records - num_none, longest_key=longest_key)
+                        str(key), (out_key if out_key != "111111111" and val != 1 else 'nil'), (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key)
             summary_string += ("-" * (longest_key + 75)) + "\n"
         return summary_string
 
