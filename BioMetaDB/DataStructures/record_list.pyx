@@ -1,6 +1,7 @@
 # cython: language_level=3
 import re
 from math import sqrt
+from io import StringIO
 from sqlalchemy import text
 from string import punctuation
 from sqlalchemy.exc import OperationalError
@@ -43,21 +44,21 @@ cdef class RecordList:
 
         :return:
         """
-        cdef str summary_string
+        cdef object summary_string = StringIO()
         cdef list sorted_keys
         cdef str key
         cdef int longest_key
         sorted_keys = sorted(ClassManager.get_class_as_dict(self.cfg).keys())
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
-        summary_string = ("*" * (longest_key + 30)) + "\n"
-        summary_string += "\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Record Name:", self.cfg.table_name, longest_key=longest_key)
-        summary_string += "\t\t{:>{longest_key}s}\n\n".format("Column Name", longest_key=longest_key)
+        summary_string.write(("*" * (longest_key + 30)) + "\n")
+        summary_string.write("\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Record Name:", self.cfg.table_name, longest_key=longest_key))
+        summary_string.write("\t\t{:>{longest_key}s}\n\n".format("Column Name", longest_key=longest_key))
         # Get all columns
         for key in sorted_keys:
-            summary_string += "\t\t{:>{longest_key}s}\n".format(key, longest_key=longest_key)
-        summary_string += ("-" * (longest_key + 30) + "\n")
-        return summary_string
+            summary_string.write("\t\t{:>{longest_key}s}\n".format(key, longest_key=longest_key))
+        summary_string.write(("-" * (longest_key + 30) + "\n"))
+        return summary_string.getvalue()
 
     def columns(self):
         """ Returns dict of columns
@@ -77,7 +78,7 @@ cdef class RecordList:
 
         :return:
         """
-        cdef str summary_string
+        cdef object summary_string = StringIO()
         cdef list sorted_keys
         cdef str key, out_key, _out_key
         cdef int longest_key, num_none
@@ -87,67 +88,67 @@ cdef class RecordList:
         sorted_keys = sorted(self.columns())
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
-        summary_string = ("*" * (longest_key + 75)) + "\n"
+        summary_string.write(("*" * (longest_key + 75)) + "\n")
         # Display multiple records
         if self.num_records > 1:
-            summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<10d}\n\n".format(
+            summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<10d}\n\n".format(
                 "Table Name:",
                 self.cfg.table_name,
                 "Number of Records:",
                 self.num_records,
-                longest_key=longest_key)
+                longest_key=longest_key))
         # Display single record
         elif self.num_records == 1:
             # Long name
             if len(self.results[0]._id) > 30:
-                summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}...\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
+                summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}...\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
                     "Record Name:",
                     self.cfg.table_name,
                     "ID:",
                     self.results[0]._id,
                     "Data Type:",
                     self.results[0].data_type,
-                    longest_key=longest_key)
+                    longest_key=longest_key))
             else:
-                summary_string += "\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
+                summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
                     "Record Name:",
                     self.cfg.table_name,
                     "ID:",
                     self.results[0]._id,
                     "Data Type:",
                     self.results[0].data_type,
-                    longest_key=longest_key)
+                    longest_key=longest_key))
         # No records found
         else:
-            summary_string += "\t{:>{longest_key}}".format("No records found", longest_key=longest_key)
+            summary_string.write("\t{:>{longest_key}}".format("No records found", longest_key=longest_key))
             # Do not create summary info
-            return summary_string
+            return summary_string.getvalue()
         # Metadata display column headers
-        summary_string += "\t{:>{longest_key}}\t{:<20s}\t{:<12s}\n\n".format(
+        summary_string.write("\t{:>{longest_key}}\t{:<20s}\t{:<12s}\n\n".format(
             "Column Name",
             "Average",
             "Std Dev",
             longest_key=longest_key
-        )
+        ))
         # Build summary string
         for key in sorted_keys:
             if key in self._summary.keys():
                 if type(self._summary[key]) == list:
-                    summary_string += "\t{:>{longest_key}}\t{:<20.3f}\t{:<12.3f}\n".format(
+                    summary_string.write("\t{:>{longest_key}}\t{:<20.3f}\t{:<12.3f}\n".format(
                         key,
                         self._summary[key][0],
                         self._summary[key][3],
-                    longest_key=longest_key)
-        summary_string += ("-" * (longest_key + 75)) + "\n"
+                    longest_key=longest_key))
+        summary_string.write(("-" * (longest_key + 75)) + "\n")
         if self.has_text:
             longest_key = max([len(key) for key in sorted_keys if key in self._summary.keys() and type(self._summary[key]) == dict])
-            summary_string += "\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}\n\n".format(
+            summary_string.write("\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}\n\n".format(
                 "Column Name",
                 "Most Frequent",
                 "Num",
                 "Count Non-Null",
                 longest_key=longest_key
-            )
+            ))
             for key in sorted_keys:
                 if key in self._summary.keys() and type(self._summary[key]) == dict:
                     num_none = self._summary[key].get("None", 0)
@@ -157,10 +158,10 @@ cdef class RecordList:
                     if out_key and len(out_key) > 16:
                         out_key = out_key[:17] + "..."
                     val = self._summary[key].get(_out_key, None)
-                    summary_string += "\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
-                        str(key), (out_key if out_key != "111111111" and val != 1 else 'nil'), (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key)
-            summary_string += ("-" * (longest_key + 75)) + "\n"
-        return summary_string
+                    summary_string.write("\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
+                        str(key), (out_key if out_key != "111111111" and val != 1 else 'nil'), (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key))
+            summary_string.write(("-" * (longest_key + 75)) + "\n")
+        return summary_string.getvalue()
 
     def _gather_metadata(self):
         """ Protected method to collect data, averages, and standard deviations

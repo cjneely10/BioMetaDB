@@ -67,7 +67,7 @@ class UpdateManager:
         cdef str outfile_path = UpdateManager._check_migration_file_number(
             os.path.join(self.cfg.migrations_dir, outfile_prefix + UpdateManager.MGMT_EXT))
         cdef str table_name
-        cdef list col_list
+        cdef object col_list
         cdef object record
         W = open(os.path.join(self.cfg.migrations_dir, outfile_path), "w")
         for table_name in data.keys():
