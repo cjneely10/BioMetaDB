@@ -38,5 +38,10 @@ def get_table(config_path, table_name=None, alias=None):
 
 
 def tables(config_path):
+    """ Primary method for listing tables in project
+
+    :param config_path:
+    :return:
+    """
     cfg, config_path = ConfigManager.confirm_config_set(config_path)
     return list(cfg[ConfigKeys.TABLES_TO_DB].keys())
