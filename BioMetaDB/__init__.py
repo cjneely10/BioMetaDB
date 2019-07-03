@@ -35,3 +35,8 @@ def get_table(config_path, table_name=None, alias=None):
     # Map to SQL orm
     mapper(UserClass, TableClass)
     return RecordList(sess, UserClass, config)
+
+
+def tables(config_path):
+    cfg, config_path = ConfigManager.confirm_config_set(config_path)
+    return list(cfg[ConfigKeys.TABLES_TO_DB].keys())

@@ -145,8 +145,8 @@ cdef class RecordList:
             summary_string.write("\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}\n\n".format(
                 "Column Name",
                 "Most Frequent",
-                "Num",
-                "Count Non-Null",
+                "Frequency",
+                "Total Count",
                 longest_key=longest_key
             ))
             for key in sorted_keys:
@@ -247,6 +247,7 @@ cdef class RecordList:
         else:
             self.results = self.sess.query(self.TableClass).all()
         self.num_records = len(self.results)
+        return self
 
     def _clear_prior_metadata(self):
         """ Protected member will clear existing data
@@ -337,6 +338,7 @@ cdef class RecordList:
         :return:
         """
         self.sess.commit()
+        return self
 
     def _regex_search(self, str possible_column, list search_list):
         """ Protected method to search a list of values for a given string
