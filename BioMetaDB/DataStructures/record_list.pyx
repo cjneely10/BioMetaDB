@@ -159,7 +159,7 @@ cdef class RecordList:
                         out_key = out_key[:17] + "..."
                     val = self._summary[key].get(_out_key, None)
                     summary_string.write("\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
-                        str(key), (out_key if out_key != "111111111" and val != 1 else 'nil'), (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key))
+                        str(key), (out_key if self.num_records == 1 or (out_key != "111111111" and val != 1) else 'nil'), (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key))
             summary_string.write(("-" * (longest_key + 75)) + "\n")
         return summary_string.getvalue()
 
@@ -386,8 +386,11 @@ cdef class RecordList:
         if ";;;" in value:
             vals = [_v for _v in value.split(";;;") if _v != '']
             for val in vals:
-                _v = val.split(":::")[1]
-                if _v != '':
-                    return_list.append(_v)
+                if ":::" in val:
+                    _v = val.split(":::")[1]
+                    if _v != '':
+                        return_list.append(_v)
+                else:
+                    return_list.append(val)
             return return_list
         return [value,]
