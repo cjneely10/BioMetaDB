@@ -198,7 +198,7 @@ cdef class RecordList:
                         has_text = True
                         # Gather count
                         val = str(getattr(record, column))
-                        vals = self._correct_value((val if val != '' else "None"))
+                        vals = RecordList._correct_value((val if val != '' else "None"))
                         summary_data[column] = {}
                         for _v in vals:
                             summary_data[column][_v] = 1
@@ -213,7 +213,7 @@ cdef class RecordList:
                     elif found_type in (str, bool):
                         # Gather count
                         val = str(getattr(record, column))
-                        vals = self._correct_value((val if val != '' else "None"))
+                        vals = RecordList._correct_value((val if val != '' else "None"))
                         for _v in vals:
                             count = summary_data[column].get(_v, 0)
                             summary_data[column][_v] = count + 1
@@ -263,7 +263,7 @@ cdef class RecordList:
 
         :return:
         """
-        return self._regex_search(possible_column, list(self.columns()))
+        return RecordList._regex_search(possible_column, list(self.columns()))
 
     def __next__(self):
         """ Returns self as iterator
@@ -340,7 +340,8 @@ cdef class RecordList:
         self.sess.commit()
         return self
 
-    def _regex_search(self, str possible_column, list search_list):
+    @staticmethod
+    def _regex_search(str possible_column, list search_list):
         """ Protected method to search a list of values for a given string
 
         :param possible_column:
@@ -375,7 +376,8 @@ cdef class RecordList:
         # Return all possible values
         return list(possible_columns)
 
-    def _correct_value(self, str value):
+    @staticmethod
+    def _correct_value(str value):
         """ Protected member function will split off annotation from %s-%s:%s paradigm
 
         :param value:

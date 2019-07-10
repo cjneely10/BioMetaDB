@@ -26,7 +26,7 @@ class BioOps:
         :param scores: (List[str])	List of nucleotide scores
         :return List[int]:
         """
-        is_phred_33 = True
+        cdef bint is_phred_33 = True
         cdef str score
         for score in scores:
             # Determines phred based on presence of lowercase characters
@@ -45,7 +45,7 @@ class BioOps:
         :param dt: (str)	Inferred data type based on file extension
         :return str:
         """
-        avail_types = {
+        cdef dict avail_types = {
             "fasta": "fasta",
             "fastq": "fastq",
             "fna": "fasta",

@@ -1,5 +1,6 @@
 import os
 from BioMetaDB.Accessories.bio_ops import BioOps
+from BioMetaDB.Serializers.fasta_parser import FastaParser
 
 """
 Script holds superclass from which all user-created classes will inherit
@@ -19,7 +20,7 @@ class Record:
 
         :return str:
         """
-        file_path = None
+        cdef str file_path = None
         if os.path.isfile(self.location + "/" + self._id):
             file_path = self.location + "/" + self._id
         elif os.path.isfile(self.location + "/" + self._id + ".gz"):
@@ -32,12 +33,13 @@ class Record:
         :return str:
         """
         # Print sorted attributes, excluding instance state object info
-        first_vals = ("_id", "data_type", "location")
-        first_cor_vals = ("ID", "Data Type", "File Location")
-        attrs = {key: val for key, val in self.__dict__.items() if key != "_sa_instance_state"
+        cdef tuple first_vals = ("_id", "data_type", "location")
+        cdef tuple first_cor_vals = ("ID", "Data Type", "File Location")
+        cdef str key
+        cdef dict attrs = {key: val for key, val in self.__dict__.items() if key != "_sa_instance_state"
                  and key not in first_vals and key != "id"}
-        sorted_keys = sorted(list(attrs.keys()))
-        longest_key = max([len(key) for key in attrs])
+        cdef list sorted_keys = sorted(list(attrs.keys()))
+        cdef int i, longest_key = max([len(key) for key in attrs])
         # Pretty formatting
         summary_string = ("*" * (longest_key + 30)) + "\n"
         for i in range(len(first_vals)):
@@ -79,9 +81,9 @@ class Record:
         """ Method writes file contents to temporary file and stores file name as instance attribute
 
         """
-        filename = self._id + ".tmp." + self.data_type
-        W = open(filename, "w")
-        with open(self.full_path(), "r") as R:
+        cdef str filename = self._id + ".tmp." + self.data_type
+        cdef object W = open(filename, "wb")
+        with open(self.full_path(), "rb") as R:
             W.write(R.read())
         W.close()
         self.temp_filename = filename
@@ -99,6 +101,6 @@ class Record:
 
         :return List[SeqRecord]
         """
-        data_type = BioOps.get_type(self.full_path())
+        cdef str data_type = BioOps.get_type(self.full_path())
         # Parses large file if needed (chunk at 10000 lines)
         return BioOps.parse_large(self.full_path(), data_type)
