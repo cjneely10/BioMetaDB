@@ -14,6 +14,9 @@ class Record:
         self.location = None
         self.temp_filename = None
 
+    def __del__(self):
+        self.clear_temp()
+
     def full_path(self):
         """ Method returns full path of bio storage location
 
@@ -91,7 +94,7 @@ class Record:
         """ Method for deleting instance temporary file
 
         """
-        if self.temp_filename:
+        if getattr(self, "temp_filename", None) is not None:
             os.remove(self.temp_filename)
             self.temp_filename = None
 
