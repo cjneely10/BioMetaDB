@@ -47,15 +47,9 @@ def summarize_database(config_file, view, query, table_name, alias, write):
     if query == "None" and (table_name != "None" or alias != "None"):
         tables_in_database = (table_name, )
     for tbl_name in tables_in_database:
-        cfg = ConfigManager(config, tbl_name)
-        engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
-        sess = BaseData.get_session_from_engine(engine)
-        TableClass = ClassManager.get_class_orm(tbl_name, engine)
-        UserClass = type(tbl_name, (Record,), {})
-        # Map to SQL orm
-        mapper(UserClass, TableClass)
-        # Display queried info for single table and break
-        if not view and table_name == tbl_name:
+        if not view and table_name == tbl_name and write == "None":
+            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
+            # Display queried info for single table and break
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             if query != "None":
                 rl.query(query)
@@ -68,13 +62,33 @@ def summarize_database(config_file, view, query, table_name, alias, write):
             break
         # Display column info for table
         elif query == "None" and view:
+            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
+            # Display queried info for single table and break
             rl = RecordList(sess, UserClass, cfg)
             # Do not need to query since only displaying columns
             print(rl.get_column_summary())
-        elif write != "None":
+        if write != "None" and table_name == tbl_name:
+            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
+            # Display queried info for single table and break
             rl = RecordList(sess, UserClass, cfg)
             if query != "None":
                 rl.query(query)
             else:
                 rl.query()
             rl.write_records(write)
+            if len(rl) != 1:
+                print(rl.summarize())
+            else:
+                print(rl[0])
+            break
+
+def load_table_metadata(config, tbl_name):
+    cfg = ConfigManager(config, tbl_name)
+    engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
+    sess = BaseData.get_session_from_engine(engine)
+    TableClass = ClassManager.get_class_orm(tbl_name, engine)
+    UserClass = type(tbl_name, (Record,), {})
+    # Map to SQL orm
+    mapper(UserClass, TableClass)
+    # Display queried info for single table and break
+    return sess, UserClass, cfg
