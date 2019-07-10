@@ -82,6 +82,7 @@ def summarize_database(config_file, view, query, table_name, alias, write):
                 print(rl[0])
             break
 
+
 def load_table_metadata(config, tbl_name):
     cfg = ConfigManager(config, tbl_name)
     engine = BaseData.get_engine(cfg.db_dir, cfg.db_name + ".db")
