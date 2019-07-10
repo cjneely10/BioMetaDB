@@ -289,8 +289,7 @@ class ClassManager:
         for key in class_as_dict.keys():
             new_key = str(key).lower()
             for bad_char in unusable_punctuation:
-                if bad_char in new_key:
-                    new_key = new_key.replace(bad_char, "")
+                new_key = new_key.replace(bad_char, "")
             new_key = new_key.replace(" ", "_")
             corrected_dict[new_key] = class_as_dict[key]
         return corrected_dict
@@ -309,8 +308,7 @@ class ClassManager:
         for _iter in iterable:
             new_val = _iter.lower()
             for bad_char in unusable_punctuation:
-                if bad_char in new_val:
-                    new_val = new_val.replace(bad_char, "")
+                new_val = new_val.replace(bad_char, "")
             new_val = new_val.replace(" ", "_")
             new_iter.append(new_val)
         return new_iter

@@ -107,15 +107,16 @@ documentation to come.
     
 - `RecordList` - returned by `get_table()`, a quasi list/dict data type for multiple records.
     - `__repr()__`:         returns a "pretty-print" summary of the table
-    - `query(query_str)`:   runs query through SQL database
+    - `query("query string")`:   runs query through SQL database
     - `columns()`:          returns a dict of column names for the database table
     - `columns_summary()`:  returns a "pretty-print" summary of all of the column names in the database table
     - `summarize()`:        returns a "pretty-print" summary (averages and std. devs) of the items in the list
-    - `find_column(search_str)`:     returns list of columns that are "like" the passed search_str
+    - `find_column("search string")`:     returns list of columns that are "like" the passed search_str
     - `save()`:             updates database with newly set values
+    - `write_records("out.fna")`: save all sequences in db view (e.g. result of `query()`) to file       
     - "quasi list/dict data type"
         - Can iterate over a `RecordList` object
-        - Can get length of `RecordList` - e.g. how many records were returned by `query()`
+        - Can get `len()` of `RecordList` - e.g. how many records were returned by `query()`
         - Can return `keys()`, `values()`, and `items()`
         - Can return records by index or by id
 
