@@ -43,6 +43,8 @@ if __name__ == "__main__":
          {"help": "Query to pass to SUMMARIZE", "default": "None"}),
         (("-i", "--integrity_cancel"),
          {"help": "Cancel integrity check", "default": False, "action": "store_true"}),
+        (("-w", "--write"),
+         {"help": "Write results to outfile", "default": "None"}),
     )
     programs = {
         "INIT":                     create_database,
@@ -62,7 +64,7 @@ if __name__ == "__main__":
         "REMOVECOL":            ("config_file", "table_name", "list_file", "alias", "silent", "integrity_cancel"),
         "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent", "integrity_cancel"),
         "REMOVE":               ("config_file", "table_name", "alias", "silent", "integrity_cancel"),
-        "SUMMARIZE":            ("config_file", "view", "query", "table_name", "alias"),
+        "SUMMARIZE":            ("config_file", "view", "query", "table_name", "alias", "write"),
         "INTEGRITY":            ("config_file", "table_name", "alias", "silent"),
         "FIX":                  ("config_file", "data_file", "silent", "integrity_cancel"),
     }
@@ -78,7 +80,7 @@ if __name__ == "__main__":
         "REMOVECOL":        "Remove column list (including data) from table",
         "DELETE":           "Delete list of ids from database tables, remove associated files",
         "REMOVE":           "Remove table and all associated data from database",
-        "SUMMARIZE":        "Quick summary of project",
+        "SUMMARIZE":        "Quick summary of project. Optional to query for subset and to write results to file",
         "INTEGRITY":        "Queries project database and structure to generate .fix file for possible issues",
         "FIX":              "Repairs errors in DB structure using .fix file",
     }

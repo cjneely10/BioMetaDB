@@ -24,7 +24,7 @@ def _summarize_display_message_prelude(db_name):
     print(" Name of database:\t\t%s.db\n" % db_name.strip(".db"))
 
 
-def summarize_database(config_file, view, query, table_name, alias):
+def summarize_database(config_file, view, query, table_name, alias, write):
     """ Function will query all tables listed in the config file, outputting simple
     metrics to the screen
 
@@ -55,9 +55,12 @@ def summarize_database(config_file, view, query, table_name, alias):
         # Map to SQL orm
         mapper(UserClass, TableClass)
         # Display queried info for single table and break
-        if query != "None" and not view and table_name == tbl_name:
+        if not view and table_name == tbl_name:
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
-            rl.query(query)
+            if query != "None":
+                rl.query(query)
+            else:
+                rl.query()
             if len(rl) != 1:
                 print(rl.summarize())
             else:
@@ -68,12 +71,10 @@ def summarize_database(config_file, view, query, table_name, alias):
             rl = RecordList(sess, UserClass, cfg)
             # Do not need to query since only displaying columns
             print(rl.get_column_summary())
-        # Display summary info for table
-        elif query == "None" and not view:
-            rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
-            rl.query()
-            if len(rl) != 1:
-                print(rl.summarize())
+        elif write != "None":
+            rl = RecordList(sess, UserClass, cfg)
+            if query != "None":
+                rl.query(query)
             else:
-                print(rl[0])
-
+                rl.query()
+            rl.write_records(write)
