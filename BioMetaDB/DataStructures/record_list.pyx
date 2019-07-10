@@ -340,6 +340,20 @@ cdef class RecordList:
         self.sess.commit()
         return self
 
+    def write_records(self, str output_file):
+        """ Method will write all records that are in the current db view to a user-provided
+         output file
+
+        :return:
+        """
+        cdef object R, W = open(output_file, "wb")
+        cdef object record
+        for record in self.results:
+            R = open(record.full_path(), "rb")
+            W.write(R.read())
+            R.close()
+        W.close()
+
     @staticmethod
     def _regex_search(str possible_column, list search_list):
         """ Protected method to search a list of values for a given string
@@ -355,7 +369,6 @@ cdef class RecordList:
         cdef set unusable_punctuation = set(punctuation) - set("_")
         cdef str punct
         cdef str tmp = possible_column
-
         r = re.compile(r"%s" % possible_column)
         # Exact matches
         possible_columns = set(filter(r.findall, cols_in_db))

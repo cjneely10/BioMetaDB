@@ -1,6 +1,5 @@
 import os
 from BioMetaDB.Accessories.bio_ops import BioOps
-from BioMetaDB.Serializers.fasta_parser import FastaParser
 
 """
 Script holds superclass from which all user-created classes will inherit
