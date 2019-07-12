@@ -60,7 +60,6 @@ def summarize_database(config_file, view, query, table_name, alias, write):
                 print(rl.summarize())
             else:
                 print(rl[0])
-            break
         # Display column info for table
         elif query == "None" and view:
             sess, UserClass, cfg = load_table_metadata(config, tbl_name)
