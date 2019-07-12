@@ -52,7 +52,8 @@ cdef class RecordList:
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
         summary_string.write(("*" * (longest_key + 30)) + "\n")
-        summary_string.write("\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Record Name:", self.cfg.table_name, longest_key=longest_key))
+        summary_string.write("\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Record Name:", self.cfg.table_name,
+                                                                         longest_key=longest_key))
         summary_string.write("\t\t{:>{longest_key}s}\n\n".format("Column Name", longest_key=longest_key))
         # Get all columns
         for key in sorted_keys:
@@ -154,12 +155,14 @@ cdef class RecordList:
                     num_none = self._summary[key].get("None", 0)
                     if num_none > 0:
                         del self._summary[key]["None"]
-                    out_key = _out_key = max((self._summary[key].items() or {"111111111":0}.items()), key=lambda x : x[1])[0]
+                    out_key = _out_key = max((self._summary[key].items() or {"111111111":0}.items()),
+                                             key=lambda x : x[1])[0]
                     if out_key and len(out_key) > 16:
                         out_key = out_key[:17] + "..."
                     val = self._summary[key].get(_out_key, None)
                     summary_string.write("\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
-                        str(key), (out_key if self.num_records == 1 or (out_key != "111111111" and val != 1) else 'nil'), (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key))
+                        str(key), (out_key if self.num_records == 1 or (out_key != "111111111" and val != 1) else 'nil'),
+                        (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key))
             summary_string.write(("-" * (longest_key + 75)) + "\n")
         return summary_string.getvalue()
 
@@ -175,7 +178,8 @@ cdef class RecordList:
         cdef object record
         cdef bint has_text = False
         cdef object found_type, obj
-        cdef dict data_types = {_k: TypeMapper.string_to_py_type[v] for _k,v in ClassManager.get_class_as_dict(self.cfg).items()}
+        cdef dict data_types = {_k: TypeMapper.string_to_py_type[v]
+                                for _k,v in ClassManager.get_class_as_dict(self.cfg).items()}
         if self.results is None:
              self.query()
         num_records = self.num_records
@@ -223,7 +227,8 @@ cdef class RecordList:
                 if type(summary_data[column]) != dict:
                 # print(summary_data[column][1], summary_data[column][2])
                     try:
-                        summary_data[column][3] = sqrt((summary_data[column][2] - ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
+                        summary_data[column][3] = sqrt((summary_data[column][2] -
+                                                        ((summary_data[column][1] ** 2) / num_records)) / (num_records - 1))
                     except ValueError:
                         summary_data[column][3] = -1
         return summary_data, num_records, has_text
@@ -247,6 +252,19 @@ cdef class RecordList:
         else:
             self.results = self.sess.query(self.TableClass).all()
         self.num_records = len(self.results)
+        return self
+
+    def join(self, RecordList other):
+        """ Method will create view of final
+
+        :param other:
+        :return:
+        """
+        try:
+            self.results = self.sess.query(self.TableClass).join(other.TableClass._id).all()
+        # Column name not found
+        except OperationalError:
+            raise ColumnNameNotFoundError
         return self
 
     def _clear_prior_metadata(self):
