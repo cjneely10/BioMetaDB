@@ -261,7 +261,7 @@ cdef class RecordList:
         :return:
         """
         try:
-            self.results = self.sess.query(self.TableClass).join(other._id).all()
+            self.results = self.sess.query(self.TableClass).join(other).all()
         # Column name not found
         except OperationalError:
             raise ColumnNameNotFoundError
