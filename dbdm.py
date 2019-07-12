@@ -44,7 +44,7 @@ if __name__ == "__main__":
         (("-i", "--integrity_cancel"),
          {"help": "Cancel integrity check", "default": False, "action": "store_true"}),
         (("-w", "--write"),
-         {"help": "Write results to outfile", "default": "None"}),
+         {"help": "Write SUMMARIZE results to outfile", "default": "None"}),
     )
     programs = {
         "INIT":                     create_database,
