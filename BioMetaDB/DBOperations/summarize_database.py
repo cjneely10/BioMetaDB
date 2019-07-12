@@ -28,11 +28,12 @@ def summarize_database(config_file, view, query, table_name, alias, write):
     """ Function will query all tables listed in the config file, outputting simple
     metrics to the screen
 
-    :param alias:
-    :param table_name:
-    :param query:
-    :param view:
     :param config_file:
+    :param view:
+    :param query:
+    :param table_name:
+    :param alias:
+    :param write:
     :return:
     """
     if not view:
@@ -47,7 +48,7 @@ def summarize_database(config_file, view, query, table_name, alias, write):
     if query == "None" and (table_name != "None" or alias != "None"):
         tables_in_database = (table_name, )
     for tbl_name in tables_in_database:
-        if not view and (table_name != "None" and table_name == tbl_name) and write == "None":
+        if not view and ((table_name != "None" and table_name == tbl_name) or (table_name == "None")) and write == "None":
             sess, UserClass, cfg = load_table_metadata(config, tbl_name)
             # Display queried info for single table and break
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
