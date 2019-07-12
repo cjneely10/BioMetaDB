@@ -254,6 +254,7 @@ cdef class RecordList:
         self.num_records = len(self.results)
         return self
 
+    # TODO Needs to be tested w/ tables that populate non-null set of db records
     def join(self, RecordList other):
         """ Method will create view of final
 
