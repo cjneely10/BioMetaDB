@@ -112,6 +112,7 @@ def create_database(db_name, table_name, directory_name, data_file, alias, silen
     print_if_not_silent(silent, " Writing database configuration to %s" % os.path.join(config_dir, config_file))
     config = Config()
     abs_path_working_dir = os.path.abspath(db_name)
+    db_name = os.path.basename(db_name)
     config[ConfigKeys.DATABASES] = {
         ConfigKeys.db_name: db_name,
         ConfigKeys.working_dir: abs_path_working_dir,
