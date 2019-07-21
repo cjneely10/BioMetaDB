@@ -66,7 +66,7 @@ cdef class RecordList:
 
         :return:
         """
-        return ClassManager.get_class_as_dict(self.cfg).keys()
+        return list(ClassManager.get_class_as_dict(self.cfg).keys())
 
     def __str__(self):
         return self.summarize()
@@ -372,6 +372,31 @@ cdef class RecordList:
             W.write(R.read())
             R.close()
         W.close()
+
+    def write_tsv(self, str output_file, str delim = "\t"):
+        """ Outputs all record metadata in current db view to file
+
+        :param output_file:
+        :param delim:
+        :return:
+        """
+        if self.results is None:
+             self.query()
+        cdef list cols = sorted(self.columns())
+        cdef object W = open(output_file, "w")
+        cdef object record
+        cdef str col
+        # Write header
+        W.write("_id" + delim + "location" + delim + "data_type" + delim)
+        W.write(delim.join(cols)[:-1] + "\n")
+        for record in self.results:
+            W.write(record._id + delim)
+            W.write(record.location + delim)
+            W.write(record.data_type)
+            for col in cols:
+                W.write(delim + str(getattr(record, col, "None")))
+            W.write("\n")
+
 
     @staticmethod
     def _regex_search(str possible_column, list search_list):
