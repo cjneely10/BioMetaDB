@@ -113,7 +113,8 @@ documentation to come.
     - `summarize()`:        returns a "pretty-print" summary (averages and std. devs) of the items in the list
     - `find_column("search string")`:     returns list of columns that are "like" the passed search_str
     - `save()`:             updates database with newly set values
-    - `write_records("out.fna")`: save all sequences in db view (e.g. result of `query()`) to file       
+    - `write_records("out.fna")`: save all sequences in db view (e.g. result of `query()`) to file
+    - `write_tsv("out.tsv")`: save all data for current db view (e.g. result of `query()`) to file
     - "quasi list/dict data type"
         - Can iterate over a `RecordList` object
         - Can get `len()` of `RecordList` - e.g. how many records were returned by `query()`
