@@ -24,7 +24,7 @@ def _summarize_display_message_prelude(db_name):
     print(" Name of database:\t\t%s.db\n" % db_name.strip(".db"))
 
 
-def summarize_database(config_file, view, query, table_name, alias, write):
+def summarize_database(config_file, view, query, table_name, alias, write, write_tsv):
     """ Function will query all tables listed in the config file, outputting simple
     metrics to the screen
 
@@ -34,6 +34,7 @@ def summarize_database(config_file, view, query, table_name, alias, write):
     :param table_name:
     :param alias:
     :param write:
+    :param write_tsv:
     :return:
     """
     if not view:
@@ -48,7 +49,7 @@ def summarize_database(config_file, view, query, table_name, alias, write):
     if query == "None" and (table_name != "None" or alias != "None"):
         tables_in_database = (table_name, )
     for tbl_name in tables_in_database:
-        if not view and ((table_name != "None" and table_name == tbl_name) or (table_name == "None")) and write == "None":
+        if view == "None" and ((table_name != "None" and table_name == tbl_name) or (table_name == "None")) and write == "None":
             sess, UserClass, cfg = load_table_metadata(config, tbl_name)
             # Display queried info for single table and break
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
@@ -61,26 +62,34 @@ def summarize_database(config_file, view, query, table_name, alias, write):
             else:
                 print(rl[0])
         # Display column info for table
-        elif query == "None" and view:
+        if view.lower()[0] == "c":
             sess, UserClass, cfg = load_table_metadata(config, tbl_name)
             # Display queried info for single table and break
             rl = RecordList(sess, UserClass, cfg)
             # Do not need to query since only displaying columns
-            print(rl.get_column_summary())
-        if write != "None" and table_name == tbl_name:
+            print(rl.columns_summary())
+        elif view.lower()[0] == "t":
             sess, UserClass, cfg = load_table_metadata(config, tbl_name)
             # Display queried info for single table and break
+            rl = RecordList(sess, UserClass, cfg)
+            # Do not need to query since only displaying columns
+            print(rl.table_name_summary())
+        if write != "None" and table_name == tbl_name:
+            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
             rl = RecordList(sess, UserClass, cfg)
             if query != "None":
                 rl.query(query)
             else:
                 rl.query()
             rl.write_records(write)
-            if len(rl) != 1:
-                print(rl.summarize())
+        elif write_tsv != "None" and table_name == tbl_name:
+            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
+            rl = RecordList(sess, UserClass, cfg)
+            if query != "None":
+                rl.query(query)
             else:
-                print(rl[0])
-            break
+                rl.query()
+            rl.write_tsv(write_tsv)
 
 
 def load_table_metadata(config, tbl_name):

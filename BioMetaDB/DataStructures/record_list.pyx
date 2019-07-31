@@ -52,13 +52,24 @@ cdef class RecordList:
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
         summary_string.write(("*" * (longest_key + 30)) + "\n")
-        summary_string.write("\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Record Name:", self.cfg.table_name,
+        summary_string.write("\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name,
                                                                          longest_key=longest_key))
         summary_string.write("\t\t{:>{longest_key}s}\n\n".format("Column Name", longest_key=longest_key))
         # Get all columns
         for key in sorted_keys:
             summary_string.write("\t\t{:>{longest_key}s}\n".format(key, longest_key=longest_key))
         summary_string.write(("-" * (longest_key + 30) + "\n"))
+        return summary_string.getvalue()
+
+    def table_name_summary(self):
+        """ Wrapper for returning columns in class as simple dictionary Name: SQLType
+
+        :return:
+        """
+        cdef object summary_string = StringIO()
+        cdef str key
+        # Pretty formatting
+        summary_string.write("\t\t{:>11s}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name))
         return summary_string.getvalue()
 
     def columns(self):
