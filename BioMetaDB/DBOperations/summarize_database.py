@@ -41,8 +41,8 @@ def summarize_database(config_file, view, query, table_name, alias, write):
             assert (query != "None" and (table_name != "None" or alias != "None")), SummarizeDBAssertString.QUERY_AND_TABLE_SET
         assert not (table_name != "None" and alias != "None"), SummarizeDBAssertString.ALIAS_OR_TABLE_ONLY
     config, config_file = ConfigManager.confirm_config_set(config_file)
-    tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     _summarize_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name])
+    tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
     if query == "None" and (table_name != "None" or alias != "None"):

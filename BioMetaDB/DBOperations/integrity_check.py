@@ -56,8 +56,8 @@ def integrity_check(config_file, table_name, alias, silent):
         tables_to_search = list(config[ConfigKeys.TABLES_TO_DB].keys())
     else:
         tables_to_search = [table_name, ]
-    py_fixfile_name = "%s.%s.%s.fix" % (datetime.today().strftime("%Y%m%d"),
-                                        str(randint(1, 1001)), "_".join(tables_to_search))
+    py_fixfile_name = "%s.%s.fix" % (datetime.today().strftime("%Y%m%d"),
+                                     str(randint(1, 1001)))
     if not silent:
         _integrity_check_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name],
                                                  config[ConfigKeys.DATABASES][ConfigKeys.working_dir],

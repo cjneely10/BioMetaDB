@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-
 from BioMetaDB.DBOperations.fix import fix
 from BioMetaDB.Accessories.arg_parse import ArgParse
+from BioMetaDB.DBOperations.move_project import move_project
 from BioMetaDB.Accessories.program_caller import ProgramCaller
 from BioMetaDB.DBOperations.integrity_check import integrity_check
 from BioMetaDB.DBOperations.create_database import create_database
@@ -45,6 +45,8 @@ if __name__ == "__main__":
          {"help": "Cancel integrity check", "default": False, "action": "store_true"}),
         (("-w", "--write"),
          {"help": "Write SUMMARIZE results to outfile", "default": "None"}),
+        (("-p", "--path"),
+         {"help": "New path for moving project in MOVE command"}),
     )
     programs = {
         "INIT":                     create_database,
@@ -54,6 +56,7 @@ if __name__ == "__main__":
         "DELETE":                   delete_from_table,
         "REMOVE":                   remove_table_from_database,
         "SUMMARIZE":                summarize_database,
+        "MOVE":                     move_project,
         "INTEGRITY":                integrity_check,
         "FIX":                      fix,
     }
@@ -65,6 +68,7 @@ if __name__ == "__main__":
         "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent", "integrity_cancel"),
         "REMOVE":               ("config_file", "table_name", "alias", "silent", "integrity_cancel"),
         "SUMMARIZE":            ("config_file", "view", "query", "table_name", "alias", "write"),
+        "MOVE":                 ("config_file", "path", "silent"),
         "INTEGRITY":            ("config_file", "table_name", "alias", "silent"),
         "FIX":                  ("config_file", "data_file", "silent", "integrity_cancel"),
     }
@@ -81,6 +85,7 @@ if __name__ == "__main__":
         "DELETE":           "Delete list of ids from database tables, remove associated files",
         "REMOVE":           "Remove table and all associated data from database",
         "SUMMARIZE":        "Quick summary of project. Optional to query for subset and to write results to file",
+        "MOVE":             "Move project to new location",
         "INTEGRITY":        "Queries project database and structure to generate .fix file for possible issues",
         "FIX":              "Repairs errors in DB structure using .fix file",
     }
@@ -91,4 +96,4 @@ if __name__ == "__main__":
 
     pc = ProgramCaller(programs=programs, flags=flags, _help=_help, errors=errors)
 
-    pc.run(ap.args, debug=False)
+    pc.run(ap.args, debug=True)

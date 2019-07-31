@@ -47,7 +47,7 @@ cdef class FixFile:
 
     cdef read_issue(self):
         cdef object line
-        cdef str data_type, issue_type, fix_type, fix_data = "NONE", location, parsed_issue
+        cdef str data_type, issue_type, fix_type, fix_data = "NONE", location = "NONE", parsed_issue
         for line in self.fp:
             while line.startswith("@"):
                 line = next(self.fp)

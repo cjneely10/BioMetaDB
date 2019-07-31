@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 from BioMetaDB.Accessories.arg_parse import ArgParse
 from BioMetaDB.Accessories.ops import chunk
 import fileinput

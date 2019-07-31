@@ -35,6 +35,8 @@ def record_bad_location_file(**kwargs):
         )
     except FileNotFoundError:
         return "Unable to set location for %s" % kwargs["_id"]
+    except shutil.SameFileError:
+        return "File in location"
     record = (kwargs["sess"]).query(kwargs["UserClass"]).filter(text("_id == '%s'" % kwargs["_id"])).first()
     setattr(record, "location", os.path.join(kwargs["config"][ConfigKeys.DATABASES][ConfigKeys.db_dir], kwargs["table_name"]))
     setattr(record, "_id", os.path.basename(kwargs['fix_data']))
@@ -47,7 +49,8 @@ def file_bad_record_delete(**kwargs):
     :return:
     """
     assert_kwargs_loaded(kwargs, "_id")
-    os.remove(kwargs["_id"])
+    if os.path.exists(kwargs["_id"]):
+        os.remove(kwargs["_id"])
     return "File %s was deleted" % kwargs["_id"]
 
 def file_bad_record_record(**kwargs):
