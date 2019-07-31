@@ -163,7 +163,7 @@ values or columns.
 
 <pre><code>usage: dbdm.py [-h] [-n DB_NAME] [-t TABLE_NAME] [-d DIRECTORY_NAME]
                [-f DATA_FILE] [-l LIST_FILE] [-c CONFIG_FILE] [-a ALIAS] [-s]
-               [-v] [-q QUERY] [-i] [-w WRITE] [-p PATH]
+               [-v VIEW] [-q QUERY] [-i] [-w WRITE] [-x WRITE_TSV] [-p PATH]
                program
 
 dbdm:	Manage BioMetaDB project
@@ -181,13 +181,13 @@ INIT: Initialize database with starting table, fasta directory, and/or data file
 INTEGRITY: Queries project database and structure to generate .fix file for possible issues
 		(Req:  --config_file --table_name --alias --silent)
 MOVE: Move project to new location
-		(Req:  --config_file --path --silent)
+		(Req:  --config_file --path --integrity_cancel --silent)
 REMOVE: Remove table and all associated data from database
 		(Req:  --config_file --table_name --alias --silent --integrity_cancel)
 REMOVECOL: Remove column list (including data) from table
 		(Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
-SUMMARIZE: Quick summary of project. Optional to query for subset and to write results to file
-		(Req:  --config_file --view --query --table_name --alias --write)
+SUMMARIZE: Summarize project and query data. Write records or metadata to file
+		(Req:  --config_file --view --query --table_name --alias --write --write_tsv)
 UPDATE: Update values in existing table or add new sequences
 		(Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 
@@ -211,13 +211,15 @@ optional arguments:
   -a ALIAS, --alias ALIAS
                         Provide alias for locating and creating table class
   -s, --silent          Silence all standard output (Standard error still displays to screen)
-  -v, --view            Display column names only with SUMMARIZE
+  -v VIEW, --view VIEW  View (c)olumns or (t)ables
   -q QUERY, --query QUERY
                         Query to pass to SUMMARIZE
   -i, --integrity_cancel
                         Cancel integrity check
   -w WRITE, --write WRITE
-                        Write SUMMARIZE results to outfile
+                        Write fastx records from SUMMARIZE to outfile
+  -x WRITE_TSV, --write_tsv WRITE_TSV
+                        Write table record metadata from SUMMARIZE to outfile
   -p PATH, --path PATH  New path for moving project in MOVE command</code></pre>
 
 The typical workflow for initializing **BioMetaDB** is straightforward. Many options exist for updating, adding to, 
@@ -402,12 +404,20 @@ queries to the database and display summary data on only these selected records.
 - Optional flags
     - --table_name (-t): Name of table to summarize
     - --alias (-a): Alias (short name) for table in database
-    - --view (-v): View only column names in database
+    - --view (-v): View (c)olumns or (t)ables
     - --query (-q): Attach SQL query to summarize select records only. Must be combined with `-t` or `-a` flags
-- Example
+    - --write (-w): Write records in SQL query, or entire table, to file. Must pass with `-t` or `-a` flags
+    - --write_tsv (-x): Write metadata for record in table to file. Must pass with `-t` or `-a` flags
+- Examples
     - `dbdm SUMMARIZE -c /path/to/database`
     - This command will summarize all tables in the database. Per table, this command displays the number of records as 
     well as averages and standard deviations for each column.
+    - `dbdm SUMMARIZE -t table_name -w out.fna` or `dbdm SUMMARIZE -t table_name -x out.tsv`
+    - The first command writes all records in the table `table_name` to `out.fna`, whereas the second command writes record metadata
+    from `table_name` to `out.tsv`.
+    - `dbdm SUMMARIZE -t table_name -v c` or `dbdm SUMMARIZE -v t`
+    - These commands display the columns in `table_name` and the names of all tables in the project, respectively.
+    - See `Examples/README.md` for using the query option.
     
 ### INTEGRITY
 
