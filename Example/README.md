@@ -37,6 +37,7 @@ Be sure to gunzip all fasta files prior to use.
 7. Remove extraneous columns and records.
 8. Delete plant table.
 9. Ensure the table is appropriately integrated.
+10. Move table to a new directory
 
 ## Create database and initial file system using prokaryote data
 
@@ -254,3 +255,11 @@ the provided table.
 └── migrations
     └── ########.migrations.mgt
 </code></pre>
+
+## Move the project to a new location
+
+Moving the **BioMetaDB** project is done using the `MOVE` command.
+
+1. Run the following command to move a project:
+    1. `dbdm MOVE -c /path/to/ModelOrganisms -p /path/to/new/existing/location`
+    2. This command will move the `ModelOrganisms` project from its current location to `/path/to/new/existing/location`

@@ -68,7 +68,7 @@ if __name__ == "__main__":
         "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent", "integrity_cancel"),
         "REMOVE":               ("config_file", "table_name", "alias", "silent", "integrity_cancel"),
         "SUMMARIZE":            ("config_file", "view", "query", "table_name", "alias", "write"),
-        "MOVE":                 ("config_file", "path", "silent"),
+        "MOVE":                 ("config_file", "path", "integrity_cancel", "silent"),
         "INTEGRITY":            ("config_file", "table_name", "alias", "silent"),
         "FIX":                  ("config_file", "data_file", "silent", "integrity_cancel"),
     }
@@ -96,4 +96,4 @@ if __name__ == "__main__":
 
     pc = ProgramCaller(programs=programs, flags=flags, _help=_help, errors=errors)
 
-    pc.run(ap.args, debug=True)
+    pc.run(ap.args, debug=False)

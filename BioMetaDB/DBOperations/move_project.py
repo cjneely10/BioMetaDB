@@ -35,14 +35,16 @@ def _move_project_display_message_epilogue():
     print("Move complete!", "\n")
 
 
-def move_project(config_file, path, silent):
+def move_project(config_file, path, integrity_cancel, silent):
     """
 
-    :param db_name:
     :param config_file:
+    :param path:
+    :param integrity_cancel:
     :param silent:
     :return:
     """
+    path = os.path.abspath(path)
     config, config_file = ConfigManager.confirm_config_set(config_file)
     old_path = config[ConfigKeys.DATABASES][ConfigKeys.working_dir]
     assert os.path.dirname(old_path) != os.path.abspath(path), \
@@ -78,10 +80,14 @@ def move_project(config_file, path, silent):
     )
     sess = BaseData.get_session_from_engine(engine)
     for tbl_name in tables_in_database:
+
         TableClass = ClassManager.get_class_orm(tbl_name, engine)
         UserClass = type(tbl_name, (Record,), {})
         mapper(UserClass, TableClass)
         for record in sess.query(UserClass).all():
-            record.location = path
+            record.location = os.path.join(abs_path_working_dir, Directories.DATABASE, tbl_name)
         sess.commit()
-    _move_project_display_message_epilogue()
+        if not integrity_cancel:
+            integrity_check(abs_path_working_dir, tbl_name, "None", silent)
+    if not silent:
+        _move_project_display_message_epilogue()

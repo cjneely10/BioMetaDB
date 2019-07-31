@@ -163,31 +163,33 @@ values or columns.
 
 <pre><code>usage: dbdm.py [-h] [-n DB_NAME] [-t TABLE_NAME] [-d DIRECTORY_NAME]
                [-f DATA_FILE] [-l LIST_FILE] [-c CONFIG_FILE] [-a ALIAS] [-s]
-               [-v] [-q QUERY] [-i]
+               [-v] [-q QUERY] [-i] [-w WRITE] [-p PATH]
                program
 
-dbdm:   Manage BioMetaDB project
+dbdm:	Manage BioMetaDB project
 
 Available Programs:
 
 CREATE: Create a new table in an existing database, optionally populate using data files
-                (Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
+		(Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 DELETE: Delete list of ids from database tables, remove associated files
-                (Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
+		(Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
 FIX: Repairs errors in DB structure using .fix file
-                (Req:  --config_file --data_file --silent --integrity_cancel)
+		(Req:  --config_file --data_file --silent --integrity_cancel)
 INIT: Initialize database with starting table, fasta directory, and/or data files
-                (Req:  --db_name --table_name --directory_name --data_file --alias --silent --integrity_cancel)
+		(Req:  --db_name --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 INTEGRITY: Queries project database and structure to generate .fix file for possible issues
-                (Req:  --config_file --table_name --alias --silent)
+		(Req:  --config_file --table_name --alias --silent)
+MOVE: Move project to new location
+		(Req:  --config_file --path --silent)
 REMOVE: Remove table and all associated data from database
-                (Req:  --config_file --table_name --alias --silent --integrity_cancel)
+		(Req:  --config_file --table_name --alias --silent --integrity_cancel)
 REMOVECOL: Remove column list (including data) from table
-                (Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
-SUMMARIZE: Quick summary of project
-                (Req:  --config_file --view --query --table_name --alias)
+		(Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
+SUMMARIZE: Quick summary of project. Optional to query for subset and to write results to file
+		(Req:  --config_file --view --query --table_name --alias --write)
 UPDATE: Update values in existing table or add new sequences
-                (Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
+		(Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 
 positional arguments:
   program               Program to run
@@ -213,7 +215,10 @@ optional arguments:
   -q QUERY, --query QUERY
                         Query to pass to SUMMARIZE
   -i, --integrity_cancel
-                        Cancel integrity check</code></pre>
+                        Cancel integrity check
+  -w WRITE, --write WRITE
+                        Write SUMMARIZE results to outfile
+  -p PATH, --path PATH  New path for moving project in MOVE command</code></pre>
 
 The typical workflow for initializing **BioMetaDB** is straightforward. Many options exist for updating, adding to, 
 and removing from the existing project structure. You may also choose to assign an alternate name to a table within a
