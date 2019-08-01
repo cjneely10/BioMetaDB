@@ -117,6 +117,8 @@ quick glance at a particular table or database, as well as to test queries on th
         2. `-t/--table_name`    View only for given table
         3. `-a/--alias`     View only for given alias
         4. `-q/--query`     Attach SQL query to summarize select records only. Must be combined with `-t` or `-a` flags
+        5. `-w/--write`   Write records in SQL query, or entire table, to directory. Must pass with `-t` or `-a` flags
+        6. `-x/--write_tsv` Write metadata for record in table to file. Must pass with `-t` or `-a` flags
 <pre><code>*********************************************************************************
 	          Table Name:	prokaryotes 
 	   Number of Records:	8         

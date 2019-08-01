@@ -406,14 +406,14 @@ queries to the database and display summary data on only these selected records.
     - --alias (-a): Alias (short name) for table in database
     - --view (-v): View (c)olumns or (t)ables
     - --query (-q): Attach SQL query to summarize select records only. Must be combined with `-t` or `-a` flags
-    - --write (-w): Write records in SQL query, or entire table, to file. Must pass with `-t` or `-a` flags
+    - --write (-w): Write records in SQL query, or entire table, to directory. Must pass with `-t` or `-a` flags
     - --write_tsv (-x): Write metadata for record in table to file. Must pass with `-t` or `-a` flags
 - Examples
     - `dbdm SUMMARIZE -c /path/to/database`
     - This command will summarize all tables in the database. Per table, this command displays the number of records as 
     well as averages and standard deviations for each column.
-    - `dbdm SUMMARIZE -t table_name -w out.fna` or `dbdm SUMMARIZE -t table_name -x out.tsv`
-    - The first command writes all records in the table `table_name` to `out.fna`, whereas the second command writes record metadata
+    - `dbdm SUMMARIZE -t table_name -w output` or `dbdm SUMMARIZE -t table_name -x out.tsv`
+    - The first command writes all records in the table `table_name` to `output/`, whereas the second command writes record metadata
     from `table_name` to `out.tsv`.
     - `dbdm SUMMARIZE -t table_name -v c` or `dbdm SUMMARIZE -v t`
     - These commands display the columns in `table_name` and the names of all tables in the project, respectively.
