@@ -1,4 +1,5 @@
 # cython: language_level=3
+import os
 import re
 from math import sqrt
 from io import StringIO
@@ -370,15 +371,18 @@ cdef class RecordList:
         self.sess.commit()
         return self
 
-    def write_records(self, str output_file):
+    def write_records(self, str output_dir):
         """ Method will write all records that are in the current db view to a user-provided
          output file
 
         :return:
         """
-        cdef object R, W = open(output_file, "wb")
+        cdef object R, W
         cdef object record
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         for record in self.results:
+            W = open(os.path.join(output_dir, record._id + "." + record.data_type), "wb")
             R = open(record.full_path(), "rb")
             W.write(R.read())
             R.close()
