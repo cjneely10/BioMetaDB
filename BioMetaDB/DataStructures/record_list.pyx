@@ -403,7 +403,7 @@ cdef class RecordList:
         cdef str col
         # Write header
         W.write("_id" + delim + "location" + delim + "data_type" + delim)
-        W.write(delim.join(cols)[:-1] + "\n")
+        W.write(delim.join(cols) + "\n")
         for record in self.results:
             W.write(record._id + delim)
             W.write(record.location + delim)
