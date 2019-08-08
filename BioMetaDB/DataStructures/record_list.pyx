@@ -32,6 +32,7 @@ cdef class RecordList:
         self.cfg = cfg
         self._summary = None
         self.num_records = 0
+        self.num_records_in_db = len(self.sess.query(self.TableClass).all())
         self.results = None
         self.has_text = False
         if compute_metadata and query:
