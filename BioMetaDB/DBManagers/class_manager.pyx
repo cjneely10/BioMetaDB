@@ -21,6 +21,8 @@ table creation, and class loading
 """
 
 unusable_punctuation = set(punctuation) - set("_")
+num_to_chars = {"1": "one", "2": "two", "3": "three", "4": "four", "5": "five",
+                "6": "six", "7": "seven", "8": "eight", "9": "nine"}
 
 
 class ClassManager:
@@ -291,6 +293,8 @@ class ClassManager:
             for bad_char in unusable_punctuation:
                 new_key = new_key.replace(bad_char, "")
             new_key = new_key.replace(" ", "_")
+            if new_key[0] in num_to_chars.keys():
+                new_key = num_to_chars[new_key[0]] + new_key[1:]
             corrected_dict[new_key] = class_as_dict[key]
         return corrected_dict
 
@@ -310,5 +314,7 @@ class ClassManager:
             for bad_char in unusable_punctuation:
                 new_val = new_val.replace(bad_char, "")
             new_val = new_val.replace(" ", "_")
+            if new_val[0] in num_to_chars.keys():
+                new_val = num_to_chars[new_val[0]] + new_val[1:]
             new_iter.append(new_val)
         return new_iter
