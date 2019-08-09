@@ -186,12 +186,12 @@ class ClassManager:
                 except KeyError:
                     setattr(db_object, "data_type", "unknown")
                     new_records_no_data_type += 1
-                try:
-                    if corrected_header:
-                        for attr in corrected_header:
+                if corrected_header:
+                    for attr in corrected_header:
+                        try:
                             setattr(db_object, attr, count_table_object.get_at(_id_, corrected_header.index(attr)))
-                except KeyError:
-                    setattr(record, attr, None)
+                        except KeyError:
+                            setattr(record, attr, None)
                 to_add.append(db_object)
         for val in to_add:
             sess.add(val)

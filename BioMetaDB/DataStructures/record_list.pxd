@@ -6,3 +6,4 @@ cdef class RecordList:
     cdef int num_records
     cdef list results
     cdef bint has_text
+    cdef int num_records_in_db

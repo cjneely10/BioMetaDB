@@ -105,11 +105,11 @@ cdef class RecordList:
         summary_string.write(("*" * (longest_key + 75)) + "\n")
         # Display multiple records
         if self.num_records > 1:
-            summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<10d}\n\n".format(
+            summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{}\n\n".format(
                 "Table Name:",
                 self.cfg.table_name,
                 "Number of Records:",
-                self.num_records,
+                "{:>10d}/{:<10d}".format(self.num_records, self.num_records_in_db),
                 longest_key=longest_key))
         # Display single record
         elif self.num_records == 1:
@@ -198,6 +198,8 @@ cdef class RecordList:
         num_records = self.num_records
         column_keys = list(self.columns())
         for record in self.results:
+            # if record._id in self.ignore_ids:
+            #     continue
             for column in column_keys:
                 found_type = data_types[column]
                 obj = getattr(record, column, None)
@@ -252,12 +254,13 @@ cdef class RecordList:
         :param args:
         :return:
         """
+        cdef object record
         self._clear_prior_metadata()
         # Query passed
         if len(args) > 0:
             # Attempt query
             try:
-                self.results = self.sess.query(self.TableClass).filter(text(*args)).all()
+                self.results = self._map_query(*args)
             # Column name not found
             except OperationalError:
                 raise ColumnNameNotFoundError
@@ -265,7 +268,28 @@ cdef class RecordList:
         else:
             self.results = self.sess.query(self.TableClass).all()
         self.num_records = len(self.results)
-        return self
+        return
+
+    def _map_query(self, *args):
+        """ Method calls 'convenience queries'
+
+        :param args:
+        :return:
+        """
+        cdef str query = "", col
+        # At least one annotation
+        if args[0] == "annotated":
+            for col in self.columns():
+                query += "(%s != 'None' AND %s != '') OR " % (col, col)
+            return self.sess.query(self.TableClass).filter(text(query[:-4])).all()
+        # High quality, non-redundant
+        elif args[0] == 'hqnr':
+            return self.sess.query(self.TableClass).filter(
+                "is_non_redundant == True AND is_complete == TRUE AND is_contaminated == FALSE"
+            ).all()
+        else:
+            return self.sess.query(self.TableClass).filter(text(*args)).all()
+
 
     # TODO Needs to be tested w/ tables that populate non-null set of db records
     def join(self, RecordList other):
@@ -413,6 +437,27 @@ cdef class RecordList:
                 W.write(delim + str(getattr(record, col, "None")))
             W.write("\n")
 
+    # def _get_table_record_count_and_all_null_ids(self):
+    #     """ Use in in
+    #
+    #     :return:
+    #     """
+    #     cdef int num_records = 0
+    #     cdef object record, stored_val
+    #     cdef str column
+    #     cdef list columns = self.columns()
+    #     cdef set all_null_ids = set()
+    #     cdef list all_records = self.sess.query(self.TableClass).all()
+    #     cdef bint is_found
+    #     for record in all_records:
+    #         num_records += 1
+    #         is_found = False
+    #         for column in columns:
+    #             if str(getattr(record, column)) != "None":
+    #                 is_found = True
+    #         if not is_found:
+    #             all_null_ids.add(record._id)
+    #     return num_records, all_null_ids
 
     @staticmethod
     def _regex_search(str possible_column, list search_list):
