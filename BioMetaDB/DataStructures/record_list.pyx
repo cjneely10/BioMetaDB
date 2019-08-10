@@ -413,7 +413,7 @@ cdef class RecordList:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         for record in self.results:
-            W = open(os.path.join(output_dir, record._id + "." + record.data_type), "wb")
+            W = open(os.path.join(output_dir, record._id), "wb")
             R = open(record.full_path(), "rb")
             try:
                 for _line in R:
@@ -437,7 +437,7 @@ cdef class RecordList:
         cdef list priority_list = RecordList._annotation_priority()
         for annot in priority_list:
             located_annot = getattr(record, annot, None)
-            if located_annot:
+            if located_annot and located_annot not in ("", "None"):
                 return located_annot
         return ""
 
@@ -491,6 +491,10 @@ cdef class RecordList:
     def _annotation_priority():
         return ["ko", "merops", "cazy", "merops_pfam", "prokka",
                 "panther", "sfld", "tigrfam"]
+
+    # @staticmethod
+    # def _strip_coords():
+    #
 
     @staticmethod
     def _regex_search(str possible_column, list search_list):
