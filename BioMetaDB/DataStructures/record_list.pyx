@@ -10,6 +10,11 @@ from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.DBManagers.type_mapper import TypeMapper
 from BioMetaDB.Exceptions.record_list_exceptions import ColumnNameNotFoundError
 
+
+cdef extern from "Python.h":
+    char* PyUnicode_AsUTF8(object unicode)
+
+
 """
 Script holds functionality for handling data types associated with database records
 Based on verbosity, will calculate standard deviation and averages of numerical values
@@ -56,7 +61,7 @@ cdef class RecordList:
         summary_string.write(("*" * (longest_key + 30)) + "\n")
         summary_string.write("\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name,
                                                                          longest_key=longest_key))
-        summary_string.write("\t\t{:>{longest_key}s}\n\n".format("Column Name", longest_key=longest_key))
+        summary_string.write("\t\t{:>{longest_key}s}\n\n".format("Database", longest_key=longest_key))
         # Get all columns
         for key in sorted_keys:
             summary_string.write("\t\t{:>{longest_key}s}\n".format(key, longest_key=longest_key))
@@ -139,7 +144,7 @@ cdef class RecordList:
             return summary_string.getvalue()
         # Metadata display column headers
         summary_string.write("\t{:>{longest_key}}\t{:<20s}\t{:<12s}\n\n".format(
-            "Column Name",
+            "Database",
             "Average",
             "Std Dev",
             longest_key=longest_key
@@ -157,9 +162,9 @@ cdef class RecordList:
         if self.has_text:
             longest_key = max([len(key) for key in sorted_keys if key in self._summary.keys() and type(self._summary[key]) == dict])
             summary_string.write("\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}\n\n".format(
-                "Column Name",
+                "Database",
                 "Most Frequent",
-                "Frequency",
+                "Number",
                 "Total Count",
                 longest_key=longest_key
             ))
@@ -403,15 +408,38 @@ cdef class RecordList:
         :return:
         """
         cdef object R, W
+        cdef bytes _line
         cdef object record
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         for record in self.results:
             W = open(os.path.join(output_dir, record._id + "." + record.data_type), "wb")
             R = open(record.full_path(), "rb")
-            W.write(R.read())
+            try:
+                for _line in R:
+                    W.write(_line[:-1] + b" " + PyUnicode_AsUTF8(self._add_annotation(record)) + b"\n")
+                    _line = next(R)
+                    while _line[0] != b">":
+                        W.write(_line)
+                        _line = next(R)
+            except StopIteration:
+                continue
             R.close()
         W.close()
+
+    def _add_annotation(self, object record):
+        """ Protected method will search for annotation (via priority list) and add as fasta description
+
+        :param record:
+        :return:
+        """
+        cdef str annot, located_annot
+        cdef list priority_list = RecordList._annotation_priority()
+        for annot in priority_list:
+            located_annot = getattr(record, annot, None)
+            if located_annot:
+                return located_annot
+        return ""
 
     def write_tsv(self, str output_file, str delim = "\t"):
         """ Outputs all record metadata in current db view to file
@@ -460,6 +488,11 @@ cdef class RecordList:
     #     return num_records, all_null_ids
 
     @staticmethod
+    def _annotation_priority():
+        return ["ko", "merops", "cazy", "merops_pfam", "prokka",
+                "panther", "sfld", "tigrfam"]
+
+    @staticmethod
     def _regex_search(str possible_column, list search_list):
         """ Protected method to search a list of values for a given string
 
@@ -496,7 +529,7 @@ cdef class RecordList:
 
     @staticmethod
     def _correct_value(str value):
-        """ Protected member function will split off annotation from %s-%s:%s paradigm
+        """ Protected member function will split off annotation from %s-%s:::%s;;; paradigm
 
         :param value:
         :return:

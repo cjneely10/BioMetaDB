@@ -49,8 +49,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
     if query == "None" and (table_name != "None" or alias != "None"):
         tables_in_database = (table_name, )
     for tbl_name in tables_in_database:
+        sess, UserClass, cfg = load_table_metadata(config, tbl_name)
         if view == "None" and ((table_name != "None" and table_name == tbl_name) or (table_name == "None")) and write == "None":
-            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
             # Display queried info for single table and break
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             if query != "None":
@@ -61,30 +61,23 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 print(rl.summarize())
             else:
                 print(rl[0])
+        rl = RecordList(sess, UserClass, cfg)
         # Display column info for table
         if view.lower()[0] == "c":
-            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
             # Display queried info for single table and break
-            rl = RecordList(sess, UserClass, cfg)
             # Do not need to query since only displaying columns
             print(rl.columns_summary())
         elif view.lower()[0] == "t":
-            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
             # Display queried info for single table and break
-            rl = RecordList(sess, UserClass, cfg)
             # Do not need to query since only displaying columns
             print(rl.table_name_summary())
         if write != "None" and table_name == tbl_name:
-            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
-            rl = RecordList(sess, UserClass, cfg)
             if query != "None":
                 rl.query(query)
             else:
                 rl.query()
             rl.write_records(write)
         elif write_tsv != "None" and table_name == tbl_name:
-            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
-            rl = RecordList(sess, UserClass, cfg)
             if query != "None":
                 rl.query(query)
             else:
