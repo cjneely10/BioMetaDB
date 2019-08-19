@@ -3,11 +3,10 @@
 ## Installation
 Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access `dbdm`.
 <pre><code>cd /path/to/BioMetaDB
+pip3 install -r requirements.txt
 python3 setup.py build_ext --inplace
-chmod +x dbdm.py
-export PYTHONPATH=/path/to/BioMetaDB:$PYTHONPATH
 alias dbdm="python3 /path/to/BioMetaDB/dbdm.py"</code></pre>
-Adding the last two lines of the above code to a user's `.bashrc` file will maintain these settings on next log-in.
+Adding the last line of the above code to a user's `.bashrc` file will maintain these settings on next log-in.
 
 ### Dependencies
 
