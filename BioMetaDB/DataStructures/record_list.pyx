@@ -76,7 +76,7 @@ cdef class RecordList:
         cdef object summary_string = StringIO()
         cdef str key
         # Pretty formatting
-        summary_string.write("\t\t{:>11s}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name))
+        summary_string.write(self.cfg.table_name + "\n")
         return summary_string.getvalue()
 
     def columns(self):
