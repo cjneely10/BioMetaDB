@@ -11,10 +11,10 @@ Adding the last line of the above code to a user's `.bashrc` file will maintain 
 ### Dependencies
 
 - Python &ge; 3.5
-- Cython
+- Cython 0.29.2
 - Python packages
-    - SQLAlchemy
-    - BioPython
+    - SQLAlchemy 1.3.2
+    - BioPython 1.73
     - ConfigParser
     - ArgParse
 
