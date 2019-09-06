@@ -290,7 +290,7 @@ cdef class RecordList:
         # High quality, non-redundant
         elif args[0] == 'hqnr':
             return self.sess.query(self.TableClass).filter(
-                text("is_non_redundant AND is_complete AND is_contaminated")
+                text("is_non_redundant AND is_complete AND NOT is_contaminated")
             ).all()
         else:
             return self.sess.query(self.TableClass).filter(text(*args)).all()
