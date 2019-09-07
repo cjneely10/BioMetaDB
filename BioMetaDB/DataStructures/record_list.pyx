@@ -110,7 +110,7 @@ cdef class RecordList:
         summary_string.write(("*" * (longest_key + 75)) + "\n")
         # Display multiple records
         if self.num_records > 1:
-            summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{}\n\n".format(
+            summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:<{longest_key}}\t{}\n\n".format(
                 "Table Name:",
                 self.cfg.table_name,
                 "Number of Records:",
@@ -212,11 +212,11 @@ cdef class RecordList:
                     if obj is not None and obj != "None" and found_type in (int, float):
                         summary_data[column] = []
                         # Gather portion for average calculation
-                        summary_data[column].append(float(float(obj) / num_records))
+                        summary_data[column].append(float(obj) / float(num_records))
                         # Gather portion for running sum
                         summary_data[column].append(float(obj))
                         # Gather portion for running sq sum
-                        summary_data[column].append(float(obj ** 2))
+                        summary_data[column].append(float(obj) ** 2)
                         summary_data[column].append(0.0)
                     elif found_type in (str, bool):
                         has_text = True
@@ -229,9 +229,9 @@ cdef class RecordList:
                 else:
                     if obj is not None and obj != "None" and found_type in (int, float):
                         # Gather portion for average calculation
-                        summary_data[column][0] += float(float(obj) / num_records)
+                        summary_data[column][0] += float(obj) / float(num_records)
                         # Gather portion for running sum
-                        summary_data[column][1] += float(float(obj) / num_records)
+                        summary_data[column][1] += float(obj)
                         # Gather portion for running sq sum
                         summary_data[column][2] += float(float(obj) ** 2)
                     elif found_type in (str, bool):
