@@ -87,13 +87,37 @@ cdef class CountTable:
             return True
         elif value == "False":
             return False
+        elif value == 'None':
+            return None
         try:
             return int(value)
         except ValueError:
             try:
                 return float(value)
             except ValueError:
-                if value != '':
+                if value and value != '':
                     return value
+                else:
+                    return None
+
+    @staticmethod
+    def _try_return_type(object value):
+        """ Attempts to parse value as integer and then as float. Simply returns if fails
+
+        :param value: (str) Value from count table
+        :return:
+        """
+        if value in ("True", "False"):
+            return bool
+        try:
+            val = int(value)
+            return int
+        except ValueError:
+            try:
+                val = float(value)
+                return float
+            except ValueError:
+                if value != '':
+                    return str
                 else:
                     return None

@@ -2,6 +2,7 @@ import operator
 import random
 from sqlalchemy import Float, Integer, String, VARCHAR, Boolean
 
+from BioMetaDB.Serializers.count_table import CountTable
 
 """
 Class holds dictionaries to map types to each other and to string representations
@@ -58,7 +59,7 @@ class TypeMapper:
         if dict_to_reference == TypeMapper.py_type_to_string:
             return {
                 counttable_object.header[i]:
-                    TypeMapper.determine_column_type(counttable_object, i, dict_to_reference)
+                    dict_to_reference[TypeMapper.determine_column_type(counttable_object, i)]
                 for i in range(len(counttable_object.header))
             }
         return {
@@ -70,13 +71,17 @@ class TypeMapper:
         }
 
     @staticmethod
-    def determine_column_type(counttable_object, column_idx, dict_to_reference):
+    def determine_column_type(counttable_object, column_idx):
         values = {
-            py_type: 0 for py_type in list(dict_to_reference.values()) + list(dict_to_reference.keys())
+            int: 0,
+            bool: 0,
+            float: 0,
+            str: 0,
+            None: 0
         }
-        for _id, value_list in counttable_object.file_contents.items():
+        for value_list in counttable_object.file_contents.values():
             if value_list[column_idx] != 'None':
-                values[dict_to_reference[
-                    type(value_list[column_idx])
-                ]] += 1
+                values[
+                    CountTable._try_return_type(value_list[column_idx])
+                ] += 1
         return (max(values.items(), key=lambda x: x[1]) if values.items() else ('String',))[0]
