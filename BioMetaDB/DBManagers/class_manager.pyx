@@ -123,9 +123,7 @@ class ClassManager:
             table_copy_csv = update_manager.create_table_copy(datetime.today().strftime("%Y%m%d"), TableClass, silent)
             print_if_not_silent(silent, " ..Combining existing columns with new headers")
             UpdatedDBClass, metadata = ClassManager.generate_class(config.table_name,
-                                                                   {key: value
-                                                                    for key, value in
-                                                                    combined_attrs.items()},
+                                                                   combined_attrs,
                                                                    config.db_dir,
                                                                    config.db_name,
                                                                    config.table_dir)

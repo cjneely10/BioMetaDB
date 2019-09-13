@@ -1,3 +1,4 @@
+import operator
 import random
 from sqlalchemy import Float, Integer, String, VARCHAR, Boolean
 
@@ -54,6 +55,12 @@ class TypeMapper:
 
     @staticmethod
     def get_translated_types(counttable_object, dict_to_reference):
+        if dict_to_reference == TypeMapper.py_type_to_string:
+            return {
+                counttable_object.header[i]:
+                    TypeMapper.determine_column_type(counttable_object, i, dict_to_reference)
+                for i in range(len(counttable_object.header))
+            }
         return {
             counttable_object.header[i]:
                 dict_to_reference[
@@ -61,3 +68,15 @@ class TypeMapper:
                 ]
             for i in range(len(counttable_object.header))
         }
+
+    @staticmethod
+    def determine_column_type(counttable_object, column_idx, dict_to_reference):
+        values = {
+            py_type: 0 for py_type in list(dict_to_reference.values()) + list(dict_to_reference.keys())
+        }
+        for _id, value_list in counttable_object.file_contents.items():
+            if value_list[column_idx] != 'None':
+                values[dict_to_reference[
+                    type(value_list[column_idx])
+                ]] += 1
+        return max(values.items(), key=lambda x: x[1])[0]
