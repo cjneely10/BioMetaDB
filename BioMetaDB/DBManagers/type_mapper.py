@@ -79,4 +79,4 @@ class TypeMapper:
                 values[dict_to_reference[
                     type(value_list[column_idx])
                 ]] += 1
-        return max(values.items(), key=lambda x: x[1])[0]
+        return (max(values.items(), key=lambda x: x[1]) if values.items() else ('String',))[0]
