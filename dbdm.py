@@ -38,7 +38,7 @@ if __name__ == "__main__":
          {"help": "Silence all standard output (Standard error still displays to screen)", "action": "store_true",
           "default": False}),
         (("-v", "--view"),
-         {"help": "View (c)olumns or (t)ables", "default": "None"}),
+         {"help": "View (c)olumns or (t)ables with SUMMARIZE", "default": "None"}),
         (("-q", "--query"),
          {"help": "Query to pass to SUMMARIZE", "default": "None"}),
         (("-i", "--integrity_cancel"),
@@ -98,4 +98,4 @@ if __name__ == "__main__":
 
     pc = ProgramCaller(programs=programs, flags=flags, _help=_help, errors=errors)
 
-    pc.run(ap.args, debug=True)
+    pc.run(ap.args, debug=False)
