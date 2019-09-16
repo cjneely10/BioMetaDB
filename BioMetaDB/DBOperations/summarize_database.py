@@ -24,7 +24,7 @@ def _summarize_display_message_prelude(db_name):
     print(" Name of database:\t\t%s.db\n" % db_name.strip(".db"))
 
 
-def summarize_database(config_file, view, query, table_name, alias, write, write_tsv):
+def summarize_database(config_file, view, query, table_name, alias, write, write_tsv, unique):
     """ Function will query all tables listed in the config file, outputting simple
     metrics to the screen
 
@@ -84,6 +84,13 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             else:
                 rl.query()
             rl.write_tsv(write_tsv)
+        if unique != 'None' and table_name == tbl_name:
+            rl.query()
+            col_vals = set()
+            for record in rl:
+                col_vals.add(getattr(record, unique, "None"))
+            for val in col_vals:
+                print(val)
 
 
 def load_table_metadata(config, tbl_name):
