@@ -37,6 +37,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
     :param write_tsv:
     :return:
     """
+    annot_rl = None
     if not view:
         if query != "None":
             assert (query != "None" and (table_name != "None" or alias != "None")), SummarizeDBAssertString.QUERY_AND_TABLE_SET
@@ -49,37 +50,59 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         table_name = ConfigManager.get_name_by_alias(alias, config)
     if query == "None" and (table_name != "None" or alias != "None"):
         tables_in_database = (table_name, )
+    if table_name != "None" and ("~>" in query or "<~" in query):
+        matching_records = []
+        sess, UserClass, cfg = load_table_metadata(config, table_name)
+        eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
+        annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
+        if "~>" in query:
+            evaluation_query, annotation_query = query.split("~>")[0:1]
+        elif "<~" in query:
+            annotation_query, evaluation_query = query.split("<~")[0:1]
+        annot_rl.query(annotation_query)
+        eval_rl.query(evaluation_query)
+        eval_keys = [key.split(".")[0].lower() for key in eval_rl.keys()]
+        for record in annot_rl:
+            if record._id.split(".")[0].lower() in eval_keys:
+                matching_records.append(record)
+        annot_rl = RecordList(sess, UserClass, cfg, records_list=matching_records)
     for tbl_name in tables_in_database:
         sess, UserClass, cfg = load_table_metadata(config, tbl_name)
         if view == "None" and ((table_name != "None" and table_name == tbl_name) or (table_name == "None")) and write == "None":
             # Display queried info for single table and break
-            rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
-            _handle_query(rl, query)
-            if len(rl) != 1:
-                print(rl.summarize())
+            if not annot_rl:
+                annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+                _handle_query(annot_rl, query)
+            if len(annot_rl) != 1:
+                print(annot_rl.summarize())
             else:
-                print(rl[0])
-        rl = RecordList(sess, UserClass, cfg)
+                print(annot_rl[0])
+        annot_rl = RecordList(sess, UserClass, cfg)
         # Display column info for table
         if view.lower()[0] == "c":
             # Display queried info for single table and break
             # Do not need to query since only displaying columns
-            print(rl.columns_summary())
+            print(annot_rl.columns_summary())
         elif view.lower()[0] == "t":
             # Display queried info for single table and break
             # Do not need to query since only displaying columns
-            print(rl.table_name_summary())
+            print(annot_rl.table_name_summary())
         if write != "None" and table_name == tbl_name:
-            _handle_query(rl, query)
-            rl.write_records(write)
+            if not annot_rl:
+                _handle_query(annot_rl, query)
+            annot_rl.write_records(write)
         elif write_tsv != "None" and table_name == tbl_name:
-            _handle_query(rl, query)
-            rl.write_tsv(write_tsv)
+            if not annot_rl:
+                _handle_query(annot_rl, query)
+            annot_rl.write_tsv(write_tsv)
         if unique != 'None' and table_name == tbl_name:
-            _handle_query(rl)
+            if not annot_rl:
+                _handle_query(annot_rl)
             col_vals = set()
-            for record in rl:
+            for record in annot_rl:
                 col_vals.add(getattr(record, unique, "None"))
+            col_vals = sorted([col_vals])
             for val in col_vals:
                 print(val)
 
@@ -99,9 +122,5 @@ def load_table_metadata(config, tbl_name):
 def _handle_query(rl, query="None"):
     if query != "None":
         rl.query(query)
-    elif "~>" in query:
-        pass
-    elif "<~" in query:
-        pass
     else:
         rl.query()
