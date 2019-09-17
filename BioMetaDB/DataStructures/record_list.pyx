@@ -25,7 +25,7 @@ And will provide info about most frequently occurring characters/words in charac
 
 cdef class RecordList:
 
-    def __init__(self, object db_session, object table_class, object cfg, bint compute_metadata=False, str query=None,
+    def __init__(self, object db_session=None, object table_class=None, object cfg=None, bint compute_metadata=False, str query=None,
                  list records_list = []):
         """ Class for handling (mostly) user interfacing to inner classes
 
@@ -38,11 +38,11 @@ cdef class RecordList:
         self.cfg = cfg
         self._summary = None
         self.num_records = 0
-        self.num_records_in_db = len(self.sess.query(self.TableClass).all())
         if records_list:
             self.results = records_list
         else:
             self.results = None
+            self.num_records_in_db = len(self.sess.query(self.TableClass).all())
         self.has_text = False
         if compute_metadata and query:
             if not records_list:
