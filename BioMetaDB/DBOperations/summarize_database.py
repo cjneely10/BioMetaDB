@@ -66,7 +66,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         for record in annot_rl:
             if record._id.split(".")[0].lower() in eval_keys:
                 matching_records.append(record)
-        annot_rl = RecordList(sess, UserClass, cfg, records_list=matching_records)
+        annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True, records_list=matching_records)
     for tbl_name in tables_in_database:
         sess, UserClass, cfg = load_table_metadata(config, tbl_name)
         if view == "None" and ((table_name != "None" and table_name == tbl_name) or (table_name == "None")) and write == "None":
@@ -101,8 +101,10 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 _handle_query(annot_rl)
             col_vals = set()
             for record in annot_rl:
-                col_vals.add(getattr(record, unique, "None"))
-            col_vals = sorted([col_vals])
+                val = getattr(record, unique, "None")
+                if val:
+                    col_vals.add(val)
+            col_vals = sorted(col_vals)
             for val in col_vals:
                 print(val)
 
