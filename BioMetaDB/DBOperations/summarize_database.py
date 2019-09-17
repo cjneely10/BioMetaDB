@@ -54,10 +54,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         if view == "None" and ((table_name != "None" and table_name == tbl_name) or (table_name == "None")) and write == "None":
             # Display queried info for single table and break
             rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
-            if query != "None":
-                rl.query(query)
-            else:
-                rl.query()
+            _handle_query(rl, query)
             if len(rl) != 1:
                 print(rl.summarize())
             else:
@@ -73,19 +70,13 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             # Do not need to query since only displaying columns
             print(rl.table_name_summary())
         if write != "None" and table_name == tbl_name:
-            if query != "None":
-                rl.query(query)
-            else:
-                rl.query()
+            _handle_query(rl, query)
             rl.write_records(write)
         elif write_tsv != "None" and table_name == tbl_name:
-            if query != "None":
-                rl.query(query)
-            else:
-                rl.query()
+            _handle_query(rl, query)
             rl.write_tsv(write_tsv)
         if unique != 'None' and table_name == tbl_name:
-            rl.query()
+            _handle_query(rl)
             col_vals = set()
             for record in rl:
                 col_vals.add(getattr(record, unique, "None"))
@@ -103,3 +94,14 @@ def load_table_metadata(config, tbl_name):
     mapper(UserClass, TableClass)
     # Display queried info for single table and break
     return sess, UserClass, cfg
+
+
+def _handle_query(rl, query="None"):
+    if query != "None":
+        rl.query(query)
+    elif "~>" in query:
+        pass
+    elif "<~" in query:
+        pass
+    else:
+        rl.query()
