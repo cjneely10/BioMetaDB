@@ -63,6 +63,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             annot_rl.query(annotation_query)
+            print(annot_rl.summarize())
             for record_2 in annot_rl:
                 matching_records.append(record_2)
         # eval_keys = [key.split(".")[0].lower() for key in eval_rl.keys()]
