@@ -71,9 +71,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         # for record in annot_rl:
         #     if record._id.split(".")[0].lower() in eval_keys:
         #         matching_records.append(record)
-        annot_rl = RecordList(compute_metadata=True, records_list=matching_records)
-        if write != "None":
-            annot_rl.write_records(write)
+        if matching_records and write != "None":
+            rl = RecordList(compute_metadata=True, records_list=matching_records)
+            rl.write_records(write)
         return
     for tbl_name in tables_in_database:
         sess, UserClass, cfg = load_table_metadata(config, tbl_name)

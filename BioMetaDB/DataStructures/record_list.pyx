@@ -46,7 +46,7 @@ cdef class RecordList:
         self.has_text = False
         if query and not records_list:
             self.query(query)
-        if compute_metadata:
+        if compute_metadata and not records_list:
             self._summary, self.num_records, self.has_text = self._gather_metadata()
 
     def columns_summary(self):
