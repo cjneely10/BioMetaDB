@@ -58,7 +58,10 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             evaluation_query, annotation_query = query.split("~>")
         elif "<~" in query:
             annotation_query, evaluation_query = query.split("<~")
-        eval_rl.query(evaluation_query)
+        if evaluation_query.replace(" ", "") != '':
+            eval_rl.query(evaluation_query)
+        else:
+            eval_rl.query()
         for record in eval_rl:
             sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
