@@ -44,12 +44,10 @@ cdef class RecordList:
             self.results = None
             self.num_records_in_db = len(self.sess.query(self.TableClass).all())
         self.has_text = False
-        if compute_metadata and query:
-            if not records_list:
-                self.query(query)
-            self._summary, self.num_records, self.has_text = self._gather_metadata()
-        elif query and not records_list:
+        if query and not records_list:
             self.query(query)
+        if compute_metadata:
+            self._summary, self.num_records, self.has_text = self._gather_metadata()
 
     def columns_summary(self):
         """ Wrapper for returning columns in class as simple dictionary Name: SQLType
