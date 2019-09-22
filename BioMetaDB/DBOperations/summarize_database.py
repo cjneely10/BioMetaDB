@@ -86,6 +86,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 print(annot_rl.summarize())
             else:
                 print(annot_rl[0])
+            if table_name == tbl_name and query != 'None':
+                return
         annot_rl = RecordList(sess, UserClass, cfg)
         # Display column info for table
         if view.lower()[0] == "c":
@@ -97,15 +99,12 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             # Do not need to query since only displaying columns
             print(annot_rl.table_name_summary())
         if write != "None" and table_name == tbl_name:
-
             _handle_query(annot_rl, query)
             annot_rl.write_records(write)
         elif write_tsv != "None" and table_name == tbl_name:
-
             _handle_query(annot_rl, query)
             annot_rl.write_tsv(write_tsv)
         if unique != 'None' and table_name == tbl_name:
-
             _handle_query(annot_rl)
             col_vals = set()
             for record in annot_rl:
