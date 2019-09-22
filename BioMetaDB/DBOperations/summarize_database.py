@@ -133,8 +133,9 @@ def _handle_query(rl, query="None"):
     if query != "None":
         for val in query.split(" "):
             if "annot" in val:
-                _v = query.replace("_annot", "")
+                _v = val.replace("_annot", "")
                 query = query.replace(val, "%s != '' AND %s != 'None'" % (_v, _v))
+        print(query)
         rl.query(query)
     else:
         rl.query()
