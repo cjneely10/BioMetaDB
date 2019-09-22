@@ -121,25 +121,27 @@ cdef class RecordList:
                 longest_key=longest_key))
         # Display single record
         elif self.num_records == 1:
-            # Long name
-            if len(self.results[0]._id) > 30:
-                summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}...\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
-                    "Record Name:",
-                    self.cfg.table_name,
-                    "ID:",
-                    self.results[0]._id,
-                    "Data Type:",
-                    self.results[0].data_type,
-                    longest_key=longest_key))
-            else:
-                summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
-                    "Record Name:",
-                    self.cfg.table_name,
-                    "ID:",
-                    self.results[0]._id,
-                    "Data Type:",
-                    self.results[0].data_type,
-                    longest_key=longest_key))
+            # # Long name
+            # if len(self.results[0]._id) > 30:
+            #     summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}...\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
+            #         "Record Name:",
+            #         self.cfg.table_name,
+            #         "ID:",
+            #         self.results[0]._id,
+            #         "Data Type:",
+            #         self.results[0].data_type,
+            #         longest_key=longest_key))
+            # else:
+            #     summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
+            #         "Record Name:",
+            #         self.cfg.table_name,
+            #         "ID:",
+            #         self.results[0]._id,
+            #         "Data Type:",
+            #         self.results[0].data_type,
+            #         longest_key=longest_key))
+            summary_string.write(str(self.results[0]))
+            return summary_string.getvalue()
         # No records found
         else:
             summary_string.write("\t{:>{longest_key}}".format("No records found", longest_key=longest_key))
@@ -176,13 +178,13 @@ cdef class RecordList:
                     num_none = self._summary[key].get("None", 0)
                     if num_none > 0:
                         del self._summary[key]["None"]
-                    out_key = _out_key = max((self._summary[key].items() or {"111111111":0}.items()),
+                    out_key = _out_key = max((self._summary[key].items() or {"n/a":0}.items()),
                                              key=lambda x : x[1])[0]
                     if out_key and len(out_key) > 16:
                         out_key = out_key[:17] + "..."
                     val = self._summary[key].get(_out_key, None)
                     summary_string.write("\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
-                        str(key), (out_key if self.num_records == 1 or (out_key != "111111111" and val != 1) else 'nil'),
+                        str(key), (out_key if self.num_records == 1 or out_key != "n/a" else 'nil'),
                         (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key))
             summary_string.write(("-" * (longest_key + 75)) + "\n")
         return summary_string.getvalue()
@@ -271,7 +273,8 @@ cdef class RecordList:
                 self.results = self._map_query(*args)
             # Column name not found
             except OperationalError:
-                raise ColumnNameNotFoundError
+                return
+                # raise ColumnNameNotFoundError
         # Default get all
         else:
             self.results = self.sess.query(self.TableClass).all()

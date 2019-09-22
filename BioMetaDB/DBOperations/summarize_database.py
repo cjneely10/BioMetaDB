@@ -50,6 +50,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
     if query == "None" and (table_name != "None" or alias != "None"):
         tables_in_database = (table_name, )
     if ("~>" in query) or ("<~" in query):
+        assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
