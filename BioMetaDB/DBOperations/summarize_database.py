@@ -77,9 +77,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             rl.write_records(write)
         return
     for tbl_name in tables_in_database:
-        sess, UserClass, cfg = load_table_metadata(config, tbl_name)
-        if view == "None" and ((table_name != "None" and table_name == tbl_name) or (table_name == "None")) and write == "None":
+        if view == "None" and (table_name == tbl_name or (table_name == "None")) and write == "None":
             # Display queried info for single table and break
+            sess, UserClass, cfg = load_table_metadata(config, tbl_name)
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             _handle_query(annot_rl, query)
             if len(annot_rl) != 1:
@@ -88,6 +88,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 print(annot_rl[0])
             if table_name == tbl_name and query != 'None':
                 return
+    for tbl_name in tables_in_database:
+        sess, UserClass, cfg = load_table_metadata(config, tbl_name)
         annot_rl = RecordList(sess, UserClass, cfg)
         # Display column info for table
         if view.lower()[0] == "c":
