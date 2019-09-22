@@ -64,7 +64,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         for record in eval_rl:
             sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
-            annot_rl.query(annotation_query)
+            _handle_query(annot_rl, annotation_query)
             print(annot_rl.summarize())
             for record_2 in annot_rl:
                 matching_records.append(record_2)
@@ -131,6 +131,10 @@ def load_table_metadata(config, tbl_name):
 
 def _handle_query(rl, query="None"):
     if query != "None":
+        for val in query.split(" "):
+            if "annot" in val:
+                _v = query.replace("_annot", "")
+                query = query.replace(val, "%s != '' AND %s != 'None'" % (_v, _v))
         rl.query(query)
     else:
         rl.query()
