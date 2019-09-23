@@ -47,6 +47,7 @@ def move_project(config_file, path, integrity_cancel, silent):
     path = os.path.abspath(path)
     config, config_file = ConfigManager.confirm_config_set(config_file)
     old_path = config[ConfigKeys.DATABASES][ConfigKeys.working_dir]
+    current_path = os.path.abspath(config_file)
     assert os.path.dirname(old_path) != os.path.abspath(path), \
         "Project exists in directory, cancelling"
     assert os.path.exists(path), "Path does not exist, exiting"
@@ -57,7 +58,7 @@ def move_project(config_file, path, integrity_cancel, silent):
             old_path,
             path),
     # Move directory from old location to new location
-    shutil.move(old_path, path)
+    shutil.move(current_path, path)
     # Update config file with new location
     abs_path_working_dir = os.path.abspath(os.path.join(path, project_name))
     db_name = project_name
