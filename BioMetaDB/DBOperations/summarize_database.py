@@ -149,10 +149,11 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             annot_rl.query(annotation_query)
         else:
             annot_rl.query()
+        in_query = ""
         for record in annot_rl:
-            if record in eval_rl:
-                matching_records.append(record)
-                print(record)
+            in_query += "_id == '%s' OR" % record._id
+        annot_rl.query(in_query[:-3])
+        print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=True, records_list=matching_records)
             rl.write_records(write)
