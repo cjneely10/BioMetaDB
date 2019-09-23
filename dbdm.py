@@ -50,7 +50,7 @@ if __name__ == "__main__":
         (("-x", "--write_tsv"),
          {"help": "Write table record metadata from SUMMARIZE to outfile", "default": "None"}),
         (("-p", "--path"),
-         {"help": "New path for moving project in MOVE command"}),
+         {"help": "New path for moving project in MOVE command", "default": "None"}),
     )
     programs = {
         "INIT":                     create_database,
