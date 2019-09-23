@@ -217,7 +217,7 @@ cdef class RecordList:
                     if obj is not None and obj != "None" and found_type in (int, float):
                         summary_data[column] = []
                         # Gather portion for average calculation
-                        summary_data[column].append(float(obj) / float(num_records))
+                        summary_data[column].append((float(obj) / float(num_records) if num_records > 0 else 0))
                         # Gather portion for running sum
                         summary_data[column].append(float(obj))
                         # Gather portion for running sq sum
@@ -234,7 +234,7 @@ cdef class RecordList:
                 else:
                     if obj is not None and obj != "None" and found_type in (int, float):
                         # Gather portion for average calculation
-                        summary_data[column][0] += float(obj) / float(num_records)
+                        summary_data[column][0] += (float(obj) / float(num_records) if num_records > 0 else 0)
                         # Gather portion for running sum
                         summary_data[column][1] += float(obj)
                         # Gather portion for running sq sum
