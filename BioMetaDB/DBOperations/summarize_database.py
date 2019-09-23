@@ -49,6 +49,39 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         table_name = ConfigManager.get_name_by_alias(alias, config)
     if query == "None" and (table_name != "None" or alias != "None"):
         tables_in_database = (table_name, )
+    if (("->" in query) and ("~>" in query)) or (("<~" in query) and ("<-" in query)):
+        assert table_name == 'None', "Query cannot contain '~>/->' statement with a table name"
+        matching_records = []
+        eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
+        fxn_sess, FxnClass, fxn_cfg = load_table_metadata(config, "functions")
+        fxn_rl = RecordList(fxn_sess, FxnClass, fxn_cfg, compute_metadata=True)
+        if "->" in query:
+            evaluation_query, block_1 = query.split("->")
+            function_query, annotation_query = block_1.split("~>")
+        elif "<-" in query:
+            block_1, evaluation_query = query.split("<-")
+            annotation_query, evaluation_query = block_1.split("<~")
+        if evaluation_query.replace(" ", "") != '':
+            eval_rl.query(evaluation_query)
+        else:
+            eval_rl.query()
+        if function_query.replace(" ", "") != '':
+            fxn_rl.query(function_query)
+        else:
+            fxn_rl.query()
+        for record in eval_rl:
+            if record in fxn_rl:
+                sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
+                annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+                _handle_query(annot_rl, annotation_query)
+                print(annot_rl.summarize())
+                for record_2 in annot_rl:
+                    matching_records.append(record_2)
+        if matching_records and write != "None":
+            rl = RecordList(compute_metadata=True, records_list=matching_records)
+            rl.write_records(write)
+        return
     if ("~>" in query) or ("<~" in query):
         assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
         matching_records = []
@@ -120,39 +153,6 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             if record in eval_rl:
                 matching_records.append(record)
                 print(record)
-        if matching_records and write != "None":
-            rl = RecordList(compute_metadata=True, records_list=matching_records)
-            rl.write_records(write)
-        return
-    if (("->" in query) and ("~>" in query)) or (("<~" in query) and ("<-" in query)):
-        assert table_name == 'None', "Query cannot contain '~>/->' statement with a table name"
-        matching_records = []
-        eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
-        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
-        fxn_sess, FxnClass, fxn_cfg = load_table_metadata(config, "functions")
-        fxn_rl = RecordList(fxn_sess, FxnClass, fxn_cfg, compute_metadata=True)
-        if "->" in query:
-            evaluation_query, block_1 = query.split("->")
-            function_query, annotation_query = block_1.split("~>")
-        elif "<-" in query:
-            block_1, evaluation_query = query.split("<-")
-            annotation_query, evaluation_query = block_1.split("<~")
-        if evaluation_query.replace(" ", "") != '':
-            eval_rl.query(evaluation_query)
-        else:
-            eval_rl.query()
-        if function_query.replace(" ", "") != '':
-            fxn_rl.query(function_query)
-        else:
-            fxn_rl.query()
-        for record in eval_rl:
-            if record in fxn_rl:
-                sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
-                annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
-                _handle_query(annot_rl, annotation_query)
-                print(annot_rl.summarize())
-                for record_2 in annot_rl:
-                    matching_records.append(record_2)
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=True, records_list=matching_records)
             rl.write_records(write)
