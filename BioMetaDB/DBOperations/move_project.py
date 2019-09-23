@@ -44,8 +44,8 @@ def move_project(config_file, path, integrity_cancel, silent):
     :param silent:
     :return:
     """
-    path = os.path.abspath(os.path.relpath(path))
     assert os.path.exists(path), "Path (-p) does not exist, exiting"
+    path = os.path.abspath(os.path.relpath(path))
     config, config_file = ConfigManager.confirm_config_set(config_file)
     old_path = config[ConfigKeys.DATABASES][ConfigKeys.working_dir]
     current_path = os.path.abspath(config_file)
