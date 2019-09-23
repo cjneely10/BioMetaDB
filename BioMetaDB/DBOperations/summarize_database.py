@@ -69,10 +69,6 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             print(annot_rl.summarize())
             for record_2 in annot_rl:
                 matching_records.append(record_2)
-        # eval_keys = [key.split(".")[0].lower() for key in eval_rl.keys()]
-        # for record in annot_rl:
-        #     if record._id.split(".")[0].lower() in eval_keys:
-        #         matching_records.append(record)
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=True, records_list=matching_records)
             rl.write_records(write)
@@ -97,10 +93,33 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             print(annot_rl.summarize())
             for record_2 in annot_rl:
                 matching_records.append(record_2)
-        # eval_keys = [key.split(".")[0].lower() for key in eval_rl.keys()]
-        # for record in annot_rl:
-        #     if record._id.split(".")[0].lower() in eval_keys:
-        #         matching_records.append(record)
+        if matching_records and write != "None":
+            rl = RecordList(compute_metadata=True, records_list=matching_records)
+            rl.write_records(write)
+        return
+    if (">>" in query) or ("<<" in query):
+        matching_records = []
+        assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
+        eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
+        if ">>" in query:
+            evaluation_query, annotation_query = query.split(">>")
+        elif "<<" in query:
+            annotation_query, evaluation_query = query.split("<<")
+        if evaluation_query.replace(" ", "") != '':
+            eval_rl.query(evaluation_query)
+        else:
+            eval_rl.query()
+        sess, UserClass, cfg = load_table_metadata(config, "functions")
+        annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+        if annotation_query.replace(" ", "") != '':
+            annot_rl.query(annotation_query)
+        else:
+            annot_rl.query()
+        for record in annot_rl:
+            if record in eval_rl:
+                matching_records.append(record)
+                print(record)
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=True, records_list=matching_records)
             rl.write_records(write)
@@ -134,10 +153,6 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 print(annot_rl.summarize())
                 for record_2 in annot_rl:
                     matching_records.append(record_2)
-        # eval_keys = [key.split(".")[0].lower() for key in eval_rl.keys()]
-        # for record in annot_rl:
-        #     if record._id.split(".")[0].lower() in eval_keys:
-        #         matching_records.append(record)
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=True, records_list=matching_records)
             rl.write_records(write)
