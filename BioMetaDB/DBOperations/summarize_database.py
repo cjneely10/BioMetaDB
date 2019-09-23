@@ -77,15 +77,15 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             rl = RecordList(compute_metadata=True, records_list=matching_records)
             rl.write_records(write)
         return
-    if ("^>" in query) or ("<^" in query):
+    if ("->" in query) or ("<-" in query):
         assert table_name == 'None', "Query cannot contain a '^>' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "functions")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
-        if "^>" in query:
-            evaluation_query, annotation_query = query.split("^>")
-        elif "<^" in query:
-            annotation_query, evaluation_query = query.split("<^")
+        if "->" in query:
+            evaluation_query, annotation_query = query.split("->")
+        elif "<-" in query:
+            annotation_query, evaluation_query = query.split("<-")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
         else:
