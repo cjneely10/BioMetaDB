@@ -44,13 +44,13 @@ def move_project(config_file, path, integrity_cancel, silent):
     :param silent:
     :return:
     """
+    assert os.path.exists(path), "Path (-p) does not exist, exiting"
     path = os.path.abspath(path)
     config, config_file = ConfigManager.confirm_config_set(config_file)
     old_path = config[ConfigKeys.DATABASES][ConfigKeys.working_dir]
     current_path = os.path.abspath(config_file)
     assert os.path.dirname(old_path) != os.path.abspath(path), \
         "Project exists in directory, cancelling"
-    assert os.path.exists(path), "Path does not exist, exiting"
     project_name = config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir]
     if not silent:
         _move_project_display_message_prelude(
