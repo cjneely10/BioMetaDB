@@ -339,6 +339,9 @@ cdef class RecordList:
         """
         return self
 
+    def __contains__(self, item):
+        return item._id in [record._id for record in self.results]
+
     def __iter__(self):
         """ Iterator yields next value in self.results
 
