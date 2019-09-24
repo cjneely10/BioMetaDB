@@ -49,19 +49,15 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         table_name = ConfigManager.get_name_by_alias(alias, config)
     if query == "None" and (table_name != "None" or alias != "None"):
         tables_in_database = (table_name, )
-    if (("~>" in query) and ("->" in query)) or (("<-" in query) and ("<~" in query)):
+    if ("~>" in query) and ("->" in query):
         assert table_name == 'None', "Query cannot contain '~>/->' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
         fxn_sess, FxnClass, fxn_cfg = load_table_metadata(config, "functions")
         fxn_rl = RecordList(fxn_sess, FxnClass, fxn_cfg, compute_metadata=True)
-        if "~>" in query:
-            evaluation_query, block_1 = query.split("~>")
-            function_query, annotation_query = block_1.split("->")
-        elif "<~" in query:
-            block_1, evaluation_query = query.split("<~")
-            annotation_query, evaluation_query = block_1.split("<-")
+        evaluation_query, block_1 = query.split("~>")
+        function_query, annotation_query = block_1.split("->")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
         else:
@@ -85,15 +81,12 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             rl = RecordList(compute_metadata=True, records_list=matching_records)
             rl.write_records(write)
         return
-    if ("~>" in query) or ("<~" in query):
+    if "~>" in query:
         assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
-        if "~>" in query:
-            evaluation_query, annotation_query = query.split("~>")
-        elif "<~" in query:
-            annotation_query, evaluation_query = query.split("<~")
+        evaluation_query, annotation_query = query.split("~>")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
         else:
@@ -112,15 +105,12 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             rl = RecordList(compute_metadata=True, records_list=matching_records)
             rl.write_records(write)
         return
-    if ("->" in query) or ("<-" in query):
+    if "->" in query:
         assert table_name == 'None', "Query cannot contain a '->' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "functions")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
-        if "->" in query:
-            evaluation_query, annotation_query = query.split("->")
-        elif "<-" in query:
-            annotation_query, evaluation_query = query.split("<-")
+        evaluation_query, annotation_query = query.split("->")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
         else:
@@ -139,14 +129,11 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             rl = RecordList(compute_metadata=True, records_list=matching_records)
             rl.write_records(write)
         return
-    if (">>" in query) or ("<<" in query):
+    if ">>" in query:
         assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
-        if ">>" in query:
-            evaluation_query, annotation_query = query.split(">>")
-        elif "<<" in query:
-            annotation_query, evaluation_query = query.split("<<")
+        evaluation_query, annotation_query = query.split(">>")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
         else:
@@ -158,7 +145,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 in_query += "_id == '%s' OR " % record._id
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             if annotation_query.replace(" ", "") != '':
-                annot_rl.query(annotation_query + "AND " + in_query[:-4])
+                annot_rl.query(annotation_query + " AND " + in_query[:-4])
             else:
                 annot_rl.query(in_query[:-4])
             if write_tsv != 'None':
