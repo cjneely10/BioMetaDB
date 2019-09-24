@@ -72,10 +72,13 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             fxn_rl.query()
         for record in eval_rl:
             if record in fxn_rl:
-                sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
+                record_id = record._id.split(".")[0].lower()
+                sess, UserClass, cfg = load_table_metadata(config, record_id)
                 annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
                 _handle_query(annot_rl, annotation_query)
                 print(annot_rl.summarize())
+                if write_tsv != 'None':
+                    annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
                 for record_2 in annot_rl:
                     matching_records.append(record_2)
         if matching_records and write != "None":
@@ -96,10 +99,13 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         else:
             eval_rl.query()
         for record in eval_rl:
-            sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
+            record_id = record._id.split(".")[0].lower()
+            sess, UserClass, cfg = load_table_metadata(config, record_id)
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             _handle_query(annot_rl, annotation_query)
             print(annot_rl.summarize())
+            if write_tsv != 'None':
+                annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
             for record_2 in annot_rl:
                 matching_records.append(record_2)
         if matching_records and write != "None":
@@ -120,10 +126,13 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         else:
             eval_rl.query()
         for record in eval_rl:
+            record_id = record._id.split(".")[0].lower()
             sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
             _handle_query(annot_rl, annotation_query)
             print(annot_rl.summarize())
+            if write_tsv != 'None':
+                annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
             for record_2 in annot_rl:
                 matching_records.append(record_2)
         if matching_records and write != "None":
@@ -131,7 +140,6 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             rl.write_records(write)
         return
     if (">>" in query) or ("<<" in query):
-        matching_records = []
         assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
@@ -151,12 +159,15 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             annot_rl.query()
         in_query = ""
         for record in annot_rl:
-            in_query += "_id == '%s' OR" % record._id
-        annot_rl.query(in_query[:-3])
+            in_query += "_id == '%s' OR " % record._id
+        annot_rl.query(in_query[:-4])
+        if write_tsv != 'None':
+            annot_rl.write_tsv(write_tsv)
         print(annot_rl.summarize())
-        if matching_records and write != "None":
-            rl = RecordList(compute_metadata=True, records_list=matching_records)
-            rl.write_records(write)
+        if write != "None":
+            annot_rl.write_records(write)
+        if write_tsv != "None":
+            annot_rl.write_tsv(write_tsv.replace(".tsv", "") + ".tsv")
         return
     if view == "None" and write == "None" and unique == 'None':
         for tbl_name in tables_in_database:
@@ -216,9 +227,10 @@ def load_table_metadata(config, tbl_name):
 def _handle_query(rl, query="None"):
     if query != "None":
         for val in query.split(" "):
-            if "annot" in val:
+            if "_annot" in val:
                 _v = val.replace("_annot", "")
                 query = query.replace(val, "%s != '' AND %s != 'None'" % (_v, _v))
+        print(query)
         rl.query(query)
     else:
         rl.query()

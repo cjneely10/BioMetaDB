@@ -288,13 +288,19 @@ cdef class RecordList:
         :return:
         """
         cdef str query = "", col
+        new_args = []
+        for arg in args:
+            new_args.append(arg)
+            new_args[-1] = new_args[-1].rstrip(" ")
+            new_args[-1] = new_args[-1].lstrip(" ")
+        args = new_args
         # At least one annotation
-        if args[0] == "annotated":
+        if "annotated" in args:
             for col in self.columns():
                 query += "(%s != 'None' AND %s != '') OR " % (col, col)
             return self.sess.query(self.TableClass).filter(text(query[:-4])).all()
         # High quality, non-redundant
-        elif args[0] == 'hqnr':
+        if 'hqnr' in args:
             return self.sess.query(self.TableClass).filter(
                 text("is_non_redundant AND is_complete AND NOT is_contaminated")
             ).all()
