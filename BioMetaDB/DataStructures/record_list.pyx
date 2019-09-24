@@ -295,15 +295,15 @@ cdef class RecordList:
             new_args[-1] = new_args[-1].lstrip(" ")
         args = new_args
         # At least one annotation
-        if "annotated" in args:
+        if "annotated" in args[0]:
             for col in self.columns():
                 query += "(%s != 'None' AND %s != '') OR " % (col, col)
-            return self.sess.query(self.TableClass).filter(text(query[:-4])).all()
+            args[0] = args[0].replace("annotated", query[:-4])
+            return self.sess.query(self.TableClass).filter(text(*args)).all()
         # High quality, non-redundant
-        if 'hqnr' in args:
-            return self.sess.query(self.TableClass).filter(
-                text("is_non_redundant AND is_complete AND NOT is_contaminated")
-            ).all()
+        if 'hqnr' in args[0]:
+            args[0] = args[0].replace("hqnr", "is_non_redundant AND is_complete AND NOT is_contaminated")
+            return self.sess.query(self.TableClass).filter(text(*args)).all()
         else:
             return self.sess.query(self.TableClass).filter(text(*args)).all()
 

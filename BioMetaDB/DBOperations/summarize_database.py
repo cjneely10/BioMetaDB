@@ -152,22 +152,24 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         else:
             eval_rl.query()
         sess, UserClass, cfg = load_table_metadata(config, "functions")
-        annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
-        if annotation_query.replace(" ", "") != '':
-            annot_rl.query(annotation_query)
+        if len(eval_rl) > 0:
+            in_query = ""
+            for record in eval_rl:
+                in_query += "_id == '%s' OR " % record._id
+            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+            if annotation_query.replace(" ", "") != '':
+                annot_rl.query(annotation_query + "AND " + in_query[:-4])
+            else:
+                annot_rl.query(in_query[:-4])
+            if write_tsv != 'None':
+                annot_rl.write_tsv(write_tsv)
+            print(annot_rl.summarize())
+            if write != "None":
+                annot_rl.write_records(write)
+            if write_tsv != "None":
+                annot_rl.write_tsv(write_tsv.replace(".tsv", "") + ".tsv")
         else:
-            annot_rl.query()
-        in_query = ""
-        for record in annot_rl:
-            in_query += "_id == '%s' OR " % record._id
-        annot_rl.query(in_query[:-4])
-        if write_tsv != 'None':
-            annot_rl.write_tsv(write_tsv)
-        print(annot_rl.summarize())
-        if write != "None":
-            annot_rl.write_records(write)
-        if write_tsv != "None":
-            annot_rl.write_tsv(write_tsv.replace(".tsv", "") + ".tsv")
+            print(eval_rl.summarize())
         return
     if view == "None" and write == "None" and unique == 'None':
         for tbl_name in tables_in_database:
