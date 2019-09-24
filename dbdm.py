@@ -40,7 +40,7 @@ if __name__ == "__main__":
         (("-v", "--view"),
          {"help": "View (c)olumns or (t)ables with SUMMARIZE", "default": "None"}),
         (("-q", "--query"),
-         {"help": "Query to pass to SUMMARIZE", "default": "None"}),
+         {"help": "evaluation ~> genome; function -> gen; eval >> fxn; eval ~> fxn -> gen;", "default": "None"}),
         (("-u", "--unique"),
          {"help": "View unique values of column using SUMMARIZE", "default": "None"}),
         (("-i", "--integrity_cancel"),
