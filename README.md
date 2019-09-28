@@ -162,33 +162,34 @@ values or columns.
 
 <pre><code>usage: dbdm.py [-h] [-n DB_NAME] [-t TABLE_NAME] [-d DIRECTORY_NAME]
                [-f DATA_FILE] [-l LIST_FILE] [-c CONFIG_FILE] [-a ALIAS] [-s]
-               [-v VIEW] [-q QUERY] [-i] [-w WRITE] [-x WRITE_TSV] [-p PATH]
+               [-v VIEW] [-q QUERY] [-u UNIQUE] [-i] [-w WRITE] [-x WRITE_TSV]
+               [-p PATH]
                program
 
-dbdm:	Manage BioMetaDB project
+dbdm:   Manage BioMetaDB project
 
 Available Programs:
 
 CREATE: Create a new table in an existing database, optionally populate using data files
-		(Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
+        (Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 DELETE: Delete list of ids from database tables, remove associated files
-		(Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
+        (Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
 FIX: Repairs errors in DB structure using .fix file
-		(Req:  --config_file --data_file --silent --integrity_cancel)
+        (Req:  --config_file --data_file --silent --integrity_cancel)
 INIT: Initialize database with starting table, fasta directory, and/or data files
-		(Req:  --db_name --table_name --directory_name --data_file --alias --silent --integrity_cancel)
+        (Req:  --db_name --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 INTEGRITY: Queries project database and structure to generate .fix file for possible issues
-		(Req:  --config_file --table_name --alias --silent)
+        (Req:  --config_file --table_name --alias --silent)
 MOVE: Move project to new location
-		(Req:  --config_file --path --integrity_cancel --silent)
+        (Req:  --config_file --path --integrity_cancel --silent)
 REMOVE: Remove table and all associated data from database
-		(Req:  --config_file --table_name --alias --silent --integrity_cancel)
+        (Req:  --config_file --table_name --alias --silent --integrity_cancel)
 REMOVECOL: Remove column list (including data) from table
-		(Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
+        (Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
 SUMMARIZE: Summarize project and query data. Write records or metadata to file
-		(Req:  --config_file --view --query --table_name --alias --write --write_tsv)
+        (Req:  --config_file --view --query --table_name --alias --write --write_tsv --unique)
 UPDATE: Update values in existing table or add new sequences
-		(Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
+        (Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 
 positional arguments:
   program               Program to run
@@ -206,13 +207,15 @@ optional arguments:
   -l LIST_FILE, --list_file LIST_FILE
                         File with list of items, typically ids or column names
   -c CONFIG_FILE, --config_file CONFIG_FILE
-                        Config file for loading database schema
+                        /path/to/BioMetaDB-project-directory - Can omit if no other BioMetaDB project present
   -a ALIAS, --alias ALIAS
                         Provide alias for locating and creating table class
   -s, --silent          Silence all standard output (Standard error still displays to screen)
-  -v VIEW, --view VIEW  View (c)olumns or (t)ables
+  -v VIEW, --view VIEW  View (c)olumns or (t)ables with SUMMARIZE
   -q QUERY, --query QUERY
-                        Query to pass to SUMMARIZE
+                        evaluation ~> genome; function -> gen; eval >> fxn; eval ~> fxn -> gen;
+  -u UNIQUE, --unique UNIQUE
+                        View unique values of column using SUMMARIZE
   -i, --integrity_cancel
                         Cancel integrity check
   -w WRITE, --write WRITE
@@ -396,7 +399,7 @@ your data as a .tsv file.
 ### SUMMARIZE
 
 **SUMMARIZE** is used to display information about the project or a table within the project. This command can also run 
-queries to the database and display summary data on only these selected records.
+queries to the database and display summary data on only these selected records. See [this blog](https://cjneely10.github.io/posts/2019/09/MetaSanity-demo-part-3/) for more info on query statements.
 
 - Required flags
     - --config_file (-c): Path to project directory 
