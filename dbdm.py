@@ -31,7 +31,7 @@ if __name__ == "__main__":
         (("-l", "--list_file"),
          {"help": "File with list of items, typically ids or column names", "default": "None"}),
         (("-c", "--config_file"),
-         {"help": "/path/to/BioMetaDB-project-directory"}),
+         {"help": "/path/to/BioMetaDB-project-directory - Can omit if no other BioMetaDB project present"}),
         (("-a", "--alias"),
          {"help": "Provide alias for locating and creating table class", "default": "None"}),
         (("-s", "--silent"),

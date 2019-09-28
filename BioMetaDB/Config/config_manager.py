@@ -85,12 +85,20 @@ class ConfigManager:
         :param config_file:
         :return:
         """
-        assert config_file != "None" and config_file is not None, ConfigAssertString.CONFIG_FILE_NOT_PASSED
+        if config_file == 'None' or config_file is None:
+            config_file = glob.glob(os.path.join(os.getcwd(), "*/config/*.ini"))
+        else:
+            config_file = glob.glob(os.path.join(config_file, "config/*.ini"))
+        num_files = len(config_file)
+        if num_files == 1:
+            config_file = config_file[0]
+        elif num_files > 1:
+            raise ConfigAssertString.CONFIG_FILE_MULTIPLES
+        elif num_files == 0:
+            raise ConfigAssertString.CONFIG_FILE_NOT_PASSED
         config = Config()
-        config_file = glob.glob(os.path.join(config_file, "config/*.ini"))
-        assert config_file != [], ConfigAssertString.CONFIG_FILE_NOT_FOUND
-        config.read(config_file[0])
-        return config, config_file[0]
+        config.read(config_file)
+        return config, config_file
 
     @staticmethod
     def get_name_by_alias(alias, config):

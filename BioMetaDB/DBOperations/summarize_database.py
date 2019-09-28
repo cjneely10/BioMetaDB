@@ -44,11 +44,12 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if not view.lower()[0] == "t":
         _summarize_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name])
-    tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
-    if query == "None" and (table_name != "None" or alias != "None"):
+    if table_name != "None" or alias != "None":
         tables_in_database = (table_name, )
+    else:
+        tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     if ("~>" in query) and ("->" in query):
         assert table_name == 'None', "Query cannot contain '~>/->' statement with a table name"
         matching_records = []
@@ -158,7 +159,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         else:
             print(eval_rl.summarize())
         return
-    if view == "None" and write == "None" and unique == 'None':
+    if view == "None" and unique == 'None':
         for tbl_name in tables_in_database:
             # Display queried info for single table and break
             if table_name == 'None' or table_name == tbl_name:
@@ -169,8 +170,6 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                     print(annot_rl.summarize())
                 else:
                     print(annot_rl[0])
-                if table_name == tbl_name and query != 'None':
-                    return
     for tbl_name in tables_in_database:
         sess, UserClass, cfg = load_table_metadata(config, tbl_name)
         annot_rl = RecordList(sess, UserClass, cfg)
@@ -186,7 +185,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         if write != "None" and table_name == tbl_name:
             _handle_query(annot_rl, query)
             annot_rl.write_records(write)
-        elif write_tsv != "None" and table_name == tbl_name:
+        if write_tsv != "None" and table_name == tbl_name:
             _handle_query(annot_rl, query)
             annot_rl.write_tsv(write_tsv)
         if unique != 'None' and table_name == tbl_name:

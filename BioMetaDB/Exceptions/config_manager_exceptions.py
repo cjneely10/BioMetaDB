@@ -8,6 +8,7 @@ class TableNameNotFoundError(Error):
 class ConfigAssertString:
     CONFIG_FILE_NOT_PASSED = "Config file for project not passed"
     CONFIG_FILE_NOT_FOUND = "Config file for project not found"
+    CONFIG_FILE_MULTIPLES = "Multiple projects located - specify with -c /path/to/BioMetaDB-project-directory"
 
 
 class TableNameAssertString:
