@@ -77,7 +77,7 @@ class ProgramCaller:
                 print(" ERROR " + self.errors["INCORRECT_FLAGS"], "--" + " --".join(self.flags[program]))
         else:
             print()
-            print(" ERROR " + self.errors[error_type] + ":\t" + str(message))
+            print(" ERROR " + self.errors[error_type] + "\t" + str(message))
             exit(1)
         if program in self._help.keys():
             print()

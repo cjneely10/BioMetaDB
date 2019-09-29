@@ -2,7 +2,8 @@ import os
 import glob
 from configparser import ConfigParser
 from BioMetaDB.Config.directory_manager import Directories
-from BioMetaDB.Exceptions.config_manager_exceptions import TableNameNotFoundError
+from BioMetaDB.Exceptions.config_manager_exceptions import TableNameNotFoundError, MultipleTablesFoundError, \
+    ConfigFileNotFound
 from BioMetaDB.Exceptions.config_manager_exceptions import ConfigAssertString
 
 
@@ -93,9 +94,9 @@ class ConfigManager:
         if num_files == 1:
             config_file = config_file[0]
         elif num_files > 1:
-            raise ConfigAssertString.CONFIG_FILE_MULTIPLES
+            raise MultipleTablesFoundError
         elif num_files == 0:
-            raise ConfigAssertString.CONFIG_FILE_NOT_PASSED
+            raise ConfigFileNotFound
         config = Config()
         config.read(config_file)
         return config, config_file

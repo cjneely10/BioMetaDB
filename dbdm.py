@@ -9,7 +9,8 @@ from BioMetaDB.DBOperations.delete_from_table import delete_from_table
 from BioMetaDB.DBOperations.summarize_database import summarize_database
 from BioMetaDB.DBOperations.update_existing_table import update_existing_table
 from BioMetaDB.Exceptions.record_list_exceptions import ColumnNameNotFoundError
-from BioMetaDB.Exceptions.config_manager_exceptions import TableNameNotFoundError
+from BioMetaDB.Exceptions.config_manager_exceptions import TableNameNotFoundError, MultipleTablesFoundError, \
+    ConfigFileNotFound
 from BioMetaDB.DBOperations.remove_columns_from_table import remove_columns_from_table
 from BioMetaDB.DBOperations.remove_table_from_database import remove_table_from_database
 from BioMetaDB.Exceptions.remove_columns_from_table_exceptions import ListFileNotProvidedError
@@ -80,6 +81,8 @@ if __name__ == "__main__":
         TableNameNotFoundError:     "Name of table not found",
         ListFileNotProvidedError:   "List file not provided",
         ColumnNameNotFoundError:    "Column name not in table",
+        MultipleTablesFoundError:   "Multiple projects located - specify with -c /path/to/BioMetaDB-project-directory",
+        ConfigFileNotFound:         "Config file for project not found",
     }
     _help = {
         "INIT":             "Initialize database with starting table, fasta directory, and/or data files",
