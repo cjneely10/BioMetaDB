@@ -109,15 +109,19 @@ cdef class RecordList:
             self._summary, self.num_records, self.has_text = self._gather_metadata()
         sorted_keys = sorted(self.columns())
         longest_key = max([len(key) for key in sorted_keys])
+        if longest_key < 18:
+            longest_key = 18
         # Pretty formatting
         summary_string.write(("*" * (longest_key + 75)) + "\n")
         # Display multiple records
         if self.num_records > 1:
-            summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:<{longest_key}}\t{}\n\n".format(
+            summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{}\n\n".format(
                 "Table Name:",
                 self.cfg.table_name,
                 "Number of Records:",
-                "{:>10d}/{:<10d}".format(self.num_records, self.num_records_in_db),
+                "{:>{len_num}}/{:<{len_db}}".format(str(self.num_records), str(self.num_records_in_db),
+                                               len_num=len(str(self.num_records)),
+                                               len_db=len(str(self.num_records_in_db))),
                 longest_key=longest_key))
         # Display single record
         elif self.num_records == 1:
@@ -166,6 +170,8 @@ cdef class RecordList:
         summary_string.write(("-" * (longest_key + 75)) + "\n")
         if self.has_text:
             longest_key = max([len(key) for key in sorted_keys if key in self._summary.keys() and type(self._summary[key]) == dict])
+            if longest_key < 18:
+                longest_key = 18
             summary_string.write("\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}\n\n".format(
                 "Database",
                 "Most Frequent",
