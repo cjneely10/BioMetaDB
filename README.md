@@ -399,7 +399,7 @@ your data as a .tsv file.
 ### SUMMARIZE
 
 **SUMMARIZE** is used to display information about the project or a table within the project. This command can also run 
-queries to the database and display summary data on only these selected records. See [this blog](https://cjneely10.github.io/posts/2019/09/MetaSanity-demo-part-3/) for more info on query statements.
+queries to the database and display summary data on only these selected records. See [this blog](https://cjneely10.github.io/posts/2019/10/MetaSanity-Demo-BioMetaDB/) for more info on query statements.
 
 - Required flags
     - --config_file (-c): Path to project directory 
