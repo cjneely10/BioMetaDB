@@ -476,13 +476,14 @@ cdef class RecordList:
         cdef object record
         cdef str col
         # Write header
-        W.write("_id" + delim)
-        W.write(delim.join(cols) + "\n")
-        for record in self.results:
-            W.write(record._id + delim)
-            for col in cols:
-                W.write(delim + str(getattr(record, col, "None")))
-            W.write("\n")
+        if len(self.results) > 0:
+            W.write("_id" + delim)
+            W.write(delim.join(cols) + "\n")
+            for record in self.results:
+                W.write(record._id + delim)
+                for col in cols:
+                    W.write(delim + str(getattr(record, col, "None")))
+                W.write("\n")
 
     # def _get_table_record_count_and_all_null_ids(self):
     #     """ Use in in
