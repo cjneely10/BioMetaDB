@@ -471,12 +471,14 @@ cdef class RecordList:
         """
         if self.results is None:
              self.query()
-        cdef list cols = sorted(self.columns())
-        cdef object W = open(output_file, "w")
+        cdef list cols
+        cdef object W
         cdef object record
         cdef str col
         # Write header
         if len(self.results) > 0:
+            cols = sorted(self.columns())
+            W = open(output_file, "w")
             W.write("_id" + delim)
             W.write(delim.join(cols) + "\n")
             for record in self.results:
