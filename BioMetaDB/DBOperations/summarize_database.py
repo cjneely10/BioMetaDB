@@ -147,18 +147,17 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             in_query = ""
             for record in eval_rl:
                 in_query += "_id == '%s' OR " % record._id
-            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
             if annotation_query.replace(" ", "") != '':
                 annot_rl.query(annotation_query + " AND " + in_query[:-4])
             else:
                 annot_rl.query(in_query[:-4])
-            if write_tsv != 'None':
-                annot_rl.write_tsv(write_tsv)
-            print(annot_rl.summarize())
             if write != "None":
                 annot_rl.write_records(write)
             if write_tsv != "None":
                 annot_rl.write_tsv(write_tsv.replace(".tsv", "") + ".tsv")
+            if write_tsv == 'None' and write == 'None':
+                print(annot_rl.summarize())
         else:
             print(eval_rl.summarize())
         return

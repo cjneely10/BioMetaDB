@@ -458,7 +458,11 @@ cdef class RecordList:
         cdef list priority_list = RecordList._annotation_priority()
         for annot in priority_list:
             located_annot = getattr(record, annot, None)
-            if located_annot and located_annot not in ("", "None"):
+            if located_annot is not None and located_annot not in ("", "None"):
+                return located_annot
+        for annot in set(self.columns()) - set(priority_list):
+            located_annot = getattr(record, annot, None)
+            if located_annot is not None and located_annot not in ("", "None"):
                 return located_annot
         return ""
 
