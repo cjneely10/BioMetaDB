@@ -54,9 +54,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         assert table_name == 'None', "Query cannot contain '~>/->' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
-        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False)
         fxn_sess, FxnClass, fxn_cfg = load_table_metadata(config, "functions")
-        fxn_rl = RecordList(fxn_sess, FxnClass, fxn_cfg, compute_metadata=True)
+        fxn_rl = RecordList(fxn_sess, FxnClass, fxn_cfg, compute_metadata=False)
         evaluation_query, block_1 = query.split("~>")
         function_query, annotation_query = block_1.split("->")
         if evaluation_query.replace(" ", "") != '':
@@ -71,22 +71,23 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             if record in fxn_rl:
                 record_id = record._id.split(".")[0].lower()
                 sess, UserClass, cfg = load_table_metadata(config, record_id)
-                annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+                annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
                 _handle_query(annot_rl, annotation_query)
-                print(annot_rl.summarize())
                 if write_tsv != 'None':
                     annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
                 for record_2 in annot_rl:
                     matching_records.append(record_2)
+                if write_tsv == 'None':
+                    print(annot_rl.summarize())
         if matching_records and write != "None":
-            rl = RecordList(compute_metadata=True, records_list=matching_records)
+            rl = RecordList(compute_metadata=False, records_list=matching_records)
             rl.write_records(write)
         return
     if "~>" in query:
         assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
-        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False)
         evaluation_query, annotation_query = query.split("~>")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
@@ -95,22 +96,23 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         for record in eval_rl:
             record_id = record._id.split(".")[0].lower()
             sess, UserClass, cfg = load_table_metadata(config, record_id)
-            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
             _handle_query(annot_rl, annotation_query)
-            print(annot_rl.summarize())
             if write_tsv != 'None':
                 annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
             for record_2 in annot_rl:
                 matching_records.append(record_2)
+            if write_tsv == 'None':
+                print(annot_rl.summarize())
         if matching_records and write != "None":
-            rl = RecordList(compute_metadata=True, records_list=matching_records)
+            rl = RecordList(compute_metadata=False, records_list=matching_records)
             rl.write_records(write)
         return
     if "->" in query:
         assert table_name == 'None', "Query cannot contain a '->' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "functions")
-        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False)
         evaluation_query, annotation_query = query.split("->")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
@@ -119,21 +121,22 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         for record in eval_rl:
             record_id = record._id.split(".")[0].lower()
             sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
-            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
             _handle_query(annot_rl, annotation_query)
-            print(annot_rl.summarize())
             if write_tsv != 'None':
                 annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
             for record_2 in annot_rl:
                 matching_records.append(record_2)
+            if write_tsv == 'None':
+                print(annot_rl.summarize())
         if matching_records and write != "None":
-            rl = RecordList(compute_metadata=True, records_list=matching_records)
+            rl = RecordList(compute_metadata=False, records_list=matching_records)
             rl.write_records(write)
         return
     if ">>" in query:
         assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
-        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=True)
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False)
         evaluation_query, annotation_query = query.split(">>")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
