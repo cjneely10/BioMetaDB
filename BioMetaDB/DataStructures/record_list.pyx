@@ -466,11 +466,12 @@ cdef class RecordList:
                 return located_annot
         return ""
 
-    def write_tsv(self, str output_file, str delim = "\t"):
+    def write_tsv(self, str output_file, str delim = "\t", list col_list = []):
         """ Outputs all record metadata in current db view to file
 
         :param output_file:
         :param delim:
+        :param col_list:
         :return:
         """
         if self.results is None:
@@ -481,7 +482,10 @@ cdef class RecordList:
         cdef str col
         # Write header
         if len(self.results) > 0:
-            cols = sorted(self.columns())
+            if not col_list:
+                cols = col_list
+            else:
+                cols = sorted(self.columns())
             W = open(output_file, "w")
             W.write("_id" + delim)
             W.write(delim.join(cols) + "\n")
