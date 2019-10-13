@@ -1,10 +1,10 @@
 from sqlalchemy.orm import mapper
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Models.functions import Record
-from BioMetaDB.Config.config_manager import ConfigManager, Config
-from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.DataStructures.record_list import RecordList
+from BioMetaDB.DBManagers.class_manager import ClassManager
+from BioMetaDB.Config.config_manager import ConfigManager, Config
 
 """
 Script is for top-level function and classes
