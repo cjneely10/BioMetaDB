@@ -487,7 +487,6 @@ cdef class RecordList(object):
         :return:
         """
         update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, "None", silent, integrity_cancel)
-        super(object, self).__delete__()
 
     @staticmethod
     def _annotation_priority():
