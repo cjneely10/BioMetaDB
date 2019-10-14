@@ -69,7 +69,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             fxn_rl.query()
         for record in eval_rl:
             if record in fxn_rl:
-                record_id = record._id.split(".")[0].lower()
+                record_id = record._id.split(".")[0]
                 sess, UserClass, cfg = load_table_metadata(config, record_id)
                 annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
                 _handle_query(annot_rl, annotation_query)
@@ -94,7 +94,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         else:
             eval_rl.query()
         for record in eval_rl:
-            record_id = record._id.split(".")[0].lower()
+            record_id = record._id.split(".")[0]
             sess, UserClass, cfg = load_table_metadata(config, record_id)
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
             _handle_query(annot_rl, annotation_query)
@@ -119,8 +119,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         else:
             eval_rl.query()
         for record in eval_rl:
-            record_id = record._id.split(".")[0].lower()
-            sess, UserClass, cfg = load_table_metadata(config, record._id.split(".")[0].lower())
+            record_id = record._id.split(".")[0]
+            sess, UserClass, cfg = load_table_metadata(config, record_id)
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
             _handle_query(annot_rl, annotation_query)
             if write_tsv != 'None':
