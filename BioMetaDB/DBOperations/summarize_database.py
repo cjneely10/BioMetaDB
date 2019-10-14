@@ -81,8 +81,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                     print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
-            if rl is not None:
-                rl.write_records(write)
+            rl.write_records(write)
         return
     if "~>" in query:
         assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
@@ -107,8 +106,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
-            if rl is not None:
-                rl.write_records(write)
+            rl.write_records(write)
         return
     if "->" in query:
         assert table_name == 'None', "Query cannot contain a '->' statement with a table name"
@@ -133,8 +131,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
-            if rl is not None:
-                rl.write_records(write)
+            rl.write_records(write)
         return
     if ">>" in query:
         assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
@@ -163,8 +160,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 if write_tsv == 'None' and write == 'None':
                     print(annot_rl.summarize())
         else:
-            if eval_rl is not None:
-                print(eval_rl.summarize())
+            print(eval_rl.summarize())
         return
     if view == "None" and unique == 'None':
         for tbl_name in tables_in_database:

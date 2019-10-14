@@ -442,10 +442,11 @@ cdef class RecordList(object):
             located_annot = getattr(record, annot, None)
             if located_annot is not None and located_annot not in ("", "None"):
                 return located_annot
-        for annot in set(self.columns()) - set(priority_list):
-            located_annot = getattr(record, annot, None)
-            if located_annot is not None and located_annot not in ("", "None"):
-                return located_annot
+        if self.cfg is not None:
+            for annot in set(self.columns()) - set(priority_list):
+                located_annot = getattr(record, annot, None)
+                if located_annot is not None and located_annot not in ("", "None"):
+                    return located_annot
         return ""
 
     def write_tsv(self, str output_file, str delim = "\t", list col_list = []):
