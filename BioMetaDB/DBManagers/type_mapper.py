@@ -53,6 +53,10 @@ class TypeMapper:
         String:     str,
         Boolean:    bool,
     }
+    py_bool_to_sql_bool = {
+        "True": "TRUE",
+        "False": "FALSE",
+    }
 
     @staticmethod
     def get_translated_types(counttable_object, dict_to_reference):

@@ -2,6 +2,8 @@
 import os
 import csv
 import glob
+
+from BioMetaDB.DBManagers.type_mapper import TypeMapper
 from BioMetaDB.Models.functions import Record
 from sqlalchemy.orm import mapper
 from BioMetaDB.Accessories.ops import print_if_not_silent
@@ -170,7 +172,7 @@ class UpdateManager:
                     db_object = DBClass()
                     for i in range(len(cols[name])):
                         if cols[name][i] not in ignore_fields:
-                            setattr(db_object, cols[name][i], entry[i])
+                            setattr(db_object, TypeMapper.py_bool_to_sql_bool.get(cols[name][i], cols[name][i]), entry[i])
                     # Add to list of objects to commit
                     db_objects[name].append(db_object)
         return db_objects
