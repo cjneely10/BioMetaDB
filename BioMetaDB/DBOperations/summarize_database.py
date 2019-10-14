@@ -81,7 +81,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                     print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
-            rl.write_records(write)
+            if rl is not None:
+                rl.write_records(write)
         return
     if "~>" in query:
         assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
@@ -106,7 +107,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
-            rl.write_records(write)
+            if rl is not None:
+                rl.write_records(write)
         return
     if "->" in query:
         assert table_name == 'None', "Query cannot contain a '->' statement with a table name"
@@ -131,7 +133,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
-            rl.write_records(write)
+            if rl is not None:
+                rl.write_records(write)
         return
     if ">>" in query:
         assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
@@ -152,14 +155,16 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 annot_rl.query(annotation_query + " AND " + in_query[:-4])
             else:
                 annot_rl.query(in_query[:-4])
-            if write != "None":
-                annot_rl.write_records(write)
-            if write_tsv != "None":
-                annot_rl.write_tsv(write_tsv.replace(".tsv", "") + ".tsv")
-            if write_tsv == 'None' and write == 'None':
-                print(annot_rl.summarize())
+            if annot_rl is not None:
+                if write != "None":
+                    annot_rl.write_records(write)
+                if write_tsv != "None":
+                    annot_rl.write_tsv(write_tsv.replace(".tsv", "") + ".tsv")
+                if write_tsv == 'None' and write == 'None':
+                    print(annot_rl.summarize())
         else:
-            print(eval_rl.summarize())
+            if eval_rl is not None:
+                print(eval_rl.summarize())
         return
     if view == "None" and unique == 'None':
         for tbl_name in tables_in_database:
