@@ -8,6 +8,7 @@ from string import punctuation
 from sqlalchemy.exc import OperationalError
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.DBManagers.type_mapper import TypeMapper
+from BioMetaDB.DBOperations.update_existing_table import update_existing_table
 from BioMetaDB.Exceptions.record_list_exceptions import ColumnNameNotFoundError
 
 
@@ -23,7 +24,7 @@ And will provide info about most frequently occurring characters/words in charac
 """
 
 
-cdef class RecordList:
+cdef class RecordList(object):
 
     def __init__(self, object db_session=None, object table_class=None, object cfg=None, bint compute_metadata=False, str query=None,
                  list records_list = []):
@@ -125,25 +126,6 @@ cdef class RecordList:
                 longest_key=longest_key))
         # Display single record
         elif self.num_records == 1:
-            # # Long name
-            # if len(self.results[0]._id) > 30:
-            #     summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}...\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
-            #         "Record Name:",
-            #         self.cfg.table_name,
-            #         "ID:",
-            #         self.results[0]._id,
-            #         "Data Type:",
-            #         self.results[0].data_type,
-            #         longest_key=longest_key))
-            # else:
-            #     summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{:<25.30s}\n\t{:>{longest_key}}\t{:<12s}\n\n".format(
-            #         "Record Name:",
-            #         self.cfg.table_name,
-            #         "ID:",
-            #         self.results[0]._id,
-            #         "Data Type:",
-            #         self.results[0].data_type,
-            #         longest_key=longest_key))
             summary_string.write(str(self.results[0]))
             return summary_string.getvalue()
         # No records found
@@ -495,36 +477,14 @@ cdef class RecordList:
                     W.write(delim + str(getattr(record, col, "None")))
                 W.write("\n")
 
-    # def _get_table_record_count_and_all_null_ids(self):
-    #     """ Use in in
-    #
-    #     :return:
-    #     """
-    #     cdef int num_records = 0
-    #     cdef object record, stored_val
-    #     cdef str column
-    #     cdef list columns = self.columns()
-    #     cdef set all_null_ids = set()
-    #     cdef list all_records = self.sess.query(self.TableClass).all()
-    #     cdef bint is_found
-    #     for record in all_records:
-    #         num_records += 1
-    #         is_found = False
-    #         for column in columns:
-    #             if str(getattr(record, column)) != "None":
-    #                 is_found = True
-    #         if not is_found:
-    #             all_null_ids.add(record._id)
-    #     return num_records, all_null_ids
+    def update(self, str directory_name="None", str data_file="None", str alias="None", bint silent=False, bint integrity_cancel=False):
+        update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, silent, integrity_cancel)
+        self.__delete__()
 
     @staticmethod
     def _annotation_priority():
         return ["ko", "merops", "cazy", "merops_pfam", "prokka",
                 "panther", "sfld", "tigrfam"]
-
-    # @staticmethod
-    # def _strip_coords():
-    #
 
     @staticmethod
     def _regex_search(str possible_column, list search_list):
