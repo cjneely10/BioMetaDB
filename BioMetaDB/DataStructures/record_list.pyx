@@ -486,7 +486,7 @@ cdef class RecordList(object):
         :param integrity_cancel:
         :return:
         """
-        update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, silent, integrity_cancel)
+        update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, "None", silent, integrity_cancel)
         self.__delete__()
 
     @staticmethod
