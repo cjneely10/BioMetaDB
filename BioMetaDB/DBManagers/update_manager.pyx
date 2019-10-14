@@ -2,6 +2,8 @@
 import os
 import csv
 import glob
+
+from BioMetaDB.DBManagers.type_mapper import TypeMapper
 from BioMetaDB.Models.functions import Record
 from sqlalchemy.orm import mapper
 from BioMetaDB.Accessories.ops import print_if_not_silent
@@ -81,7 +83,7 @@ class UpdateManager:
             for record in data[table_name]:
                 # Write each entry by column
                 # W.write(','.join(['"{}"'.format(entry[col]) for col in col_list]) + "\n")
-                W.write(','.join([str(getattr(record, col)) for col in col_list]) + "\n")
+                W.write(','.join([TypeMapper.py_bool_to_sql_bool.get(str(getattr(record, col)), str(getattr(record, col))) for col in col_list]) + "\n")
                 # W.write(','.join([str(ent) for ent in entry]) + "\n")
             W.write("\n")
         W.close()
