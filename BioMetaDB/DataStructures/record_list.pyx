@@ -477,7 +477,7 @@ cdef class RecordList(object):
                     W.write(delim + str(getattr(record, col, "None")))
                 W.write("\n")
 
-    def update(self, str directory_name="None", str data_file="None", str alias="None", bint silent=False, bint integrity_cancel=False):
+    def update(self, str directory_name="None", str data_file="None", bint silent=False, bint integrity_cancel=False):
         update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, silent, integrity_cancel)
         self.__delete__()
 
