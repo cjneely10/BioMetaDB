@@ -465,7 +465,7 @@ cdef class RecordList(object):
         cdef str col
         # Write header
         if len(self.results) > 0:
-            if not col_list:
+            if col_list:
                 cols = col_list
             else:
                 cols = sorted(self.columns())
