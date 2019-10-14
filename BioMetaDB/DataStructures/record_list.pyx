@@ -376,8 +376,11 @@ cdef class RecordList(object):
         :return:
         """
         cdef object record
+        cdef list to_return
         if self.results:
-            return [record._id for record in self.results]
+            to_return = [record._id for record in self.results]
+            for record in to_return:
+                yield record
         return None
 
     def values(self):
