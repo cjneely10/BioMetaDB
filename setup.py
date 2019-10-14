@@ -11,7 +11,7 @@ setup(
     url="https://github.com/cjneely10/BioMetaDB",
     author="Christopher Neely",
     author_email="christopher.neely1200@gmail.com",
-    license="",
+    license="GNU GPL 3",
     ext_modules=cythonize(["*/*/*.pyx",]),
     requires=['biopython', 'Cython', 'SQLAlchemy'],
 )

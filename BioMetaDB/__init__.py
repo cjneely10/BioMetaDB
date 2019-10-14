@@ -45,3 +45,7 @@ def tables(config_path):
     """
     cfg, config_path = ConfigManager.confirm_config_set(config_path)
     return list(cfg[ConfigKeys.TABLES_TO_DB].keys())
+
+
+def genomes(config_path):
+    return [val for val in tables(config_path) if val not in ("functions", "evaluation")]
