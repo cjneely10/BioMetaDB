@@ -54,8 +54,8 @@ class TypeMapper:
         Boolean:    bool,
     }
     py_bool_to_sql_bool = {
-        True: "TRUE",
-        False: "FALSE",
+        "True": "TRUE",
+        "False": "FALSE",
     }
 
     @staticmethod
