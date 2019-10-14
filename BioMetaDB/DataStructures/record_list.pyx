@@ -478,6 +478,14 @@ cdef class RecordList(object):
                 W.write("\n")
 
     def update(self, str directory_name="None", str data_file="None", bint silent=False, bint integrity_cancel=False):
+        """ Wrapper function to update project. In experimental mode.
+
+        :param directory_name:
+        :param data_file:
+        :param silent:
+        :param integrity_cancel:
+        :return:
+        """
         update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, silent, integrity_cancel)
         self.__delete__()
 
