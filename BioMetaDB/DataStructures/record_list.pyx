@@ -285,7 +285,7 @@ cdef class RecordList(object):
         # At least one annotation
         if "annotated" in args[0]:
             for col in self.columns():
-                query += "(%s != 'None' AND %s != '') OR " % (col, col)
+                query += "(%s != 'None' AND %s != '' AND %s != 'hypothetical protein') OR " % (col, col, col)
             args[0] = args[0].replace("annotated", query[:-4])
             return self.sess.query(self.TableClass).filter(text(*args)).all()
         # High quality, non-redundant
