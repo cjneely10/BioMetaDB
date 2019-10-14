@@ -173,7 +173,7 @@ class UpdateManager:
                     db_object = DBClass()
                     for i in range(len(cols[name])):
                         if cols[name][i] not in ignore_fields:
-                            setattr(db_object, cols[name][i], CountTable._try_return(entry[i], entry[i]))
+                            setattr(db_object, cols[name][i], CountTable._try_return(entry[i]))
                     # Add to list of objects to commit
                     db_objects[name].append(db_object)
         return db_objects
