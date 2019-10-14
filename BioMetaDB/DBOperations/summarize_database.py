@@ -77,7 +77,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                     annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
                 for record_2 in annot_rl:
                     matching_records.append(record_2)
-                if write_tsv == 'None':
+                if write_tsv == 'None' and write == 'None':
                     print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
@@ -102,7 +102,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
             for record_2 in annot_rl:
                 matching_records.append(record_2)
-            if write_tsv == 'None':
+            if write_tsv == 'None' and write == 'None':
                 print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
@@ -127,7 +127,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
             for record_2 in annot_rl:
                 matching_records.append(record_2)
-            if write_tsv == 'None':
+            if write_tsv == 'None' and write == 'None':
                 print(annot_rl.summarize())
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
