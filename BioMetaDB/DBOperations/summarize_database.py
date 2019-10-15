@@ -169,9 +169,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 sess, UserClass, cfg = load_table_metadata(config, tbl_name)
                 annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
                 _handle_query(annot_rl, query)
-                if len(annot_rl) != 1:
+                if len(annot_rl) > 1:
                     print(annot_rl.summarize())
-                else:
+                elif len(annot_rl) == 1:
                     print(annot_rl[0])
     for tbl_name in tables_in_database:
         sess, UserClass, cfg = load_table_metadata(config, tbl_name)
