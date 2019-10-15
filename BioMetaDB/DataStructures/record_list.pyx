@@ -474,7 +474,7 @@ cdef class RecordList(object):
             W.write("_id" + delim)
             W.write(delim.join(cols) + "\n")
             for record in self.results:
-                W.write(record._id + delim)
+                W.write(record._id)
                 for col in cols:
                     W.write(delim + str(getattr(record, col, "None")))
                 W.write("\n")
