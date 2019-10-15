@@ -3,5 +3,5 @@ cdef class DataTable:
         if header is not None:
             self.header = set(header)
         else:
-            
+            pass
 
