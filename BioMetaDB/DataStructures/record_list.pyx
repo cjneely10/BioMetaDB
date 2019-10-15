@@ -496,7 +496,7 @@ cdef class RecordList(object):
         # Function call for .tsv file
         update_path = None
         if data != {}:
-            update_path = os.path.join(os.path.dirname(data_file), "update.tsv")
+            update_path = os.path.join((os.path.dirname(data_file) if data_file != "None" else os.getcwd()), "update.tsv")
             tsv = TSVJoiner(data_file, data)
             tsv.write_tsv(update_path)
             data_file = update_path
