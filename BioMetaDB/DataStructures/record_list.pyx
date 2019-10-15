@@ -479,16 +479,22 @@ cdef class RecordList(object):
                     W.write(delim + str(getattr(record, col, "None")))
                 W.write("\n")
 
-    def update(self, str directory_name="None", str data_file="None", bint silent=False, bint integrity_cancel=False):
+    def update(self, dict data = {}, str directory_name="None", str data_file="None", bint silent=False, bint integrity_cancel=False):
         """ Wrapper function to update project. In experimental mode.
 
+        :param data:
         :param directory_name:
         :param data_file:
         :param silent:
         :param integrity_cancel:
         :return:
         """
+        # No valid info passed
+        if data == {} and directory_name == "None" and data_file == "None":
+            return
+        # Function call for .tsv file
         update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, "None", silent, integrity_cancel)
+        # Logic for data dict
 
     @staticmethod
     def _annotation_priority():
