@@ -6,8 +6,9 @@ from io import StringIO
 from sqlalchemy import text
 from string import punctuation
 from sqlalchemy.exc import OperationalError
-from BioMetaDB.DBManagers.class_manager import ClassManager
+from BioMetaDB.Serializers.tsv_joiner import TSVJoiner
 from BioMetaDB.DBManagers.type_mapper import TypeMapper
+from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.DBOperations.update_existing_table import update_existing_table
 from BioMetaDB.Exceptions.record_list_exceptions import ColumnNameNotFoundError
 
@@ -493,7 +494,16 @@ cdef class RecordList(object):
         if data == {} and directory_name == "None" and data_file == "None":
             return
         # Function call for .tsv file
+        update_path = None
+        if data != {}:
+            update_path = os.path.join(os.path.dirname(data_file), "update.tsv")
+            tsv = TSVJoiner(data_file, data)
+            tsv.write_tsv(update_path)
+            data_file = update_path
         update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, "None", silent, integrity_cancel)
+        if update_path is not None:
+            os.remove(update_path)
+
         # Logic for data dict
 
     @staticmethod
