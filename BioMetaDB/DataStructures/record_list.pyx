@@ -215,7 +215,7 @@ cdef class RecordList(object):
                     elif found_type in (str, bool):
                         has_text = True
                         # Gather count
-                        val = str(getattr(record, column, "None"))
+                        val = str(getattr(record, column, ''))
                         vals = RecordList._correct_value((val if val != '' else "None"))
                         summary_data[column] = {}
                         for _v in vals:
@@ -230,7 +230,7 @@ cdef class RecordList(object):
                         summary_data[column][2] += float(float(obj) ** 2)
                     elif found_type in (str, bool):
                         # Gather count
-                        val = str(getattr(record, column, "None"))
+                        val = str(getattr(record, column, ""))
                         vals = RecordList._correct_value((val if val != '' else "None"))
                         for _v in vals:
                             count = summary_data[column].get(_v, 0)
