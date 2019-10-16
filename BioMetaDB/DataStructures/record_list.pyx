@@ -378,8 +378,7 @@ cdef class RecordList(object):
         """
         cdef object record
         if self.results:
-            for record in self.results:
-                yield record._id
+            return [record._id for record in self.results]
         return None
 
     def values(self):

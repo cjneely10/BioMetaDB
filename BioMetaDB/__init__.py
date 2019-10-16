@@ -5,6 +5,8 @@ from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.DataStructures.record_list import RecordList
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Config.config_manager import ConfigManager, Config
+from BioMetaDB.Accessories.data_table import DataTable
+from BioMetaDB.Serializers.tsv_joiner import TSVJoiner
 
 """
 Script is for top-level function and classes
