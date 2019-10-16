@@ -498,8 +498,9 @@ cdef class RecordList(object):
         if data is None:
             return
         # Function call for .tsv file
-        data.to_file("%s.tmp" % "".join(random.choices(ascii_lowercase, k=20)))
-        update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, "out.tsv", "None", silent, integrity_cancel)
+        cdef str file_name = "%s.tmp" % "".join(random.choices(ascii_lowercase, k=20))
+        data.to_file(file_name)
+        update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, file_name, "None", silent, integrity_cancel)
         data.delete_file()
 
         # Logic for data dict
