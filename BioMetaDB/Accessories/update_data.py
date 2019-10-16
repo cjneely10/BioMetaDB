@@ -20,7 +20,7 @@ class Data:
         return tuple((c for c in vars(self) if not c.startswith("__") and c != '_id'))
 
 
-class DataTable:
+class UpdateData:
 
     def __init__(self):
         self.tsv = ""
