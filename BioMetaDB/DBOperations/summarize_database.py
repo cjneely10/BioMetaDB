@@ -215,12 +215,8 @@ def load_table_metadata(config, tbl_name):
     return sess, UserClass, cfg
 
 
-def _handle_query(rl, query="None"):
-    if query != "None":
-        for val in query.split(" "):
-            if "_annot" in val:
-                _v = val.replace("_annot", "")
-                query = query.replace(val, "%s != '' AND %s != 'None'" % (_v, _v))
+def _handle_query(rl, query=None):
+    if query is not None:
         rl.query(query)
     else:
         rl.query()

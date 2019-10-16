@@ -289,6 +289,11 @@ cdef class RecordList(object):
                 query += "(%s != 'None' AND %s != '' AND %s != 'hypothetical protein') OR " % (col, col, col)
             args[0] = args[0].replace("annotated", query[:-4])
             return self.sess.query(self.TableClass).filter(text(*args)).all()
+        for val in query.split(" "):
+            if "_annot" in val:
+                _v = val.replace("_annot", "")
+                query = query.replace(val, "%s != '' AND %s != 'None' AND %s != 'hypothetical protein'" % (_v, _v, _v))
+                return self.sess.query(self.TableClass).filter(text(query)).all()
         # High quality, non-redundant
         if 'hqnr' in args[0]:
             args[0] = args[0].replace("hqnr", "is_non_redundant AND is_complete AND NOT is_contaminated")
