@@ -479,7 +479,7 @@ cdef class RecordList(object):
                     W.write(delim + str(getattr(record, col, "None")))
                 W.write("\n")
 
-    def update(self, dict data = {}, str directory_name="None", str data_file="None", bint silent=False, bint integrity_cancel=False):
+    def update(self, object data=None, str directory_name="None", str data_file="None", bint silent=False, bint integrity_cancel=False):
         """ Wrapper function to update project. In experimental mode.
 
         :param data:
@@ -490,13 +490,13 @@ cdef class RecordList(object):
         :return:
         """
         # No valid info passed
-        if data == {} and directory_name == "None" and data_file == "None":
+        if data is None and directory_name == "None" and data_file == "None":
             return
         # Function call for .tsv file
         update_path = None
-        if data != {}:
+        if data is not None:
             update_path = os.path.join((os.path.dirname(data_file) if data_file != "None" else os.getcwd()), "update.tsv")
-            tsv = TSVJoiner(data_file, data)
+            tsv = TSVJoiner(data_file, data.get())
             tsv.write_tsv(update_path)
             data_file = update_path
         update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, "None", silent, integrity_cancel)
