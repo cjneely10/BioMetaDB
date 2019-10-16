@@ -215,8 +215,8 @@ def load_table_metadata(config, tbl_name):
     return sess, UserClass, cfg
 
 
-def _handle_query(rl, query=None):
-    if query is not None:
+def _handle_query(rl, query="None"):
+    if query != "None":
         rl.query(query)
     else:
         rl.query()
