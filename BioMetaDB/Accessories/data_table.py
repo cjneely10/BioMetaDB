@@ -3,6 +3,7 @@
 Class for use by user - Build a DataTable and use this to update records and to write to a tsv
 
 """
+import os
 
 
 class Data:
@@ -22,6 +23,7 @@ class Data:
 class DataTable:
 
     def __init__(self):
+        self.tsv = ""
         self.num_records = 0
         self._header = set()
         self.data = [Data(),]
@@ -64,6 +66,7 @@ class DataTable:
         return None
 
     def to_tsv(self, file_name):
+        self.tsv = file_name
         W = open(file_name, "w")
         W.write("ID")
         header = list(self.keys())
@@ -80,6 +83,9 @@ class DataTable:
                     W.write("\t" + "None")
             W.write("\n")
         W.close()
+
+    def delete_tsv(self):
+        os.remove(self.tsv)
 
     def __len__(self):
         """ Accessible through len()
