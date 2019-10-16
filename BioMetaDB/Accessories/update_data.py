@@ -7,16 +7,33 @@ import os
 
 
 class Data:
+    """ Data node for building objects with key:value attributes
+
+    """
     def __init__(self, _id=""):
         self._id = _id
 
     def set(self, key, value):
+        """ Calls setattr
+
+        :param key:
+        :param value:
+        :return:
+        """
         setattr(self, key, value)
 
     def get(self):
+        """ Returns a dictionary consisting of the item and its attributes
+
+        :return:
+        """
         return {val: getattr(self, val) for val in self._get_current_cols()}
 
     def _get_current_cols(self):
+        """ Returns a tuple of all of the current user-added attributes
+
+        :return:
+        """
         return tuple((c for c in vars(self) if not c.startswith("__") and c != '_id'))
 
 
@@ -29,6 +46,12 @@ class UpdateData:
         self.data = [Data(),]
 
     def add(self, _id):
+        """ Method for adding a new id to the list. Automatically called when UpdateData is accessed for
+        a non-existing id
+
+        :param _id:
+        :return:
+        """
         if self.num_records == 0:
             self.data[0] = Data(_id=_id)
             self.num_records = 1
@@ -37,13 +60,17 @@ class UpdateData:
         self.num_records += 1
 
     def keys(self):
+        """ Returns the ids of all Data objects stored in the UpdateData object
+
+        :return:
+        """
         for value in self.data:
             for val in value._get_current_cols():
                 self._header.add(val)
         return self._header
 
     def get(self):
-        """ Return list of
+        """ Return list of dictionaries, each composed of a Data object
 
         :return:
         """
