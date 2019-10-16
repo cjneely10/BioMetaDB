@@ -90,10 +90,14 @@ cdef class CountTable:
         elif value == 'None':
             return None
         try:
-            return int(value)
+            if "." not in value:
+                return int(value)
+            raise ValueError
         except ValueError:
             try:
-                return float(value)
+                if "." in value or "e" in value or "E" in value:
+                    return float(value)
+                raise ValueError
             except ValueError:
                 if value and value != '':
                     return value
@@ -110,12 +114,16 @@ cdef class CountTable:
         if value in ("True", "False"):
             return bool
         try:
-            val = int(value)
-            return int
+            if "." not in value:
+                val = int(value)
+                return int
+            raise ValueError
         except ValueError:
             try:
-                val = float(value)
-                return float
+                if "." in value or "E" in value or "e" in value:
+                    val = float(value)
+                    return float
+                raise ValueError
             except ValueError:
                 if value != '':
                     return str
