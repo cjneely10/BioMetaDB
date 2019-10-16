@@ -495,7 +495,7 @@ cdef class RecordList(object):
         :return:
         """
         # No valid info passed
-        if data is None and directory_name == "None":
+        if data is None:
             return
         # Function call for .tsv file
         data.to_file("%s.tmp" % "".join(random.choices(ascii_lowercase, k=20)))
