@@ -6,10 +6,10 @@ Class for use by user - Build a DataTable and use this to update records and to 
 
 
 class Data:
-    def __init__(self, str _id=""):
+    def __init__(self, _id=""):
         self._id = _id
 
-    def set(self, str key, object value):
+    def set(self, key, value):
         setattr(self, key, value)
 
     def get(self):
@@ -26,7 +26,7 @@ class DataTable:
         self._header = set()
         self.data = [Data(),]
 
-    def add(self, str _id):
+    def add(self, _id):
         if self.num_records == 0:
             self.data[0] = Data(_id=_id)
             self.num_records = 1
@@ -43,7 +43,7 @@ class DataTable:
     def get(self):
         return [val.get() for val in self.data]
 
-    def __getitem__(self, object item):
+    def __getitem__(self, item):
         """ Allows class to be indexed and searched
 
         :param item:
@@ -63,10 +63,10 @@ class DataTable:
                     return _item
         return None
 
-    def to_tsv(self, str file_name):
+    def to_tsv(self, file_name):
         W = open(file_name, "w")
         W.write("ID")
-        cdef list header = list(self.keys())
+        header = list(self.keys())
         for head in header:
             W.write("\t" + head)
         W.write("\n")
