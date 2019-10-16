@@ -484,29 +484,22 @@ cdef class RecordList(object):
                     W.write(delim + str(getattr(record, col, "None")))
                 W.write("\n")
 
-    def update(self, object data=None, str directory_name="None", str data_file="None", bint silent=False, bint integrity_cancel=False):
+    def update(self, object data=None, str directory_name="None", bint silent=False, bint integrity_cancel=False):
         """ Wrapper function to update project. In experimental mode.
 
         :param data:
         :param directory_name:
-        :param data_file:
         :param silent:
         :param integrity_cancel:
         :return:
         """
         # No valid info passed
-        if data is None and directory_name == "None" and data_file == "None":
+        if data is None and directory_name == "None":
             return
         # Function call for .tsv file
-        update_path = None
-        if data is not None:
-            update_path = os.path.join((os.path.dirname(data_file) if data_file != "None" else os.getcwd()), "update.tsv")
-            tsv = TSVJoiner(data_file, data.get())
-            tsv.write_tsv(update_path)
-            data_file = update_path
-        update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, data_file, "None", silent, integrity_cancel)
-        if update_path is not None:
-            os.remove(update_path)
+        data.to_tsv("out.tsv")
+        update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, "out.tsv", "None", silent, integrity_cancel)
+        os.remove("out.tsv")
 
         # Logic for data dict
 

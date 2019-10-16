@@ -1,12 +1,10 @@
 # cython: language_level=3
 import os
 class TSVJoiner:
-    def __init__(self, str tsv_file_path = "", list initial_data=[]):
+    def __init__(self, str tsv_file_path = ""):
         self.header = set()
         self.data = {}
-        for val in initial_data:
-            for k, v in val.items():
-                self.data[k] = k
+
         if os.path.exists(tsv_file_path):
             self.read_tsv(tsv_file_path)
 
