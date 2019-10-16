@@ -43,6 +43,10 @@ class UpdateData:
         return self._header
 
     def get(self):
+        """ Return list of
+
+        :return:
+        """
         return [val.get() for val in self.data]
 
     def __getitem__(self, item):
@@ -51,41 +55,62 @@ class UpdateData:
         :param item:
         :return:
         """
+        # Index of stored list
         if type(item) == int:
             assert item < self.num_records, "Index must be less than length"
             return self.data[item]
+        # Slice of indices
         elif type(item) == slice:
             return tuple(self.data[i] for i in range(item.start, item.stop, item.step))
+        # ID stored
         elif type(item) == str:
+            # Check if not already stored and add if needed
             if item not in (_i._id for _i in self.data):
                 self.add(item)
+                # Get newest added value
                 return self.data[-1]
+            # Return matching record
             for _item in self.data:
                 if _item._id == item:
                     return _item
         return None
 
-    def to_tsv(self, file_name):
+    def to_file(self, file_name, delim="\t", na_rep="None"):
+        """ Write entire results to tsv file, filling in gaps as needed with na_rep
+
+        :param file_name:
+        :param na_rep:
+        :param delim:
+        :return:
+        """
+        # Store name of file
         self.tsv = file_name
         W = open(file_name, "w")
+        # Write tsv header
         W.write("ID")
         header = list(self.keys())
         for head in header:
             W.write("\t" + head)
         W.write("\n")
+        # Write data, filling in as needed
         for data in self.data:
             W.write(data._id)
             for head in header:
                 val = getattr(data, head, None)
                 if val:
-                    W.write("\t" + str(val))
+                    W.write(delim + str(val))
                 else:
-                    W.write("\t" + "None")
+                    W.write(delim + na_rep)
             W.write("\n")
         W.close()
 
-    def delete_tsv(self):
-        os.remove(self.tsv)
+    def delete_file(self):
+        """ Removes tsv file stored as object attribute
+
+        :return:
+        """
+        if os.path.exists(self.tsv):
+            os.remove(self.tsv)
 
     def __len__(self):
         """ Accessible through len()

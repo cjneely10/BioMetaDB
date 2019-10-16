@@ -117,7 +117,7 @@ class ClassManager:
         # Initialize with DB class name, ConfigManager instance
         # Will create csv file of all existing data,
         # If differences found between what is in database table and what is in datafile
-        if len(table_class_attrs_keys - data_file_attrs_keys) != 0:
+        if len(table_class_attrs_keys - data_file_attrs_keys) != 0 or len(data_file_attrs_keys - table_class_attrs_keys) != 0 :
             print_if_not_silent(silent, "\n!! New column data detected, calling update manager !!")
             update_manager = UpdateManager(config, ClassManager.get_class_as_dict(config), sess)
             table_copy_csv = update_manager.create_table_copy(datetime.today().strftime("%Y%m%d"), TableClass, silent)
