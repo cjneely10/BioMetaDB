@@ -41,6 +41,16 @@ class Record:
         cdef dict attrs = {key: val for key, val in self.__dict__.items() if key != "_sa_instance_state"
                  and key not in first_vals and key != "id"}
         cdef list sorted_keys = sorted(list(attrs.keys()))
+        cdef list reorder = ["domain", "phylum", "_class", "_order", "family", "genus", "species"]
+        cdef bint is_evaluation = True
+        for ord in reorder:
+            if ord in sorted_keys:
+                continue
+            is_evaluation = False
+        if is_evaluation:
+            for ord in reorder:
+                sorted_keys.remove(ord)
+            sorted_keys = reorder + sorted_keys
         cdef int i, longest_key = max([len(key) for key in attrs])
         # Pretty formatting
         summary_string = ("*" * (longest_key + 30)) + "\n"
