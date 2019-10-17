@@ -90,6 +90,12 @@ cdef class RecordList(object):
 
         :return:
         """
+        if self.TableClass.__name__ == 'evaluation':
+            reorder = ["domain", "phylum", "_class", "_order", "family", "genus", "species"]
+            all_vals = list(ClassManager.get_class_as_dict(self.cfg).keys())
+            for val in reorder:
+                all_vals.remove(val)
+            return reorder + all_vals
         return list(ClassManager.get_class_as_dict(self.cfg).keys())
 
     def __str__(self):
