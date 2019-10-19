@@ -96,7 +96,7 @@ cdef class RecordList(object):
             for val in reorder:
                 all_vals.remove(val)
             return reorder + all_vals
-        return list(ClassManager.get_class_as_dict(self.cfg).keys())
+        return sorted(list(ClassManager.get_class_as_dict(self.cfg).keys()))
 
     def __str__(self):
         return self.summarize()
@@ -116,7 +116,7 @@ cdef class RecordList(object):
         cdef object val
         if self._summary is None:
             self._summary, self.num_records, self.has_text = self._gather_metadata()
-        sorted_keys = sorted(self.columns())
+        sorted_keys = self.columns()
         longest_key = max([len(key) for key in sorted_keys])
         if longest_key < 18:
             longest_key = 18
