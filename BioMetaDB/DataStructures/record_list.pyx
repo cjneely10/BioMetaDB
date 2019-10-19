@@ -509,8 +509,6 @@ cdef class RecordList(object):
         update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, file_name, "None", silent, integrity_cancel)
         data.delete_file()
 
-        # Logic for data dict
-
     @staticmethod
     def _annotation_priority():
         return ["ko", "merops", "cazy", "merops_pfam", "prokka",

@@ -60,7 +60,7 @@ table = get_table("/path/to/database", table_name="db_table_1")
 table.query()  # Returns all values
 table.query("n50 >= 100000")  # Simple filter query
 table.query("n50 >= 100000 AND n75 <= 1000000")  # More complex filter query
-table.query("_id == '%genome%'") # Has genome in name of record
+table.query("_id LIKE '%genome%'") # Has genome in name of record
 # Additional SQLAlchemy operations...
 </code></pre>
 
@@ -120,6 +120,11 @@ documentation to come.
         - Can get `len()` of `RecordList` - e.g. how many records were returned by `query()`
         - Can return `keys()`, `values()`, and `items()`
         - Can return records by index or by id
+    - `update(self, data=None, directory_name="None", silent=False, integrity_cancel=False)`
+        - Creates new database table schema and updates current values in database by referencing a an `UpdateData` data object
+
+- `UpdateData` - build a dataset with simple variable/attribute assignments
+    - See the [blog post](https://cjneely10.github.io/posts/2019/10/MetaSanity-Adding-Additional-Analyses/) for more info
 
 ## Usage Best Practices
 
@@ -153,6 +158,7 @@ only be removed using `dbdm DELETE`
     generated using `get_table()`. Any additional functions added to this class will be available to your records.
     - `BioMetaDB/DataStructures/record_list.pyx` holds the class `RecordList`, which is a simple container class for 
     handling database records. Currently, this class functions as a quasi-dictionary-and-list data structure.
+    - `BioMetaDB/Accessories/update_data.py` provides a dynamic data structure for storing information as object attributes and writing the result to file.
 
 ## dbdm
 
@@ -166,30 +172,30 @@ values or columns.
                [-p PATH]
                program
 
-dbdm:   Manage BioMetaDB project
+dbdm:	Manage BioMetaDB project
 
 Available Programs:
 
 CREATE: Create a new table in an existing database, optionally populate using data files
-        (Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
+		(Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 DELETE: Delete list of ids from database tables, remove associated files
-        (Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
+		(Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
 FIX: Repairs errors in DB structure using .fix file
-        (Req:  --config_file --data_file --silent --integrity_cancel)
+		(Req:  --config_file --data_file --silent --integrity_cancel)
 INIT: Initialize database with starting table, fasta directory, and/or data files
-        (Req:  --db_name --table_name --directory_name --data_file --alias --silent --integrity_cancel)
+		(Req:  --db_name --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 INTEGRITY: Queries project database and structure to generate .fix file for possible issues
-        (Req:  --config_file --table_name --alias --silent)
+		(Req:  --config_file --table_name --alias --silent)
 MOVE: Move project to new location
-        (Req:  --config_file --path --integrity_cancel --silent)
+		(Req:  --config_file --path --integrity_cancel --silent)
 REMOVE: Remove table and all associated data from database
-        (Req:  --config_file --table_name --alias --silent --integrity_cancel)
+		(Req:  --config_file --table_name --alias --silent --integrity_cancel)
 REMOVECOL: Remove column list (including data) from table
-        (Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
+		(Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
 SUMMARIZE: Summarize project and query data. Write records or metadata to file
-        (Req:  --config_file --view --query --table_name --alias --write --write_tsv --unique)
+		(Req:  --config_file --view --query --table_name --alias --write --write_tsv --unique)
 UPDATE: Update values in existing table or add new sequences
-        (Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
+		(Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 
 positional arguments:
   program               Program to run
@@ -420,6 +426,7 @@ queries to the database and display summary data on only these selected records.
     - `dbdm SUMMARIZE -t table_name -v c` or `dbdm SUMMARIZE -v t`
     - These commands display the columns in `table_name` and the names of all tables in the project, respectively.
     - See `Examples/README.md` for using the query option.
+    - See the [blog post](https://cjneely10.github.io/posts/2019/10/MetaSanity-Demo-BioMetaDB/) for more information.
     
 ### INTEGRITY
 
