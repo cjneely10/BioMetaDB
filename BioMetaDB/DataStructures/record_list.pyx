@@ -3,7 +3,7 @@ import os
 import re
 from math import sqrt
 from io import StringIO
-from random import choices
+from random import choice
 from sqlalchemy import text
 from string import punctuation
 from sqlalchemy.exc import OperationalError
@@ -504,7 +504,7 @@ cdef class RecordList(object):
         if data is None:
             return
         # Function call for .tsv file
-        cdef str file_name = "%s.tmp" % "".join(choices(ascii_lowercase, k=20))
+        cdef str file_name = "%s.tmp" % "".join([choice(ascii_lowercase) for i in range(32)])
         data.to_file(file_name)
         update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, file_name, "None", silent, integrity_cancel)
         data.delete_file()
