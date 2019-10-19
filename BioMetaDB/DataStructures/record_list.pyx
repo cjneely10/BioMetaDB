@@ -3,11 +3,11 @@ import os
 import re
 from math import sqrt
 from io import StringIO
+from random import choices
 from sqlalchemy import text
 from string import punctuation
 from sqlalchemy.exc import OperationalError
 from string import ascii_lowercase
-import random
 from BioMetaDB.DBManagers.type_mapper import TypeMapper
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.DBOperations.update_existing_table import update_existing_table
@@ -504,7 +504,7 @@ cdef class RecordList(object):
         if data is None:
             return
         # Function call for .tsv file
-        cdef str file_name = "%s.tmp" % "".join(random.choices(ascii_lowercase, k=20))
+        cdef str file_name = "%s.tmp" % "".join(choices(ascii_lowercase, k=20))
         data.to_file(file_name)
         update_existing_table(self.cfg.working_dir, self.TableClass.__name__, directory_name, file_name, "None", silent, integrity_cancel)
         data.delete_file()
