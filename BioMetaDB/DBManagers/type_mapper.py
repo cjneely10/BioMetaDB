@@ -88,4 +88,4 @@ class TypeMapper:
                 values[
                     CountTable._try_return_type(value_list[column_idx])
                 ] += 1
-        return (max(values.items(), key=lambda x: x[1]) if values.items() else ('String',))[0]
+        return (max(values.items(), key=lambda x: x[1]) if values.items() else ('str',))[0]
