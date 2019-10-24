@@ -81,11 +81,11 @@ class TypeMapper:
             bool: 0,
             float: 0,
             str: 0,
-            None: 0
+            # None: 0
         }
         for value_list in counttable_object.file_contents.values():
             if value_list[column_idx] != 'None':
                 values[
                     CountTable._try_return_type(value_list[column_idx])
                 ] += 1
-        return (max(values.items(), key=lambda x: x[1]) if values.items() else ('str',))[0]
+        return (max(values.items(), key=lambda x: x[1]) if values.items() else (str,))[0]
