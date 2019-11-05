@@ -293,14 +293,19 @@ cdef class RecordList(object):
         # At least one annotation
         if "annotated" in args[0]:
             for col in self.columns():
-                query += "(%s != 'None' AND %s != '' AND %s != 'hypothetical protein') OR " % (col, col, col)
+                query += "(%s IS NOT NULL AND %s != 'hypothetical protein') OR " % (col, col)
             args[0] = args[0].replace("annotated", query[:-4])
             return self.sess.query(self.TableClass).filter(text(*args)).all()
         for val in args[0].split(" "):
             if "_annot" in val:
                 _v = val.replace("_annot", "")
-                args[0] = args[0].replace(val, "%s != '' AND %s != 'None' AND %s != 'hypothetical protein'" % (_v, _v, _v))
-                return self.sess.query(self.TableClass).filter(text(*args)).all()
+                args[0] = args[0].replace(val, "%s IS NOT NULL AND %s != 'hypothetical protein'" % (_v, _v))
+                # return self.sess.query(self.TableClass).filter(text(*args)).all()
+            if "_unannot" in val:
+                _v = val.replace("_unannot", "")
+                args[0] = args[0].replace(val, "%s == 'hypothetical protein' OR %s IS NULL" % (_v, _v))
+        if args != new_args:
+            return self.sess.query(self.TableClass).filter(text(*args)).all()
         # High quality, non-redundant
         if 'hqnr' in args[0]:
             args[0] = args[0].replace("hqnr", "is_non_redundant AND is_complete AND NOT is_contaminated")
