@@ -291,27 +291,31 @@ cdef class RecordList(object):
             new_args[-1] = new_args[-1].lstrip(" ")
         args = new_args
         # At least one annotation
-        if "annotated" in args[0]:
+        if "annotated" in args[0] and "unannotated" not in args[0]:
             for col in self.columns():
                 query += "(%s IS NOT NULL AND %s != 'hypothetical protein') OR " % (col, col)
             args[0] = args[0].replace("annotated", query[:-4])
             return self.sess.query(self.TableClass).filter(text(*args)).all()
-        for val in args[0].split(" "):
-            if "_annot" in val:
-                _v = val.replace("_annot", "")
-                args[0] = args[0].replace(val, "%s IS NOT NULL AND %s != 'hypothetical protein'" % (_v, _v))
-                # return self.sess.query(self.TableClass).filter(text(*args)).all()
-            elif "_unannot" in val:
-                _v = val.replace("_unannot", "")
-                args[0] = args[0].replace(val, "%s IS NULL OR %s == 'hypothetical protein'" % (_v, _v))
-        if args != new_args:
+        # All unannotated
+        if "unannotated" in args[0]:
+            for col in self.columns():
+                query += "(%s IS NULL OR %s == 'hypothetical protein') AND " % (col, col)
+            args[0] = args[0].replace("unannotated", query[:-5])
             return self.sess.query(self.TableClass).filter(text(*args)).all()
         # High quality, non-redundant
         if 'hqnr' in args[0]:
             args[0] = args[0].replace("hqnr", "is_non_redundant AND is_complete AND NOT is_contaminated")
             return self.sess.query(self.TableClass).filter(text(*args)).all()
-        else:
-            return self.sess.query(self.TableClass).filter(text(*args)).all()
+        # Individual annotations
+        for val in args[0].split(" "):
+            if "_annot" in val:
+                _v = val.replace("_annot", "")
+                args[0] = args[0].replace(val, "(%s IS NOT NULL AND %s != 'hypothetical protein')" % (_v, _v))
+                # return self.sess.query(self.TableClass).filter(text(*args)).all()
+            elif "_unannot" in val:
+                _v = val.replace("_unannot", "")
+                args[0] = args[0].replace(val, "(%s IS NULL OR %s == 'hypothetical protein')" % (_v, _v))
+        return self.sess.query(self.TableClass).filter(text(*args)).all()
 
 
     # TODO Needs to be tested w/ tables that populate non-null set of db records
