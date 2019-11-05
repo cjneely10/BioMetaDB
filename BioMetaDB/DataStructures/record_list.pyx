@@ -301,9 +301,9 @@ cdef class RecordList(object):
                 _v = val.replace("_annot", "")
                 args[0] = args[0].replace(val, "%s IS NOT NULL AND %s != 'hypothetical protein'" % (_v, _v))
                 # return self.sess.query(self.TableClass).filter(text(*args)).all()
-            if "_unannot" in val:
+            elif "_unannot" in val:
                 _v = val.replace("_unannot", "")
-                args[0] = args[0].replace(val, "%s == 'hypothetical protein' OR %s IS NULL" % (_v, _v))
+                args[0] = args[0].replace(val, "%s IS NULL OR %s == 'hypothetical protein'" % (_v, _v))
         if args != new_args:
             return self.sess.query(self.TableClass).filter(text(*args)).all()
         # High quality, non-redundant
