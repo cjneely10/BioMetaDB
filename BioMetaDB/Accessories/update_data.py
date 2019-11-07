@@ -168,11 +168,11 @@ class UpdateData:
         self.tsv = UpdateData._handle_filename(file_name)
         W = open(self.tsv, "w")
         # Write tsv header
-        W.write("ID")
         header = list(self.keys())
+        header_line = "ID\t"
         for head in header:
-            W.write("\t" + head)
-        W.write("\n")
+            header_line += head + "\t"
+        W.write(header_line[:-1] + "\n")
         # Write data, filling in as needed
         for data in self.data:
             W.write(data._id)
@@ -184,41 +184,6 @@ class UpdateData:
                     W.write(delim + na_rep)
             W.write("\n")
         W.close()
-
-    @staticmethod
-    def _handle_filename(file_name):
-        if "~" in file_name:
-            return os.path.relpath(os.path.expanduser(file_name))
-        return os.path.relpath(file_name)
-
-    @staticmethod
-    def from_file(file_name, has_header=False, delim="\t", na_rep="None"):
-        """ Read in tsv/csv file into UpdateData object
-
-        :param file_name:
-        :param has_header:
-        :param delim:
-        :param na_rep:
-        :return:
-        """
-        data = UpdateData()
-        R = open(UpdateData._handle_filename(file_name), "r")
-        if has_header:
-            header = next(R)
-        else:
-            header = "Column"
-        # Write data, filling in as needed
-        for _line in R:
-            line = _line.rstrip("\r\n").split(delim)
-            line_len = len(line)
-            for i in range(1, line_len):
-                if line[i] == na_rep:
-                    line[i] = None
-                if has_header:
-                    setattr(data[line[0]], header[i], line[i])
-                else:
-                    setattr(data[line[0]], header + str(1), line[i])
-        return data
 
     def delete_file(self):
         """ Removes tsv file stored as object attribute
@@ -234,3 +199,46 @@ class UpdateData:
         :return:
         """
         return self.num_records
+
+    @staticmethod
+    def _handle_filename(file_name):
+        """ Protected method to handle loading ~ and .. in filenames
+
+        :param file_name:
+        :return:
+        """
+        if "~" in file_name:
+            return os.path.relpath(os.path.expanduser(file_name))
+        return os.path.relpath(file_name)
+
+    @staticmethod
+    def from_file(file_name, has_header=True, delim="\t", na_rep="None", initial_ud=None):
+        """ Read in tsv/csv file into UpdateData object. Can add to existing object
+
+        :param file_name:
+        :param has_header:
+        :param delim:
+        :param na_rep:
+        :param initial_ud:
+        :return:
+        """
+        if initial_ud is None:
+            initial_ud = UpdateData()
+        assert type(initial_ud) == UpdateData
+        R = open(UpdateData._handle_filename(file_name), "r")
+        if has_header:
+            header = next(R).rstrip("\r\n").split(delim)
+        else:
+            header = "Column"
+        # Write data, filling in as needed
+        for _line in R:
+            line = _line.rstrip("\r\n").split(delim)
+            line_len = len(line)
+            for i in range(1, line_len):
+                if line[i] == na_rep:
+                    line[i] = None
+                if has_header:
+                    setattr(initial_ud[line[0]], header[i], line[i])
+                else:
+                    setattr(initial_ud[line[0]], header + str(i), line[i])
+        return initial_ud
