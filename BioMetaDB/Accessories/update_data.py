@@ -1,4 +1,3 @@
-# cython: language_level=3
 """
 Class for use by user - Build a DataTable and use this to update records and to write to a tsv
 
@@ -13,21 +12,25 @@ class Data:
     def __init__(self, _id=""):
         self._id = _id
 
-    def set(self, key, value):
-        """ Calls setattr
-
-        :param key:
-        :param value:
-        :return:
-        """
-        setattr(self, key, value)
-
     def get(self):
         """ Returns a dictionary consisting of the item and its attributes
 
         :return:
         """
         return {val: getattr(self, val) for val in self._get_current_cols()}
+
+    def delattr(self, attr):
+        """ Removes column of info storage
+
+        :param attr:
+        :return:
+        """
+        current_cols = self._get_current_cols()
+        for col in current_cols:
+            if col == attr:
+                delattr(self, col)
+                return True
+        return False
 
     def _get_current_cols(self):
         """ Returns a tuple of all of the current user-added attributes
@@ -45,6 +48,13 @@ class UpdateData:
         self._header = set()
         self.data = [Data(),]
 
+    def __repr__(self):
+        """ Calls get function for string representation
+
+        :return:
+        """
+        return str(self.get())
+
     def add(self, _id):
         """ Method for adding a new id to the list. Automatically called when UpdateData is accessed for
         a non-existing id
@@ -58,6 +68,19 @@ class UpdateData:
             return
         self.data.append(Data(_id=_id))
         self.num_records += 1
+
+    def delcol(self, col_name):
+        """ Removes tracked column from UpdateData structure tracking
+
+        :param col_name:
+        :return:
+        """
+        range_obj = range(0, len(self.data))
+        success = False
+        for i in range_obj:
+            success = self.data[i].delattr(col_name)
+        if not success:
+            raise KeyError("Column name not found")
 
     def keys(self):
         """ Returns the ids of all Data objects stored in the UpdateData object
@@ -91,16 +114,39 @@ class UpdateData:
             return tuple(self.data[i] for i in range(item.start, item.stop, item.step))
         # ID stored
         elif type(item) == str:
-            # Check if not already stored and add if needed
-            if item not in (_i._id for _i in self.data):
-                self.add(item)
-                # Get newest added value
-                return self.data[-1]
             # Return matching record
             for _item in self.data:
                 if _item._id == item:
                     return _item
-        return None
+            # Not found, add to data
+            self.add(item)
+            # Get newest added value
+            return self.data[-1]
+        raise TypeError("Unable to determine type")
+
+    def __delitem__(self, item):
+        """ Delete item from list of stored data
+
+        :param item:
+        :return:
+        """
+        if type(item) == int:
+            assert item < self.num_records, "Index must be less than length"
+            del self.data[item]
+        # Slice of indices
+        elif type(item) == slice:
+            for i in range(item.start, item.stop, item.step):
+                del self.data[i]
+        # ID stored
+        elif type(item) == str:
+            # Delete matching record
+            range_obj = range(0, len(self.data))
+            for i in range_obj:
+                if self.data[i]._id == item:
+                    del self.data[i]
+                    return
+            raise ValueError("Item id not found")
+        raise TypeError("Unable to determine type")
 
     def to_file(self, file_name, delim="\t", na_rep="None"):
         """ Write entire results to tsv file, filling in gaps as needed with na_rep
