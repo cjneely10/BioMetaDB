@@ -212,13 +212,14 @@ class UpdateData:
         return os.path.relpath(file_name)
 
     @staticmethod
-    def from_file(file_name, has_header=True, delim="\t", na_rep="None", initial_ud=None):
+    def from_file(file_name, has_header=True, delim="\t", na_rep="None", skip_lines=0, initial_ud=None):
         """ Read in tsv/csv file into UpdateData object. Can add to existing object
 
         :param file_name:
         :param has_header:
         :param delim:
         :param na_rep:
+        :param skip_lines:
         :param initial_ud:
         :return:
         """
@@ -226,6 +227,8 @@ class UpdateData:
             initial_ud = UpdateData()
         assert type(initial_ud) == UpdateData
         R = open(UpdateData._handle_filename(file_name), "r")
+        for i in range(skip_lines):
+            next(R)
         if has_header:
             header = next(R).rstrip("\r\n").split(delim)
         else:
@@ -242,3 +245,12 @@ class UpdateData:
                 else:
                     setattr(initial_ud[line[0]], header + str(i), line[i])
         return initial_ud
+
+
+if __name__ == '__main__':
+    import sys
+
+    assert len(sys.argv) == 4, "Usage: update_data.py <tsv-file> <load/write> <skip-lines>"
+
+    if sys.argv[2] == "load":
+        data = UpdateData.from_file(sys.argv[1], skip_lines=int(sys.argv[3]))

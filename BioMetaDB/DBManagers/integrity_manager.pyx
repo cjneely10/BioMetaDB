@@ -1,6 +1,7 @@
 # cython: language_level=3
 import os
 import shutil
+from sys import exit
 from sqlalchemy.orm import mapper
 from sqlalchemy import text
 from BioMetaDB.Accessories.ops cimport to_cstring_array, free_cstring_array
