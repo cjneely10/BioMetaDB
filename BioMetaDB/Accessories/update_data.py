@@ -17,7 +17,7 @@ class Data:
 
         :return:
         """
-        return {val: getattr(self, val) for val in self._get_current_cols()}
+        return {self._id: {val: getattr(self, val) for val in self._get_current_cols()}}
 
     def delattr(self, attr):
         """ Removes column of info storage
@@ -54,6 +54,14 @@ class UpdateData:
         :return:
         """
         return str(self.get())
+
+    def __delattr__(self, item):
+        """ Builtin function support
+
+        :param item:
+        :return:
+        """
+        self.delcol(item)
 
     def add(self, _id):
         """ Method for adding a new id to the list. Automatically called when UpdateData is accessed for
@@ -149,7 +157,7 @@ class UpdateData:
         raise TypeError("Unable to determine type")
 
     def to_file(self, file_name, delim="\t", na_rep="None"):
-        """ Write entire results to tsv file, filling in gaps as needed with na_rep
+        """ Write entire results to tsv or csv file, filling in gaps as needed with na_rep
 
         :param file_name:
         :param na_rep:
@@ -157,8 +165,8 @@ class UpdateData:
         :return:
         """
         # Store name of file
-        self.tsv = file_name
-        W = open(file_name, "w")
+        self.tsv = UpdateData._handle_filename(file_name)
+        W = open(self.tsv, "w")
         # Write tsv header
         W.write("ID")
         header = list(self.keys())
@@ -176,6 +184,41 @@ class UpdateData:
                     W.write(delim + na_rep)
             W.write("\n")
         W.close()
+
+    @staticmethod
+    def _handle_filename(file_name):
+        if "~" in file_name:
+            return os.path.relpath(os.path.expanduser(file_name))
+        return os.path.relpath(file_name)
+
+    @staticmethod
+    def from_file(file_name, has_header=False, delim="\t", na_rep="None"):
+        """ Read in tsv/csv file into UpdateData object
+
+        :param file_name:
+        :param has_header:
+        :param delim:
+        :param na_rep:
+        :return:
+        """
+        data = UpdateData()
+        R = open(UpdateData._handle_filename(file_name), "r")
+        if has_header:
+            header = next(R)
+        else:
+            header = "Column"
+        # Write data, filling in as needed
+        for _line in R:
+            line = _line.rstrip("\r\n").split(delim)
+            line_len = len(line)
+            for i in range(1, line_len):
+                if line[i] == na_rep:
+                    line[i] = None
+                if has_header:
+                    setattr(data[line[0]], header[i], line[i])
+                else:
+                    setattr(data[line[0]], header + str(1), line[i])
+        return data
 
     def delete_file(self):
         """ Removes tsv file stored as object attribute
