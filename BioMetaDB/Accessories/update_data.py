@@ -212,7 +212,7 @@ class UpdateData:
         return os.path.relpath(file_name)
 
     @staticmethod
-    def from_file(file_name, has_header=True, delim="\t", na_rep="None", skip_lines=0, initial_ud=None):
+    def from_file(file_name, has_header=True, delim="\t", na_rep="None", skip_lines=0, n_threads=1, initial_data=None):
         """ Read in tsv/csv file into UpdateData object. Can add to existing object
 
         :param file_name:
@@ -220,12 +220,13 @@ class UpdateData:
         :param delim:
         :param na_rep:
         :param skip_lines:
-        :param initial_ud:
+        :param n_threads:
+        :param initial_data:
         :return:
         """
-        if initial_ud is None:
-            initial_ud = UpdateData()
-        assert type(initial_ud) == UpdateData
+        if initial_data is None:
+            initial_data = UpdateData()
+        assert type(initial_data) == UpdateData
         R = open(UpdateData._handle_filename(file_name), "r")
         for i in range(skip_lines):
             next(R)
@@ -241,10 +242,10 @@ class UpdateData:
                 if line[i] == na_rep:
                     line[i] = None
                 if has_header:
-                    setattr(initial_ud[line[0]], header[i], line[i])
+                    setattr(initial_data[line[0]], header[i], line[i])
                 else:
-                    setattr(initial_ud[line[0]], header + str(i), line[i])
-        return initial_ud
+                    setattr(initial_data[line[0]], header + str(i), line[i])
+        return initial_data
 
 
 if __name__ == '__main__':
