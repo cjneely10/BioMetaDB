@@ -171,14 +171,14 @@ cdef class RecordList(object):
             ))
             for key in sorted_keys:
                 if key in self._summary.keys() and type(self._summary[key]) == dict:
-                    num_none = self._summary[key]._get("None", 0)
+                    num_none = self._summary[key].get("None", 0)
                     if num_none > 0:
                         del self._summary[key]["None"]
                     out_key = _out_key = max((self._summary[key].items() or {"n/a":0}.items()),
                                              key=lambda x : x[1])[0]
                     if out_key and len(out_key) > 16:
                         out_key = out_key[:17] + "..."
-                    val = self._summary[key]._get(_out_key, None)
+                    val = self._summary[key].get(_out_key, None)
                     summary_string.write("\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
                         str(key), (out_key if self.num_records == 1 or out_key != "n/a" else 'nil'),
                         (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key))
@@ -240,7 +240,7 @@ cdef class RecordList(object):
                         val = str(getattr(record, column, ""))
                         vals = RecordList._correct_value((val if val != '' else "None"))
                         for _v in vals:
-                            count = summary_data[column]._get(_v, 0)
+                            count = summary_data[column].get(_v, 0)
                             summary_data[column][_v] = count + 1
         # Determine standard deviation values
         if num_records > 1:

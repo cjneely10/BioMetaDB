@@ -23,7 +23,7 @@ class TSVJoiner:
         self._join_header(header[1:])
         for _line in R:
             line = _line.rstrip("\r\n").split("\t")
-            data = self.data._get(line[0], None)
+            data = self.data.get(line[0], None)
             if data is None:
                 self.data[line[0]] = {}
             for i in range(1,header_len):
@@ -43,6 +43,6 @@ class TSVJoiner:
         for _id in self.data.keys():
             _out = _id + "\t"
             for head in header_list:
-                _out += self.data[_id]._get(head, "None") + "\t"
+                _out += self.data[_id].get(head, "None") + "\t"
             W.write(_out[:-1] + "\n")
         W.close()

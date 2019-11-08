@@ -153,7 +153,7 @@ class IndexCreator:
         data_type = BioOps.get_type(file_name)
         records = BioOps.parse_large(file_name, data_type)
         for record in records:
-            record.id = image_mapper._get(record.id)
+            record.id = image_mapper.get(record.id)
             if remove_description:
                 record.description = ""
         SeqIO.write(records, file_name + IndexExtensions.match[data_type], data_type)
