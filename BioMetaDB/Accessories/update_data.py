@@ -135,15 +135,11 @@ class UpdateData:
     def __add__(self, other):
         assert type(other) == UpdateData, "Must combine two UpdateData objects"
         for item in other.data:
-            if item._id in self._ids.keys():
-                for key, val in item.get().items():
-                    self.data[self._ids[item._id]].setdata(key, val)
-            else:
-                self.data.append(Data(_id=item._id))
-                self.num_records += 1
-                for key, val in item.get():
-                    self.data[-1].setdata(key, val)
-                self._ids[item._id] = self.num_records - 1
+            self.data.append(Data(_id=item._id))
+            self.num_records += 1
+            for key, val in item.get():
+                self.data[-1].setdata(key, val)
+            self._ids[item._id] = self.num_records - 1
         return self
 
     def __delitem__(self, item):
