@@ -3,8 +3,6 @@ Class for use by user - Build a DataTable and use this to update records and to 
 
 """
 import os
-# from queue import Queue
-# from BioMetaDB.Indexers.threading_class import ThreadClass
 
 
 class Data:
