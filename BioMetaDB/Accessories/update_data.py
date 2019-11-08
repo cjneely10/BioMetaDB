@@ -109,7 +109,7 @@ class UpdateData:
 
         :return:
         """
-        return [val.get() for val in self.data]
+        return [{val._id: val.get()} for val in self.data]
 
     def __getitem__(self, item):
         """ Allows class to be indexed and searched
