@@ -3,6 +3,8 @@ Class for use by user - Build a DataTable and use this to update records and to 
 
 """
 import os
+# from queue import Queue
+# from BioMetaDB.Indexers.threading_class import ThreadClass
 
 
 class Data:
@@ -11,13 +13,14 @@ class Data:
     """
     def __init__(self, _id=""):
         self._id = _id
+        self.data = {}
 
     def get(self):
         """ Returns a dictionary consisting of the item and its attributes
 
         :return:
         """
-        return {self._id: {val: getattr(self, val) for val in self._get_current_cols()}}
+        return {self._id: self.data}
 
     def delattr(self, attr):
         """ Removes column of info storage
@@ -25,19 +28,13 @@ class Data:
         :param attr:
         :return:
         """
-        current_cols = self._get_current_cols()
-        for col in current_cols:
-            if col == attr:
-                delattr(self, col)
-                return True
+        if attr in self.data.keys():
+            del self.data[attr]
+            return True
         return False
 
-    def _get_current_cols(self):
-        """ Returns a tuple of all of the current user-added attributes
-
-        :return:
-        """
-        return tuple((c for c in vars(self) if not c.startswith("__") and c != '_id'))
+    def setdata(self, key, value):
+        self.data[key] = value
 
 
 class UpdateData:
@@ -47,6 +44,7 @@ class UpdateData:
         self.num_records = 0
         self._header = set()
         self.data = [Data(),]
+        self._ids = {}
 
     def __repr__(self):
         """ Calls get function for string representation
@@ -73,9 +71,11 @@ class UpdateData:
         if self.num_records == 0:
             self.data[0] = Data(_id=_id)
             self.num_records = 1
+            self._ids[_id] = 0
             return
         self.data.append(Data(_id=_id))
         self.num_records += 1
+        self._ids[_id] = self.num_records - 1
 
     def delcol(self, col_name):
         """ Removes tracked column from UpdateData structure tracking
@@ -96,7 +96,7 @@ class UpdateData:
         :return:
         """
         for value in self.data:
-            for val in value._get_current_cols():
+            for val in value.data.keys():
                 self._header.add(val)
         return self._header
 
@@ -114,23 +114,37 @@ class UpdateData:
         :return:
         """
         # Index of stored list
-        if type(item) == int:
-            assert item < self.num_records, "Index must be less than length"
-            return self.data[item]
-        # Slice of indices
-        elif type(item) == slice:
-            return tuple(self.data[i] for i in range(item.start, item.stop, item.step))
         # ID stored
-        elif type(item) == str:
+        item_type = type(item)
+        if item_type == str:
             # Return matching record
-            for _item in self.data:
-                if _item._id == item:
-                    return _item
+            if item in self._ids:
+                return self.data[self._ids[item]]
             # Not found, add to data
             self.add(item)
             # Get newest added value
             return self.data[-1]
+        elif item_type == int:
+            assert item < self.num_records, "Index must be less than length"
+            return self.data[item]
+        # Slice of indices
+        elif item_type == slice:
+            return tuple(self.data[i] for i in range(item.start, item.stop, item.step))
         raise TypeError("Unable to determine type")
+
+    def __add__(self, other):
+        assert type(other) == UpdateData, "Must combine two UpdateData objects"
+        for item in other:
+            if item._id in self._ids.keys():
+                for key, val in item.get():
+                    self.data[self._ids[item._id]].setdata(key, val)
+            else:
+                self.data.append(Data(_id=item._id))
+                self.num_records += 1
+                for key, val in item.get():
+                    self.data[-1].setdata(key, val)
+                self._ids[item._id] = self.num_records - 1
+        return self
 
     def __delitem__(self, item):
         """ Delete item from list of stored data
@@ -141,18 +155,19 @@ class UpdateData:
         if type(item) == int:
             assert item < self.num_records, "Index must be less than length"
             del self.data[item]
+            self.num_records -= 1
         # Slice of indices
         elif type(item) == slice:
             for i in range(item.start, item.stop, item.step):
                 del self.data[i]
+                self.num_records -= 1
         # ID stored
         elif type(item) == str:
             # Delete matching record
-            range_obj = range(0, len(self.data))
-            for i in range_obj:
-                if self.data[i]._id == item:
-                    del self.data[i]
-                    return
+            if item in self._ids.keys():
+                del self.data[item]
+                self.num_records -= 1
+                return
             raise ValueError("Item id not found")
         raise TypeError("Unable to determine type")
 
@@ -177,7 +192,7 @@ class UpdateData:
         for data in self.data:
             W.write(data._id)
             for head in header:
-                val = getattr(data, head, None)
+                val = data.data.get(head, None)
                 if val:
                     W.write(delim + str(val))
                 else:
@@ -212,7 +227,8 @@ class UpdateData:
         return os.path.relpath(file_name)
 
     @staticmethod
-    def from_file(file_name, has_header=True, delim="\t", na_rep="None", skip_lines=0, n_threads=1, initial_data=None):
+    def from_file(file_name, has_header=True, delim="\t", na_rep="None", skip_lines=0, comment_delim="#",
+                  initial_data=None):
         """ Read in tsv/csv file into UpdateData object. Can add to existing object
 
         :param file_name:
@@ -220,13 +236,17 @@ class UpdateData:
         :param delim:
         :param na_rep:
         :param skip_lines:
+        :param comment_delim:
         :param n_threads:
         :param initial_data:
         :return:
         """
         if initial_data is None:
             initial_data = UpdateData()
-        assert type(initial_data) == UpdateData
+        assert type(initial_data) == UpdateData, "Parameter `initial_data` must be of type UpdateData"
+        # assert n_threads > 0, "Number of threads must be non-negative integer"
+        assert type(na_rep) == str, "Parameter `na_rep` must be of type str"
+        assert skip_lines >= 0, "Number of initial lines to skip must be an integer greater than or equal to 0"
         R = open(UpdateData._handle_filename(file_name), "r")
         for i in range(skip_lines):
             next(R)
@@ -235,17 +255,39 @@ class UpdateData:
         else:
             header = "Column"
         # Write data, filling in as needed
+        # if n_threads == 1:
         for _line in R:
+            # Skip over comment lines, if provided
+            if comment_delim is not None and _line.startswith(comment_delim):
+                continue
             line = _line.rstrip("\r\n").split(delim)
             line_len = len(line)
             for i in range(1, line_len):
                 if line[i] == na_rep:
                     line[i] = None
                 if has_header:
-                    setattr(initial_data[line[0]], header[i], line[i])
+                    initial_data[line[0]].setdata(header[i], line[i])
                 else:
-                    setattr(initial_data[line[0]], header + str(i), line[i])
+                    initial_data[line[0]].setdata(header + str(i), line[i])
         return initial_data
+        # else:
+        #     queue = Queue()
+        #     threads = []
+        #     for i in range(n_threads):
+        #         t = ThreadClass(queue, initial_data, has_header, header, na_rep, i)
+        #         t.setDaemon(True)
+        #         t.start()
+        #         threads.append(t)
+        #     for _line in R:
+        #         # Skip over comment lines, if provided
+        #         if comment_delim is not None and _line.startswith(comment_delim):
+        #             continue
+        #         line = _line.rstrip("\r\n").split(delim)
+        #         queue.put((line, len(line)))
+        #     queue.join()
+        #     # for t in threads:
+        #     #     initial_data = initial_data + t.get()
+        #     return initial_data
 
 
 if __name__ == '__main__':
