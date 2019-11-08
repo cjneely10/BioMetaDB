@@ -43,7 +43,7 @@ class UpdateData:
         self.tsv = ""
         self.num_records = 0
         self._header = set()
-        self.data = [Data(),]
+        self.data = [Data(), ]
         self._ids = {}
 
     def __repr__(self):
@@ -118,7 +118,7 @@ class UpdateData:
         item_type = type(item)
         if item_type == str:
             # Return matching record
-            if item in self._ids:
+            if item in self._ids.keys():
                 return self.data[self._ids[item]]
             # Not found, add to data
             self.add(item)
