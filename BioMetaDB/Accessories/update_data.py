@@ -13,12 +13,15 @@ class Data:
         self._id = _id
         self.data = {}
 
-    def get(self):
+    def _get(self):
         """ Returns a dictionary consisting of the item and its attributes
 
         :return:
         """
         return self.data
+
+    def get(self):
+        return self._id, self.data
 
     def delattr(self, attr):
         """ Removes column of info storage
@@ -109,7 +112,7 @@ class UpdateData:
 
         :return:
         """
-        return [{val._id: val.get()} for val in self.data]
+        return [{val._id: val._get()} for val in self.data]
 
     def __getitem__(self, item):
         """ Allows class to be indexed and searched
@@ -142,12 +145,12 @@ class UpdateData:
         for item in other.data:
             _id = self._ids.get(item, None)
             if _id is not None:
-                for key, val in item.get().items():
+                for key, val in item._get().items():
                     self.data[_id].setattr(key, val)
             else:
                 self.data.append(Data(_id=item._id))
                 self.num_records += 1
-                for key, val in item.get().items():
+                for key, val in item._get().items():
                     self.data[-1].setattr(key, val)
                 self._ids[item._id] = self.num_records - 1
         return self

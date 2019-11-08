@@ -22,7 +22,7 @@ class BaseData:
 
         :param db_name: (str)	Name of database, preferably from child class DBNames
         """
-        return os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, db_name)
+        return os.environ._get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, db_name)
 
     @staticmethod
     def create(basedir, db_name):
