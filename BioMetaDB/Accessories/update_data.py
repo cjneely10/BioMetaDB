@@ -177,6 +177,12 @@ class UpdateData:
             self.num_records -= 1
         # Slice of indices
         elif type(item) == slice:
+            if type(item.start) is None:
+                item.start = 0
+            if type(item.stop) is None:
+                item.stop = -1
+            if type(item.step) is None:
+                item.start = 1
             for i in range(item.start, item.stop, item.step):
                 del self.data[i]
                 self.num_records -= 1
