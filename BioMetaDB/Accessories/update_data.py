@@ -20,7 +20,7 @@ class Data:
 
         :return:
         """
-        return {self._id: self.data}
+        return self.data
 
     def delattr(self, attr):
         """ Removes column of info storage
@@ -134,9 +134,9 @@ class UpdateData:
 
     def __add__(self, other):
         assert type(other) == UpdateData, "Must combine two UpdateData objects"
-        for item in other:
+        for item in other.data:
             if item._id in self._ids.keys():
-                for key, val in item.get():
+                for key, val in item.get().items():
                     self.data[self._ids[item._id]].setdata(key, val)
             else:
                 self.data.append(Data(_id=item._id))
