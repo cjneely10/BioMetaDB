@@ -34,6 +34,13 @@ class Data:
             return True
         return False
 
+    def __getattr__(self, attr):
+        """
+
+        :return:
+        """
+        return self.data[attr]
+
     def setattr(self, key, value):
         """ Function sets key, value pair for this object
 
@@ -41,7 +48,10 @@ class Data:
         :param value:
         :return:
         """
-        self.data[key] = value
+        try:
+            self.data[key] = value
+        except KeyError:
+            raise AttributeError
 
 
 class UpdateData:
