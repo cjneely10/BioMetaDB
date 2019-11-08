@@ -147,6 +147,12 @@ class UpdateData:
             return self.data[item]
         # Slice of indices
         elif item_type == slice:
+            if type(item.start) is None:
+                item.start = 0
+            if type(item.stop) is None:
+                item.stop = -1
+            if type(item.step) is None:
+                item.start = 1
             return tuple(self.data[i] for i in range(item.start, item.stop, item.step))
         raise TypeError("Unable to determine type")
 

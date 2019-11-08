@@ -378,6 +378,12 @@ cdef class RecordList(object):
             assert item < self.num_records, "Index must be less than length"
             return self.results[item]
         elif type(item) == slice:
+            if type(item.start) is None:
+                item.start = 0
+            if type(item.stop) is None:
+                item.stop = -1
+            if type(item.step) is None:
+                item.start = 1
             return self.results[item.start : item.stop : item.step]
         elif type(item) == str:
             for record in self.results:
