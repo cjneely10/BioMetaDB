@@ -39,7 +39,10 @@ class Data:
 
         :return:
         """
-        return self.data[attr]
+        try:
+            return self.data[attr]
+        except KeyError:
+            raise AttributeError
 
     def setattr(self, key, value):
         """ Function sets key, value pair for this object
@@ -48,10 +51,7 @@ class Data:
         :param value:
         :return:
         """
-        try:
-            self.data[key] = value
-        except KeyError:
-            raise AttributeError
+        self.data[key] = value
 
 
 class UpdateData:
