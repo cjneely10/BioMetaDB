@@ -39,7 +39,7 @@ class BioOps:
             return [ord(score) - 64 for score in scores]
 
     @staticmethod
-    def _get_corrected_data_format(str dt):
+    def get_corrected_data_format(str dt):
         """ Protected method returns corrected data type to make it easier on user
 
         :param dt: (str)	Inferred data type based on file extension

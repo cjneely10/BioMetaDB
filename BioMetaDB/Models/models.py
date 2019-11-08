@@ -17,7 +17,7 @@ class BaseData:
     Base = declarative_base()
 
     @staticmethod
-    def _get_uri(basedir, db_name):
+    def get_uri(basedir, db_name):
         """
 
         :param db_name: (str)	Name of database, preferably from child class DBNames
