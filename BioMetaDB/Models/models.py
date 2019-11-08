@@ -22,7 +22,7 @@ class BaseData:
 
         :param db_name: (str)	Name of database, preferably from child class DBNames
         """
-        return os.environ._get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, db_name)
+        return os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, db_name)
 
     @staticmethod
     def create(basedir, db_name):
@@ -31,7 +31,7 @@ class BaseData:
         :param basedir: (str) Base directory of database folder
         :param db_name: (str) Name of database to create. Should reference from child class DBNames
         """
-        SQLALCHEMY_DATABASE_URI = BaseData._get_uri(basedir, db_name)
+        SQLALCHEMY_DATABASE_URI = BaseData.get_uri(basedir, db_name)
         engine = create_engine(SQLALCHEMY_DATABASE_URI)
         # Creates all tables in database
         BaseData.Base.metadata.create_all(engine)
@@ -44,7 +44,7 @@ class BaseData:
         :param db_name: (str) Name of database for which to create session
         :return Object:
         """
-        SQLALCHEMY_DATABASE_URI = BaseData._get_uri(basedir, db_name)
+        SQLALCHEMY_DATABASE_URI = BaseData.get_uri(basedir, db_name)
         engine = create_engine(SQLALCHEMY_DATABASE_URI)
         # Returns session for CRUD operations on database
         return sessionmaker(bind=engine)()
@@ -67,7 +67,7 @@ class BaseData:
         :param db_name: (str) Name of database for which to create session
         :return Object:
         """
-        SQLALCHEMY_DATABASE_URI = BaseData._get_uri(basedir, db_name)
+        SQLALCHEMY_DATABASE_URI = BaseData.get_uri(basedir, db_name)
         engine = create_engine(SQLALCHEMY_DATABASE_URI)
         # Returns session for CRUD operations on database
         return engine

@@ -17,7 +17,7 @@ class BioOps:
         _f, file_type = os.path.splitext(file_name)
         if file_type == ".gz":
             _f, file_type = os.path.splitext(_f)
-        return BioOps._get_corrected_data_format(file_type.strip("."))
+        return BioOps.get_corrected_data_format(file_type.strip("."))
 
     @staticmethod
     def calculate_phred(list scores):
