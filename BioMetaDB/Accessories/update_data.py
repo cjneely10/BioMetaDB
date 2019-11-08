@@ -33,7 +33,13 @@ class Data:
             return True
         return False
 
-    def setdata(self, key, value):
+    def setattr(self, key, value):
+        """ Function sets key, value pair for this object
+
+        :param key:
+        :param value:
+        :return:
+        """
         self.data[key] = value
 
 
@@ -118,8 +124,9 @@ class UpdateData:
         item_type = type(item)
         if item_type == str:
             # Return matching record
-            if item in self._ids.keys():
-                return self.data[self._ids[item]]
+            _id = self._ids.get(item, None)
+            if _id is not None:
+                return self.data[_id]
             # Not found, add to data
             self.add(item)
             # Get newest added value
@@ -135,14 +142,15 @@ class UpdateData:
     def __add__(self, other):
         assert type(other) == UpdateData, "Must combine two UpdateData objects"
         for item in other.data:
-            if item._id in self._ids.keys():
+            _id = self._ids.get(item, None)
+            if _id is not None:
                 for key, val in item.get().items():
-                    self.data[self._ids[item._id]].setdata(key, val)
+                    self.data[_id].setattr(key, val)
             else:
                 self.data.append(Data(_id=item._id))
                 self.num_records += 1
                 for key, val in item.get():
-                    self.data[-1].setdata(key, val)
+                    self.data[-1].setattr(key, val)
                 self._ids[item._id] = self.num_records - 1
         return self
 
@@ -164,8 +172,9 @@ class UpdateData:
         # ID stored
         elif type(item) == str:
             # Delete matching record
-            if item in self._ids.keys():
-                del self.data[item]
+            _id = self._ids.get(item, None)
+            if _id is not None:
+                del self.data[_id]
                 self.num_records -= 1
                 return
             raise ValueError("Item id not found")
@@ -262,9 +271,9 @@ class UpdateData:
                 if line[i] == na_rep:
                     line[i] = None
                 if has_header:
-                    initial_data[line[0]].setdata(header[i], line[i])
+                    initial_data[line[0]].setattr(header[i], line[i])
                 else:
-                    initial_data[line[0]].setdata(header + str(i), line[i])
+                    initial_data[line[0]].setattr(header + str(i), line[i])
         return initial_data
         # else:
         #     queue = Queue()

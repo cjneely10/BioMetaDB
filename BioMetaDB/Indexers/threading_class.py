@@ -18,9 +18,9 @@ class ThreadClass(threading.Thread):
                 if line[i] == self.na_rep:
                     line[i] = None
                 if self.has_header:
-                    self.data[line[0]].setdata(self.header[i], line[i])
+                    self.data[line[0]].setattr(self.header[i], line[i])
                 else:
-                    self.data[line[0]].setdata(self.header + str(i), line[i])
+                    self.data[line[0]].setattr(self.header + str(i), line[i])
             self.queue.task_done()
 
     def get(self):
