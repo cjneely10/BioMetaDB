@@ -227,8 +227,7 @@ class UpdateData:
         return os.path.relpath(file_name)
 
     @staticmethod
-    def from_file(file_name, has_header=True, delim="\t", na_rep="None", skip_lines=0, comment_delim="#",
-                  initial_data=None):
+    def from_file(file_name, has_header=True, delim="\t", na_rep="None", skip_lines=0, comment_delim="#"):
         """ Read in tsv/csv file into UpdateData object. Can add to existing object
 
         :param file_name:
@@ -237,13 +236,10 @@ class UpdateData:
         :param na_rep:
         :param skip_lines:
         :param comment_delim:
-        :param n_threads:
         :param initial_data:
         :return:
         """
-        if initial_data is None:
-            initial_data = UpdateData()
-        assert type(initial_data) == UpdateData, "Parameter `initial_data` must be of type UpdateData"
+        initial_data = UpdateData()
         # assert n_threads > 0, "Number of threads must be non-negative integer"
         assert type(na_rep) == str, "Parameter `na_rep` must be of type str"
         assert skip_lines >= 0, "Number of initial lines to skip must be an integer greater than or equal to 0"
