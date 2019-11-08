@@ -249,7 +249,6 @@ class UpdateData:
         :return:
         """
         initial_data = UpdateData()
-        # assert n_threads > 0, "Number of threads must be non-negative integer"
         assert type(na_rep) == str, "Parameter `na_rep` must be of type str"
         assert skip_lines >= 0, "Number of initial lines to skip must be an integer greater than or equal to 0"
         R = open(UpdateData._handle_filename(file_name), "r")
@@ -260,7 +259,6 @@ class UpdateData:
         else:
             header = "Column"
         # Write data, filling in as needed
-        # if n_threads == 1:
         for _line in R:
             # Skip over comment lines, if provided
             if comment_delim is not None and _line.startswith(comment_delim):
@@ -275,30 +273,3 @@ class UpdateData:
                 else:
                     initial_data[line[0]].setattr(header + str(i), line[i])
         return initial_data
-        # else:
-        #     queue = Queue()
-        #     threads = []
-        #     for i in range(n_threads):
-        #         t = ThreadClass(queue, initial_data, has_header, header, na_rep, i)
-        #         t.setDaemon(True)
-        #         t.start()
-        #         threads.append(t)
-        #     for _line in R:
-        #         # Skip over comment lines, if provided
-        #         if comment_delim is not None and _line.startswith(comment_delim):
-        #             continue
-        #         line = _line.rstrip("\r\n").split(delim)
-        #         queue.put((line, len(line)))
-        #     queue.join()
-        #     # for t in threads:
-        #     #     initial_data = initial_data + t.get()
-        #     return initial_data
-
-
-if __name__ == '__main__':
-    import sys
-
-    assert len(sys.argv) == 4, "Usage: update_data.py <tsv-file> <load/write> <skip-lines>"
-
-    if sys.argv[2] == "load":
-        data = UpdateData.from_file(sys.argv[1], skip_lines=int(sys.argv[3]))
