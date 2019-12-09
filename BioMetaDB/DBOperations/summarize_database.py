@@ -78,7 +78,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 for record_2 in annot_rl:
                     matching_records.append(record_2)
                 if write_tsv == 'None' and write == 'None':
-                    print(annot_rl.summarize())
+                    annot_rl.summarize()
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
             rl.write_records(write)
@@ -103,7 +103,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             for record_2 in annot_rl:
                 matching_records.append(record_2)
             if write_tsv == 'None' and write == 'None':
-                print(annot_rl.summarize())
+                annot_rl.summarize()
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
             rl.write_records(write)
@@ -128,7 +128,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             for record_2 in annot_rl:
                 matching_records.append(record_2)
             if write_tsv == 'None' and write == 'None':
-                print(annot_rl.summarize())
+                annot_rl.summarize()
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records)
             rl.write_records(write)
@@ -158,9 +158,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 if write_tsv != "None":
                     annot_rl.write_tsv(write_tsv.replace(".tsv", "") + ".tsv")
                 if write_tsv == 'None' and write == 'None':
-                    print(annot_rl.summarize())
+                    annot_rl.summarize()
         else:
-            print(eval_rl.summarize())
+            eval_rl.summarize()
         return
     if view == "None" and unique == 'None':
         for tbl_name in tables_in_database:
@@ -170,7 +170,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
                 _handle_query(annot_rl, query)
                 if len(annot_rl) > 1:
-                    print(annot_rl.summarize())
+                    annot_rl.summarize()
                 elif len(annot_rl) == 1:
                     print(annot_rl[0])
     for tbl_name in tables_in_database:
@@ -180,11 +180,11 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         if view.lower()[0] == "c":
             # Display queried info for single table and break
             # Do not need to query since only displaying columns
-            print(annot_rl.columns_summary())
+            annot_rl.columns_summary()
         elif view.lower()[0] == "t":
             # Display queried info for single table and break
             # Do not need to query since only displaying columns
-            print(annot_rl.table_name_summary())
+            annot_rl.table_name_summary()
         if write != "None" and table_name == tbl_name:
             _handle_query(annot_rl, query)
             annot_rl.write_records(write)

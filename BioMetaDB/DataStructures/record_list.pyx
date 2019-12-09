@@ -2,7 +2,7 @@
 import os
 import re
 from math import sqrt
-from io import StringIO
+# from io import StringIO
 from random import choice
 from sqlalchemy import text
 from string import punctuation
@@ -57,33 +57,32 @@ cdef class RecordList(object):
 
         :return:
         """
-        cdef object summary_string = StringIO()
+        # cdef object summary_string = StringIO()
         cdef list sorted_keys
         cdef str key
         cdef int longest_key
         sorted_keys = sorted(ClassManager.get_class_as_dict(self.cfg).keys())
         longest_key = max([len(key) for key in sorted_keys])
         # Pretty formatting
-        summary_string.write(("*" * (longest_key + 30)) + "\n")
-        summary_string.write("\t\t{:>{longest_key}}\t{:<12s}\n\n".format("Table Name:", self.cfg.table_name,
+        print("*" * (longest_key + 30))
+        print("\t\t{:>{longest_key}}\t{:<12s}".format("Table Name:", self.cfg.table_name,
                                                                          longest_key=longest_key))
-        summary_string.write("\t\t{:>{longest_key}s}\n\n".format("Database", longest_key=longest_key))
+        print("\t\t{:>{longest_key}s}".format("Database", longest_key=longest_key))
         # Get all columns
         for key in sorted_keys:
-            summary_string.write("\t\t{:>{longest_key}s}\n".format(key, longest_key=longest_key))
-        summary_string.write(("-" * (longest_key + 30) + "\n"))
-        return summary_string.getvalue()
+            print("\t\t{:>{longest_key}s}".format(key, longest_key=longest_key))
+        print("-" * (longest_key + 30))
+        # return summary_string.getvalue()
 
     def table_name_summary(self):
         """ Wrapper for returning columns in class as simple dictionary Name: SQLType
 
         :return:
         """
-        cdef object summary_string = StringIO()
-        cdef str key
+        # cdef object summary_string = StringIO()
         # Pretty formatting
-        summary_string.write(self.cfg.table_name)
-        return summary_string.getvalue()
+        print(self.cfg.table_name)
+        # return summary_string.getvalue()
 
     def columns(self):
         """ Returns dict of columns
@@ -109,7 +108,7 @@ cdef class RecordList(object):
 
         :return:
         """
-        cdef object summary_string = StringIO()
+        # cdef object summary_string = StringIO()
         cdef list sorted_keys
         cdef str key, out_key, _out_key
         cdef int longest_key, num_none
@@ -121,10 +120,10 @@ cdef class RecordList(object):
         if longest_key < 18:
             longest_key = 18
         # Pretty formatting
-        summary_string.write(("*" * (longest_key + 75)) + "\n")
+        print("*" * (longest_key + 75))
         # Display multiple records
         if self.num_records > 1:
-            summary_string.write("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{}\n\n".format(
+            print("\t{:>{longest_key}}\t{:<12s}\n\t{:>{longest_key}}\t{}".format(
                 "Table Name:",
                 self.cfg.table_name,
                 "Number of Records:",
@@ -134,15 +133,15 @@ cdef class RecordList(object):
                 longest_key=longest_key))
         # Display single record
         elif self.num_records == 1:
-            summary_string.write(str(self.results[0]))
-            return summary_string.getvalue()
+            print(str(self.results[0]))
+            return  # summary_string.getvalue()
         # No records found
         else:
-            summary_string.write("\t{:>{longest_key}}".format("No records found", longest_key=longest_key))
+            print("\t{:>{longest_key}}".format("No records found", longest_key=longest_key))
             # Do not create summary info
-            return summary_string.getvalue()
+            return  # summary_string.getvalue()
         # Metadata display column headers
-        summary_string.write("\t{:>{longest_key}}\t{:<20s}\t{:<12s}\n\n".format(
+        print("\t{:>{longest_key}}\t{:<20s}\t{:<12s}".format(
             "Database",
             "Average",
             "Std Dev",
@@ -152,17 +151,17 @@ cdef class RecordList(object):
         for key in sorted_keys:
             if key in self._summary.keys():
                 if type(self._summary[key]) == list:
-                    summary_string.write("\t{:>{longest_key}}\t{:<20.3f}\t{:<12.3f}\n".format(
+                    print("\t{:>{longest_key}}\t{:<20.3f}\t{:<12.3f}".format(
                         key,
                         self._summary[key][0],
                         self._summary[key][3],
                     longest_key=longest_key))
-        summary_string.write(("-" * (longest_key + 75)) + "\n")
+        print("-" * (longest_key + 75))
         if self.has_text:
             longest_key = max([len(key) for key in sorted_keys if key in self._summary.keys() and type(self._summary[key]) == dict])
             if longest_key < 18:
                 longest_key = 18
-            summary_string.write("\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}\n\n".format(
+            print("\n\t{:>{longest_key}}\t{:<20s}\t{:<10s}\t{:<12s}".format(
                 "Database",
                 "Most Frequent",
                 "Number",
@@ -179,11 +178,11 @@ cdef class RecordList(object):
                     if out_key and len(out_key) > 16:
                         out_key = out_key[:17] + "..."
                     val = self._summary[key].get(_out_key, None)
-                    summary_string.write("\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}\n".format(
+                    print("\t{:>{longest_key}}\t{:<20s}\t{:<10d}\t{:<12.0f}".format(
                         str(key), (out_key if self.num_records == 1 or out_key != "n/a" else 'nil'),
                         (val if val and val != 1 else  1), self.num_records - num_none, longest_key=longest_key))
-            summary_string.write(("-" * (longest_key + 75)) + "\n")
-        return summary_string.getvalue()
+            print(("-" * (longest_key + 75)) + "\n")
+        # return summary_string.getvalue()
 
     def _gather_metadata(self):
         """ Protected method to collect data, averages, and standard deviations

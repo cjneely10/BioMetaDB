@@ -1,4 +1,4 @@
-# BioMetaDB v1.1
+# BioMetaDB v0.1.2
 
 ## Installation
 Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access `dbdm`.
