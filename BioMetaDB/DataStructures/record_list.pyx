@@ -29,18 +29,20 @@ And will provide info about most frequently occurring characters/words in charac
 cdef class RecordList(object):
 
     def __init__(self, object db_session=None, object table_class=None, object cfg=None, bint compute_metadata=False, str query=None,
-                 list records_list = []):
+                 list records_list = [], bint truncate = False):
         """ Class for handling (mostly) user interfacing to inner classes
 
         :param db_session:
         :param table_class:
         :param compute_metadata:
+        :param truncate:
         """
         self.sess = db_session
         self.TableClass = table_class
         self.cfg = cfg
         self._summary = None
         self.num_records = 0
+        self.truncate = truncate
         if records_list:
             self.results = records_list
         else:
@@ -202,6 +204,10 @@ cdef class RecordList(object):
              self.query()
         num_records = self.num_records
         column_keys = list(self.columns())
+        if self.truncate:
+            get_fxn = self._get_truncated
+        else:
+            get_fxn = getattr
         for record in self.results:
             # if record._id in self.ignore_ids:
             #     continue
@@ -221,7 +227,7 @@ cdef class RecordList(object):
                     elif found_type in (str, bool):
                         has_text = True
                         # Gather count
-                        val = str(getattr(record, column, ''))
+                        val = str(get_fxn(record, column, ''))
                         vals = RecordList._correct_value((val if val != '' else "None"))
                         summary_data[column] = {}
                         for _v in vals:
@@ -236,7 +242,7 @@ cdef class RecordList(object):
                         summary_data[column][2] += float(float(obj) ** 2)
                     elif found_type in (str, bool):
                         # Gather count
-                        val = str(getattr(record, column, ""))
+                        val = str(get_fxn(record, column, ""))
                         vals = RecordList._correct_value((val if val != '' else "None"))
                         for _v in vals:
                             count = summary_data[column].get(_v, 0)
@@ -465,8 +471,12 @@ cdef class RecordList(object):
         """
         cdef str annot, located_annot
         cdef list priority_list = RecordList._annotation_priority()
+        if self.truncate:
+            get_fxn = self._get_truncated
+        else:
+            get_fxn = getattr
         for annot in priority_list:
-            located_annot = getattr(record, annot, None)
+            located_annot = get_fxn(record, annot, "")
             if located_annot is not None and located_annot not in ("", "None"):
                 return located_annot
         if self.cfg is not None:
@@ -475,6 +485,18 @@ cdef class RecordList(object):
                 if located_annot is not None and located_annot not in ("", "None"):
                     return located_annot
         return ""
+
+    def _get_truncated(self, object record, str annotation, str default=""):
+        """ Protected method for returning truncated annotation, as needed
+
+        :param annotation:
+        :param default:
+        :return:
+        """
+        cdef str trunc_annot = str(getattr(record, annotation, default)).split(" ")[0]
+        if trunc_annot == "hypothetical":
+            return "hypothetical protein"
+        return trunc_annot
 
     def write_tsv(self, str output_file, str delim = "\t", list col_list = []):
         """ Outputs all record metadata in current db view to file

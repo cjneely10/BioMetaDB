@@ -24,7 +24,7 @@ def _summarize_display_message_prelude(db_name):
     print(" Name of database:\t\t%s.db\n" % db_name.strip(".db"))
 
 
-def summarize_database(config_file, view, query, table_name, alias, write, write_tsv, unique):
+def summarize_database(config_file, view, query, table_name, alias, write, write_tsv, unique, truncate):
     """ Function will query all tables listed in the config file, outputting simple
     metrics to the screen
 
@@ -35,6 +35,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
     :param alias:
     :param write:
     :param write_tsv:
+    :param truncate:
     :return:
     """
     if not view:
@@ -54,9 +55,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         assert table_name == 'None', "Query cannot contain '~>/->' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
-        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False)
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
         fxn_sess, FxnClass, fxn_cfg = load_table_metadata(config, "functions")
-        fxn_rl = RecordList(fxn_sess, FxnClass, fxn_cfg, compute_metadata=False)
+        fxn_rl = RecordList(fxn_sess, FxnClass, fxn_cfg, compute_metadata=False, truncate=truncate)
         evaluation_query, block_1 = query.split("~>")
         function_query, annotation_query = block_1.split("->")
         if evaluation_query.replace(" ", "") != '':
@@ -71,7 +72,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             if record in fxn_rl:
                 record_id = record._id.split(".")[0]
                 sess, UserClass, cfg = load_table_metadata(config, record_id)
-                annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
+                annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False, truncate=truncate)
                 _handle_query(annot_rl, annotation_query)
                 if write_tsv != 'None':
                     annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
@@ -80,14 +81,14 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                 if write_tsv == 'None' and write == 'None':
                     annot_rl.summarize()
         if matching_records and write != "None":
-            rl = RecordList(compute_metadata=False, records_list=matching_records)
+            rl = RecordList(compute_metadata=False, records_list=matching_records, truncate=truncate)
             rl.write_records(write)
         return
     if "~>" in query:
         assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
-        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False)
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
         evaluation_query, annotation_query = query.split("~>")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
@@ -96,7 +97,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         for record in eval_rl:
             record_id = record._id.split(".")[0]
             sess, UserClass, cfg = load_table_metadata(config, record_id)
-            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
+            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False, truncate=truncate)
             _handle_query(annot_rl, annotation_query)
             if write_tsv != 'None':
                 annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
@@ -105,14 +106,14 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             if write_tsv == 'None' and write == 'None':
                 annot_rl.summarize()
         if matching_records and write != "None":
-            rl = RecordList(compute_metadata=False, records_list=matching_records)
+            rl = RecordList(compute_metadata=False, records_list=matching_records, truncate=truncate)
             rl.write_records(write)
         return
     if "->" in query:
         assert table_name == 'None', "Query cannot contain a '->' statement with a table name"
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "functions")
-        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False)
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
         evaluation_query, annotation_query = query.split("->")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
@@ -121,7 +122,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         for record in eval_rl:
             record_id = record._id.split(".")[0]
             sess, UserClass, cfg = load_table_metadata(config, record_id)
-            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
+            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False, truncate=truncate)
             _handle_query(annot_rl, annotation_query)
             if write_tsv != 'None':
                 annot_rl.write_tsv(record_id + "." + write_tsv.replace(".tsv", "") + ".tsv")
@@ -130,13 +131,13 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             if write_tsv == 'None' and write == 'None':
                 annot_rl.summarize()
         if matching_records and write != "None":
-            rl = RecordList(compute_metadata=False, records_list=matching_records)
+            rl = RecordList(compute_metadata=False, records_list=matching_records, truncate=truncate)
             rl.write_records(write)
         return
     if ">>" in query:
         assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
-        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False)
+        eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
         evaluation_query, annotation_query = query.split(">>")
         if evaluation_query.replace(" ", "") != '':
             eval_rl.query(evaluation_query)
@@ -147,7 +148,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             in_query = ""
             for record in eval_rl:
                 in_query += "_id == '%s' OR " % record._id
-            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False)
+            annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False, truncate=truncate)
             if annotation_query.replace(" ", "") != '':
                 annot_rl.query(annotation_query + " AND " + in_query[:-4])
             else:
@@ -167,7 +168,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             # Display queried info for single table and break
             if table_name == 'None' or table_name == tbl_name:
                 sess, UserClass, cfg = load_table_metadata(config, tbl_name)
-                annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True)
+                annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=True, truncate=truncate)
                 _handle_query(annot_rl, query)
                 if len(annot_rl) > 1:
                     annot_rl.summarize()
@@ -175,7 +176,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                     print(annot_rl[0])
     for tbl_name in tables_in_database:
         sess, UserClass, cfg = load_table_metadata(config, tbl_name)
-        annot_rl = RecordList(sess, UserClass, cfg)
+        annot_rl = RecordList(sess, UserClass, cfg, truncate=truncate)
         # Display column info for table
         if view.lower()[0] == "c":
             # Display queried info for single table and break

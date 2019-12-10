@@ -52,6 +52,9 @@ if __name__ == "__main__":
          {"help": "Write table record metadata from SUMMARIZE to outfile", "default": "None"}),
         (("-p", "--path"),
          {"help": "New path for moving project in MOVE command", "default": "None"}),
+        (("-r", "--truncate"),
+         {"help": "Return only ID of annotation and not the complete description, default False",
+          "default": False, "action": "store_true"}),
     )
     programs = {
         "INIT":                     create_database,
@@ -72,7 +75,7 @@ if __name__ == "__main__":
         "REMOVECOL":            ("config_file", "table_name", "list_file", "alias", "silent", "integrity_cancel"),
         "DELETE":               ("config_file", "table_name", "list_file", "alias", "silent", "integrity_cancel"),
         "REMOVE":               ("config_file", "table_name", "alias", "silent", "integrity_cancel"),
-        "SUMMARIZE":            ("config_file", "view", "query", "table_name", "alias", "write", "write_tsv", "unique"),
+        "SUMMARIZE":            ("config_file", "view", "query", "table_name", "alias", "write", "write_tsv", "unique", "truncate"),
         "MOVE":                 ("config_file", "path", "integrity_cancel", "silent"),
         "INTEGRITY":            ("config_file", "table_name", "alias", "silent"),
         "FIX":                  ("config_file", "data_file", "silent", "integrity_cancel"),
