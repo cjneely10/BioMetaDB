@@ -227,10 +227,12 @@ cdef class RecordList(object):
                     elif found_type in (str, bool):
                         has_text = True
                         # Gather count
-                        val = str(get_fxn(record, column, ''))
+                        val = str(getattr(record, column, ''))
                         vals = RecordList._correct_value((val if val != '' else "None"))
                         summary_data[column] = {}
                         for _v in vals:
+                            if self.truncate:
+                                _v = _v.split(" ")[0]
                             summary_data[column][_v] = 1
                 else:
                     if obj is not None and obj != "None" and found_type in (int, float):
@@ -242,9 +244,11 @@ cdef class RecordList(object):
                         summary_data[column][2] += float(float(obj) ** 2)
                     elif found_type in (str, bool):
                         # Gather count
-                        val = str(get_fxn(record, column, ""))
+                        val = str(getattr(record, column, ""))
                         vals = RecordList._correct_value((val if val != '' else "None"))
                         for _v in vals:
+                            if self.truncate:
+                                _v = _v.split(" ")[0]
                             count = summary_data[column].get(_v, 0)
                             summary_data[column][_v] = count + 1
         # Determine standard deviation values
