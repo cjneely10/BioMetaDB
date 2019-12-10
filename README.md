@@ -413,7 +413,7 @@ queries to the database and display summary data on only these selected records.
     - --table_name (-t): Name of table to summarize
     - --alias (-a): Alias (short name) for table in database
     - --view (-v): View (c)olumns or (t)ables
-    - --truncate (-r): Return only ID of annotation and not the complete description
+    - --truncate (-r): Return only ID of annotation and not the complete description, excluding Prokka
     - --query (-q): Attach SQL query to summarize select records only. Must be combined with `-t` or `-a` flags
     - --write (-w): Write records in SQL query, or entire table, to directory. Must pass with `-t` or `-a` flags
     - --write_tsv (-x): Write metadata for record in table to file. Must pass with `-t` or `-a` flags

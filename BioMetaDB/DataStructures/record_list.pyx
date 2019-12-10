@@ -481,7 +481,7 @@ cdef class RecordList(object):
                 return located_annot
         if self.cfg is not None:
             for annot in set(self.columns()) - set(priority_list):
-                located_annot = getattr(record, annot, None)
+                located_annot = get_fxn(record, annot, "")
                 if located_annot is not None and located_annot not in ("", "None"):
                     return located_annot
         return ""
@@ -493,6 +493,10 @@ cdef class RecordList(object):
         :param default:
         :return:
         """
+        # Prokka does not work well here
+        # Do not truncate
+        if annotation == "prokka":
+            return getattr(record, annotation, default)
         cdef str trunc_annot = str(getattr(record, annotation, default)).split(" ")[0]
         if trunc_annot == "hypothetical":
             return "hypothetical protein"
@@ -506,6 +510,10 @@ cdef class RecordList(object):
         :param col_list:
         :return:
         """
+        if self.truncate:
+            get_fxn = self._get_truncated
+        else:
+            get_fxn = getattr
         if self.results is None:
              self.query()
         cdef list cols
@@ -524,7 +532,7 @@ cdef class RecordList(object):
             for record in self.results:
                 W.write(record._id)
                 for col in cols:
-                    W.write(delim + str(getattr(record, col, "None")))
+                    W.write(delim + str(get_fxn(record, col, "None")))
                 W.write("\n")
 
     def update(self, object data=None, str directory_name="None", bint silent=False, bint integrity_cancel=False):

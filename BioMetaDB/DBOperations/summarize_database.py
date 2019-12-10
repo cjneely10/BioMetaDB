@@ -1,7 +1,7 @@
 from sqlalchemy.orm import mapper
-from BioMetaDB.DataStructures.record_list import RecordList
 from BioMetaDB.Models.models import BaseData
 from BioMetaDB.Models.functions import Record
+from BioMetaDB.DataStructures.record_list import RecordList
 from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Config.config_manager import ConfigManager, ConfigKeys
 from BioMetaDB.Exceptions.summarize_database_exceptions import SummarizeDBAssertString

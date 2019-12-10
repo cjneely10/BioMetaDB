@@ -53,7 +53,7 @@ if __name__ == "__main__":
         (("-p", "--path"),
          {"help": "New path for moving project in MOVE command", "default": "None"}),
         (("-r", "--truncate"),
-         {"help": "Return only ID of annotation and not the complete description, default False",
+         {"help": "Return only ID of annotation and not the complete description, excluding Prokka, default False",
           "default": False, "action": "store_true"}),
     )
     programs = {
