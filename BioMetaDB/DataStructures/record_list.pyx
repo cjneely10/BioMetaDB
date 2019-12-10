@@ -536,7 +536,7 @@ cdef class RecordList(object):
             for record in self.results:
                 W.write(record._id)
                 for col in cols:
-                    W.write(delim + str(get_fxn(record, col, "None")))
+                    W.write(delim + str(get_fxn(record, col, "None")).strip())
                 W.write("\n")
 
     def update(self, object data=None, str directory_name="None", bint silent=False, bint integrity_cancel=False):
