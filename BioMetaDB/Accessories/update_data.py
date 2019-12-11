@@ -205,6 +205,8 @@ class UpdateData:
 
     def to_file(self, file_name, delim="\t", na_rep="None", _order=None, skip_header=False):
         """ Write entire results to tsv or csv file, filling in gaps as needed with na_rep
+        _order is list to follow to output header
+        Option to skip header in output
 
         :param file_name:
         :param na_rep:
