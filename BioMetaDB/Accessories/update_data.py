@@ -203,12 +203,13 @@ class UpdateData:
             raise ValueError("Item id not found")
         raise TypeError("Unable to determine type")
 
-    def to_file(self, file_name, delim="\t", na_rep="None"):
+    def to_file(self, file_name, delim="\t", na_rep="None", skip_header=False):
         """ Write entire results to tsv or csv file, filling in gaps as needed with na_rep
 
         :param file_name:
         :param na_rep:
         :param delim:
+        :param skip_header:
         :return:
         """
         # Store name of file
@@ -217,9 +218,10 @@ class UpdateData:
         # Write tsv header
         header = list(self.keys())
         header_line = "ID\t"
-        for head in header:
-            header_line += head + "\t"
-        W.write(header_line[:-1] + "\n")
+        if not skip_header:
+            for head in header:
+                header_line += head + "\t"
+            W.write(header_line[:-1] + "\n")
         # Write data, filling in as needed
         for data in self.data:
             W.write(data._id)
