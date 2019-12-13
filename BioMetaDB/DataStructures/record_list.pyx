@@ -480,12 +480,12 @@ cdef class RecordList(object):
         else:
             get_fxn = getattr
         for annot in priority_list:
-            located_annot = get_fxn(record, annot, "")
+            located_annot = str(get_fxn(record, annot, ""))
             if located_annot is not None and located_annot not in ("", "None"):
                 return located_annot
         if self.cfg is not None:
             for annot in set(self.columns()) - set(priority_list):
-                located_annot = get_fxn(record, annot, "")
+                located_annot = str(get_fxn(record, annot, ""))
                 if located_annot is not None and located_annot not in ("", "None"):
                     return located_annot
         return ""
@@ -500,7 +500,7 @@ cdef class RecordList(object):
         # Prokka does not work well here
         # Do not truncate
         if annotation == "prokka":
-            return getattr(record, annotation, default)
+            return str(getattr(record, annotation, default))
         cdef str trunc_annot = str(getattr(record, annotation, default)).split(" ")[0]
         if trunc_annot == "hypothetical":
             return "hypothetical protein"
