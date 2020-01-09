@@ -1,9 +1,9 @@
 """
 BioMetaDB is a data-management package that automatically generates database schemas, minimizing the amount of temporary files used and handling migrations and updates smoothly.
 """
-from dbdm import run
+from BioMetaDB.dbdm import run
 
-__version__ = "0.1.2.3"
+__version__ = "0.1.2.4"
 
 from sqlalchemy.orm import mapper
 from BioMetaDB.Models.models import BaseData
