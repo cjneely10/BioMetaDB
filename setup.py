@@ -14,7 +14,7 @@ with open("requirements.txt") as fp:
 
 setup(
     name='BioMetaDB',
-    version='0.1.2.7',
+    version='0.1.2.8',
     description='Use biological data to generate SQL database schema',
     url="https://github.com/cjneely10/BioMetaDB",
     author="Christopher Neely",
@@ -22,6 +22,6 @@ setup(
     license="GNU GPL 3",
     install_requires=install_requires,
     python_requires='>=3.6',
-    ext_modules=cythonize(["*/*/*.pyx", ]),
+    ext_modules=extensions,
 )
 

@@ -17,5 +17,4 @@ build/*
 *.so
 BioMetaDB/*/*.so
 BioMetaDB/*/*.c
-dist
 BioMetaDB.egg-info
