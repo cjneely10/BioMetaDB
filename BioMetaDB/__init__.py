@@ -7,7 +7,7 @@ from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Config.config_manager import ConfigManager, Config
 from BioMetaDB.Accessories.update_data import UpdateData
 from BioMetaDB.Serializers.tsv_joiner import TSVJoiner
-from BioMetaDB.dbdm import run
+from .dbdm import run
 
 
 def get_table(config_path, table_name=None, alias=None):
