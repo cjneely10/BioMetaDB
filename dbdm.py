@@ -17,7 +17,7 @@ from BioMetaDB.Exceptions.remove_columns_from_table_exceptions import ListFileNo
 from BioMetaDB.DBOperations.create_table_in_existing_database import create_table_in_existing_database
 
 
-if __name__ == "__main__":
+def run():
     args_list = (
         (("program",),
          {"help": "Program to run"}),
@@ -107,3 +107,7 @@ if __name__ == "__main__":
     pc = ProgramCaller(programs=programs, flags=flags, _help=_help, errors=errors)
 
     pc.run(ap.args, debug=True)
+
+
+if __name__ == "__main__":
+    run()
