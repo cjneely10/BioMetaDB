@@ -1,0 +1,11 @@
+[build-system]
+requires = ["flit_core >=2,<3"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "BioMetaDB"
+author = "Christopher Neely"
+author-email = "christopher.neely1200@gmail.com"
+home-page = "https://github.com/cjneely10/BioMetaDB"
+classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
+
