@@ -9,3 +9,5 @@ author-email = "christopher.neely1200@gmail.com"
 home-page = "https://github.com/cjneely10/BioMetaDB"
 classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
 
+[tool.flit.scripts]
+dbdm = "BioMetaDB.dbdm:run"
