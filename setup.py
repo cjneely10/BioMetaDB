@@ -25,17 +25,17 @@ extensions = [
 
 setup(
     name='BioMetaDB',
-    version='0.1.2.28',
+    version='0.1.2.29',
     description='Use biological data to generate SQL database schema',
     url="https://github.com/cjneely10/BioMetaDB",
     author="Christopher Neely",
     author_email="christopher.neely1200@gmail.com",
     license="GNU GPL 3",
     install_requires=[
-        "SQLAlchemy==1.3.7",
-        "biopython==1.74",
+        "SQLAlchemy==1.3.12",
+        "biopython==1.76",
         "configparser==3.8.1",
-        "Cython==0.29.13"
+        "Cython==0.29.14"
     ],
     python_requires='>=3.6',
     ext_modules=extensions,
