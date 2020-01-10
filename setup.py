@@ -25,7 +25,7 @@ extensions = [
 
 setup(
     name='BioMetaDB',
-    version='0.1.2.32',
+    version='0.1.2.34',
     description='Use biological data to generate SQL database schema',
     url="https://github.com/cjneely10/BioMetaDB",
     author="Christopher Neely",
@@ -39,6 +39,7 @@ setup(
     ],
     python_requires='>=3.6',
     ext_modules=extensions,
+    # ext_modules=cythonize(["*/*/*.pyx"]),
     packages=setuptools.find_packages(),
     entry_points={
         'console_scripts': [

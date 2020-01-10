@@ -27,10 +27,7 @@ cdef class FixFile:
         cdef object cfile = open(self.file_name, "w")
         if cfile is None:
             raise FileNotFoundError(2, "No such file or directory: %s" % self.file_name)
-        cdef str py_header_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                               "fix_header.txt")
-        cdef object fix_header_ptr = open(py_header_path, "rb")
-        fix_header_ptr.write(b"""@ All header lines are statically generated and are preceded by '@'
+        cfile.write("""@ All header lines are statically generated and are preceded by '@'
             @
             @   This file was created by using `dbdm INTEGRITY`
             @   .fix file structure identifies issues in your project and displays them as:
@@ -90,7 +87,7 @@ cdef class FixFile:
         # for line in fix_header_ptr:
         #     cfile.write(line.decode())
         self.fp = cfile
-        fix_header_ptr.close()
+        # fix_header_ptr.close()
 
     cdef load_file(self):
         """ Loads file generated in INTEGRITY
