@@ -13,8 +13,6 @@ ModelOrganisms/*
 BioMetaDB/Models/__pycache__/*
 BioMetaDB/Serializers/__pycache__/*
 build/*
-*.c
 *.so
 BioMetaDB/*/*.so
-BioMetaDB/*/*.c
 BioMetaDB.egg-info
