@@ -25,7 +25,7 @@ extensions = [
 
 setup(
     name='BioMetaDB',
-    version='0.1.2.31',
+    version='0.1.2.32',
     description='Use biological data to generate SQL database schema',
     url="https://github.com/cjneely10/BioMetaDB",
     author="Christopher Neely",
