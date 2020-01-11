@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 from Cython.Build import cythonize
 import setuptools
@@ -47,7 +48,7 @@ else:
 
 setup(
     name='BioMetaDB',
-    version='0.1.2.35',
+    version='0.1.2.36',
     description='Use biological data to generate SQL database schema',
     url="https://github.com/cjneely10/BioMetaDB",
     author="Christopher Neely",
