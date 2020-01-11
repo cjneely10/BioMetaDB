@@ -83,7 +83,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records, truncate=truncate)
             rl.write_records(write)
-        return
+        exit()
     if "~>" in query:
         assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
         matching_records = []
@@ -108,7 +108,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records, truncate=truncate)
             rl.write_records(write)
-        return
+        exit()
     if "->" in query:
         assert table_name == 'None', "Query cannot contain a '->' statement with a table name"
         matching_records = []
@@ -133,7 +133,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         if matching_records and write != "None":
             rl = RecordList(compute_metadata=False, records_list=matching_records, truncate=truncate)
             rl.write_records(write)
-        return
+        exit()
     if ">>" in query:
         assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
@@ -162,8 +162,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                     annot_rl.summarize()
         else:
             eval_rl.summarize()
-        return
-    if view == "None" and unique == 'None':
+        exit()
+    if view == "None" and unique == 'None' and write == "None" and write_tsv == "None":
         for tbl_name in tables_in_database:
             # Display queried info for single table and break
             if table_name == 'None' or table_name == tbl_name:
@@ -174,6 +174,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                     annot_rl.summarize()
                 elif len(annot_rl) == 1:
                     print(annot_rl[0])
+        exit()
     for tbl_name in tables_in_database:
         sess, UserClass, cfg = load_table_metadata(config, tbl_name)
         annot_rl = RecordList(sess, UserClass, cfg, truncate=truncate)

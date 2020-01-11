@@ -43,11 +43,11 @@ extensions = [
 if CYTHONIZE:
     extensions = cythonize(extensions)
 else:
-    no_cythonize(extensions)
+    extensions = no_cythonize(extensions)
 
 setup(
     name='BioMetaDB',
-    version='0.1.2.34',
+    version='0.1.2.35',
     description='Use biological data to generate SQL database schema',
     url="https://github.com/cjneely10/BioMetaDB",
     author="Christopher Neely",
