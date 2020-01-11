@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-from Cython.Build import cythonize
 import setuptools
 from setuptools import setup, Extension
 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'), "r") as f:
@@ -24,8 +23,6 @@ def no_cythonize(extensions, **_ignore):
     return extensions
 
 
-CYTHONIZE = bool(int(os.getenv("CYTHONIZE", 0)))
-
 extensions = [
     Extension("BioMetaDB.Accessories.arg_parse", ["BioMetaDB/Accessories/arg_parse.pyx"]),
     Extension("BioMetaDB.Accessories.bio_ops", ["BioMetaDB/Accessories/bio_ops.pyx"]),
@@ -41,7 +38,8 @@ extensions = [
     Extension("BioMetaDB.Serializers.tsv_joiner", ["BioMetaDB/Serializers/tsv_joiner.pyx"]),
 ]
 
-if CYTHONIZE:
+if bool(int(os.getenv("CYTHONIZE", 0))):
+    from Cython.Build import cythonize
     extensions = cythonize(extensions)
 else:
     extensions = no_cythonize(extensions)
@@ -62,7 +60,6 @@ setup(
     ],
     python_requires='>=3.6',
     ext_modules=extensions,
-    # ext_modules=cythonize(["*/*/*.pyx"]),
     packages=setuptools.find_packages(),
     entry_points={
         'console_scripts': [
