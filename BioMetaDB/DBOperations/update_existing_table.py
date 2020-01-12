@@ -39,12 +39,13 @@ def _update_table_display_message_epilogue():
 def update_existing_table(config_file, table_name, directory_name, data_file, alias, silent, integrity_cancel):
     """
 
-    :param alias:
-    :param silent:
     :param config_file:
     :param table_name:
     :param directory_name:
     :param data_file:
+    :param alias:
+    :param silent:
+    :param integrity_cancel:
     :return:
     """
     _cfg, _tbl, _al, _sil = config_file, table_name, alias, silent

@@ -3,7 +3,7 @@ import os
 import setuptools
 from setuptools import setup, Extension
 
-VERSION = '0.1.2.58'
+VERSION = '0.1.2.59'
 
 
 # https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#distributing-cython-modules
@@ -22,9 +22,6 @@ def no_cythonize(extensions, **_ignore):
         extension.sources[:] = sources
     return extensions
 
-
-with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'), "r") as f:
-    long_description = f.read()
 
 extensions = [
     Extension("BioMetaDB.Accessories.arg_parse", ["BioMetaDB/Accessories/arg_parse.pyx"]),
@@ -51,7 +48,7 @@ setup(
     name='BioMetaDB',
     version=VERSION,
     description='Use biological data to generate SQL database schema',
-    long_description=long_description,
+    long_description=open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'), "r").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/cjneely10/BioMetaDB",
     author="Christopher Neely",
@@ -67,11 +64,6 @@ setup(
     ext_modules=extensions,
     packages=setuptools.find_packages(),
     include_package_data=True,
-    # entry_points={
-    #     'console_scripts': [
-    #         'dbdm = BioMetaDB:run'
-    #     ]
-    # },
     scripts=["BioMetaDB/dbdm"]
 )
 

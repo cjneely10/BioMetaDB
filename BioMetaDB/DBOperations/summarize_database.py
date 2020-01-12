@@ -39,9 +39,12 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
     :return:
     """
     if not view:
-        if query != "None":
-            assert (query != "None" and (table_name != "None" or alias != "None")), SummarizeDBAssertString.QUERY_AND_TABLE_SET
-        assert not (table_name != "None" and alias != "None"), SummarizeDBAssertString.ALIAS_OR_TABLE_ONLY
+        # if query != "None": assert (query != "None" and (table_name != "None" or alias != "None")),
+        # SummarizeDBAssertString.QUERY_AND_TABLE_SET assert not (table_name != "None" and alias != "None"),
+        # SummarizeDBAssertString.ALIAS_OR_TABLE_ONLY
+        if table_name != "None" and alias != "None":
+            print(SummarizeDBAssertString.ALIAS_OR_TABLE_ONLY)
+            exit(1)
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if not view.lower()[0] == "t":
         _summarize_display_message_prelude(config[ConfigKeys.DATABASES][ConfigKeys.db_name])
@@ -52,7 +55,10 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
     else:
         tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     if ("~>" in query) and ("->" in query):
-        assert table_name == 'None', "Query cannot contain '~>/->' statement with a table name"
+        # assert table_name == 'None', "Query cannot contain '~>/->' statement with a table name"
+        if table_name != 'None':
+            print("Query cannot contain '~>/->' statement with a table name")
+            exit(1)
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
@@ -85,7 +91,10 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             rl.write_records(write)
         exit()
     if "~>" in query:
-        assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
+        # assert table_name == 'None', "Query cannot contain a '~>' statement with a table name"
+        if table_name != 'None':
+            print("Query cannot contain '~>' statement with a table name")
+            exit(1)
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
@@ -110,7 +119,10 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             rl.write_records(write)
         exit()
     if "->" in query:
-        assert table_name == 'None', "Query cannot contain a '->' statement with a table name"
+        # assert table_name == 'None', "Query cannot contain a '->' statement with a table name"
+        if table_name != 'None':
+            print("Query cannot contain '->' statement with a table name")
+            exit(1)
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "functions")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
@@ -135,7 +147,10 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             rl.write_records(write)
         exit()
     if ">>" in query:
-        assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
+        # assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
+        if table_name != 'None':
+            print("Query cannot contain '>>' statement with a table name")
+            exit(1)
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
         evaluation_query, annotation_query = query.split(">>")

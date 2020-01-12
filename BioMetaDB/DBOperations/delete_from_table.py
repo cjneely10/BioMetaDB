@@ -42,20 +42,24 @@ def _remove_columns_display_message_epilogue():
 def delete_from_table(config_file, table_name, list_file, alias, silent, integrity_cancel):
     """
 
-    :param silent:
     :param config_file:
     :param table_name:
     :param list_file:
     :param alias:
+    :param silent:
+    :param integrity_cancel:
     :return:
     """
     _cfg, _tbl, _sil, _al = config_file, table_name, silent, alias
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
-        assert table_name is not None, TableNameAssertString.TABLE_NOT_FOUND
+        # assert table_name is not None, TableNameAssertString.TABLE_NOT_FOUND
+        if table_name is None:
+            print(TableNameAssertString.TABLE_NOT_FOUND)
+            exit(1)
     if list_file == "None":
-        raise ListFileNotProvidedError
+        raise ListFileNotProvidedError("Provide file with list of records to delete")
     cfg = ConfigManager(config, table_name)
     ids_to_remove = set(line.rstrip("\r\n") for line in open(list_file, "r"))
     if not silent:

@@ -54,16 +54,23 @@ def _create_all_directories(working_directory, table_name):
 def create_table_in_existing_database(config_file, table_name, directory_name, data_file, alias, silent, integrity_cancel):
     """
 
-    :param silent:
     :param config_file:
     :param table_name:
     :param directory_name:
     :param data_file:
     :param alias:
+    :param silent:
+    :param integrity_cancel:
     :return:
     """
-    assert table_name != "None", CreateDBAssertString.TABLE_NAME_NOT_SET
-    assert config_file is not None, ConfigAssertString.CONFIG_FILE_NOT_PASSED
+    # assert table_name != "None", CreateDBAssertString.TABLE_NAME_NOT_SET
+    if table_name == "None":
+        print(CreateDBAssertString.TABLE_NAME_NOT_SET)
+        exit(1)
+    # assert config_file is not None, ConfigAssertString.CONFIG_FILE_NOT_PASSED
+    if config_file is None:
+        print(ConfigAssertString.CONFIG_FILE_NOT_PASSED)
+        exit(1)
     _cfg, _tbl, _sil, _al = config_file, table_name, silent, alias
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if table_name in config.keys():

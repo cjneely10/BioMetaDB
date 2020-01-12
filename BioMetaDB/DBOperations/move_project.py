@@ -1,15 +1,12 @@
 import os
 import shutil
-
+from pathlib import Path
 from sqlalchemy.orm import mapper
-
 from BioMetaDB import BaseData, Record
 from BioMetaDB.Config.config_manager import ConfigKeys
 from BioMetaDB.Config.config_manager import ConfigManager
 from BioMetaDB.Config.directory_manager import Directories
 from BioMetaDB.DBManagers.class_manager import ClassManager
-from BioMetaDB.DBOperations.summarize_database import load_table_metadata
-from BioMetaDB.Serializers.count_table import CountTable
 from BioMetaDB.DBOperations.integrity_check import integrity_check
 
 """
@@ -44,13 +41,19 @@ def move_project(config_file, path, integrity_cancel, silent):
     :param silent:
     :return:
     """
-    assert path != 'None', "Path (-p) does not exist, exiting"
+    # assert path != 'None', "Path (-p) does not exist, exiting"
+    if path == "None" or not os.path.exists(str(Path(path).resolve())):
+        print("Path (-p) does not exist, exiting")
+        exit(1)
     current_path = os.path.abspath(os.path.abspath(os.path.relpath(config_file)))
     path = os.path.abspath(os.path.relpath(path))
     config, config_file = ConfigManager.confirm_config_set(config_file)
     old_path = config[ConfigKeys.DATABASES][ConfigKeys.working_dir]
-    assert os.path.dirname(old_path) != os.path.abspath(path), \
-        "Project exists in directory, cancelling"
+    # assert os.path.dirname(old_path) != os.path.abspath(path), \
+    #     "Project exists in directory, cancelling"
+    if os.path.dirname(old_path) == os.path.abspath(path):
+        print("Project exists in directory, cancelling")
+        exit(1)
     project_name = config[ConfigKeys.DATABASES][ConfigKeys.rel_work_dir]
     if not silent:
         _move_project_display_message_prelude(

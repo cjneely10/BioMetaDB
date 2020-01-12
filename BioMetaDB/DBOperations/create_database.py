@@ -66,20 +66,33 @@ def _create_all_directories(working_directory, table_name):
 def create_database(db_name, table_name, directory_name, data_file, alias, silent, integrity_cancel):
     """ Function called from dbdm initializes project/module
 
-    :param silent:
-    :param alias:
     :param db_name: (str)   Name of db
     :param table_name: (str)    Record that will be created
     :param directory_name: (str)    Directory with files to add
     :param data_file: (str)     File with metadata for storing in database
+    :param alias:
+    :param silent:
+    :param integrity_cancel:
     :return:
     """
     # Confirm working dir does not exist and that directory with genomes does exist
-    assert db_name != "None", CreateDBAssertString.WORKING_DB_NOT_SET
-    assert table_name != "None", CreateDBAssertString.TABLE_NAME_NOT_SET
-    assert os.path.isdir(db_name) is False, CreateDBAssertString.WORKING_DIR_EXISTS
-    if directory_name != "None":
-        assert os.path.isdir(directory_name), CreateDBAssertString.SEQUENCE_DIR_NOT_EXISTS
+    # assert db_name != "None", CreateDBAssertString.WORKING_DB_NOT_SET
+    if db_name == "None":
+        print(CreateDBAssertString.WORKING_DB_NOT_SET)
+        exit(1)
+    # assert table_name != "None", CreateDBAssertString.TABLE_NAME_NOT_SET
+    if table_name == "None":
+        print(CreateDBAssertString.TABLE_NAME_NOT_SET)
+        exit(1)
+    # assert os.path.isdir(db_name) is False, CreateDBAssertString.WORKING_DIR_EXISTS
+    if os.path.isdir(db_name):
+        print(CreateDBAssertString.WORKING_DIR_EXISTS)
+        exit(1)
+    # if directory_name != "None":
+    #     assert os.path.isdir(directory_name), CreateDBAssertString.SEQUENCE_DIR_NOT_EXISTS
+    if directory_name != "None" and not os.path.isdir(directory_name):
+        print(CreateDBAssertString.SEQUENCE_DIR_NOT_EXISTS)
+        exit(1)
     table_name = table_name.lower()
     if not silent:
         _initialization_display_message_prelude(db_name, db_name, table_name, directory_name, data_file, alias)

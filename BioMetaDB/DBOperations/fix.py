@@ -29,11 +29,15 @@ def fix(config_file, data_file, silent, integrity_cancel):
     :param config_file:
     :param data_file:
     :param silent:
+    :param integrity_cancel:
     :return:
     """
     _cfg, _sil = config_file, silent
     config, config_file = ConfigManager.confirm_config_set(config_file)
-    assert os.path.exists(data_file) and os.path.splitext(data_file)[1] == ".fix", FixAssertString.FIX_NOT_FOUND
+    # assert os.path.exists(data_file) and os.path.splitext(data_file)[1] == ".fix", FixAssertString.FIX_NOT_FOUND
+    if not os.path.exists(data_file) or not os.path.splitext(data_file)[1] == ".fix":
+        print(FixAssertString.FIX_NOT_FOUND)
+        exit(1)
     if not silent:
         _fix_display_message_prelude(
             config[ConfigKeys.DATABASES][ConfigKeys.db_name],

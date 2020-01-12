@@ -26,7 +26,7 @@ def _remove_table_display_message_prelude(db_name, working_directory, table_name
     :param table_name: (str)    Record that will be created
     :return:
     """
-    print("REMOVE:\tCreate table in existing database")
+    print("REMOVE:\tRemove table from existing database")
     print(" Project root directory:\t%s" % working_directory)
     print(" Name of database:\t\t%s.db" % db_name.strip(".db"))
     print(" Name of table:\t\t\t%s" % table_name)
@@ -36,23 +36,27 @@ def _remove_table_display_message_prelude(db_name, working_directory, table_name
 
 
 def _remove_columns_display_message_epilogue():
-    print("Record removed from database!", "\n")
+    print("Table removed from database!", "\n")
 
 
 def remove_table_from_database(config_file, table_name, alias, silent, integrity_cancel):
     """ Function removes a given table from a database
 
-    :param silent:
     :param config_file:
     :param table_name:
     :param alias:
+    :param silent:
+    :param integrity_cancel:
     :return:
     """
     _cfg, _tbl, _sil, _al = config_file, table_name, silent, alias
     config, config_file = ConfigManager.confirm_config_set(config_file)
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
-        assert table_name is not None, TableNameAssertString.TABLE_NOT_FOUND
+        # assert table_name is not None, TableNameAssertString.TABLE_NOT_FOUND
+        if table_name is None:
+            print(TableNameAssertString.TABLE_NOT_FOUND)
+            exit(1)
     if not silent:
         _remove_table_display_message_prelude(
             config[ConfigKeys.DATABASES][ConfigKeys.db_name],
