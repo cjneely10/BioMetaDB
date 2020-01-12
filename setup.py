@@ -3,7 +3,7 @@ import os
 import setuptools
 from setuptools import setup, Extension
 
-VERSION = '0.1.2.47'
+VERSION = '0.1.2.58'
 
 
 # https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#distributing-cython-modules
@@ -66,10 +66,12 @@ setup(
     python_requires='>=3.6',
     ext_modules=extensions,
     packages=setuptools.find_packages(),
-    entry_points={
-        'console_scripts': [
-            'dbdm = BioMetaDB:run'
-        ]
-    },
+    include_package_data=True,
+    # entry_points={
+    #     'console_scripts': [
+    #         'dbdm = BioMetaDB:run'
+    #     ]
+    # },
+    scripts=["BioMetaDB/dbdm"]
 )
 

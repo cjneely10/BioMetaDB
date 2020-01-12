@@ -107,3 +107,7 @@ def run():
     pc = ProgramCaller(programs=programs, flags=flags, _help=_help, errors=errors)
 
     pc.run(ap.args, debug=True)
+
+
+if __name__ == "__main__":
+    run()
