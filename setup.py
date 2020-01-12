@@ -3,6 +3,8 @@ import os
 import setuptools
 from setuptools import setup, Extension
 
+VERSION = '0.1.2.47'
+
 
 # https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#distributing-cython-modules
 def no_cythonize(extensions, **_ignore):
@@ -47,7 +49,7 @@ else:
 
 setup(
     name='BioMetaDB',
-    version='0.1.2.38',
+    version=VERSION,
     description='Use biological data to generate SQL database schema',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -59,15 +61,14 @@ setup(
         "SQLAlchemy==1.3.12",
         "biopython==1.76",
         "configparser==3.8.1",
-        "Cython==0.29.14",
-        "wheel"
+        "Cython==0.29.14"
     ],
     python_requires='>=3.6',
     ext_modules=extensions,
     packages=setuptools.find_packages(),
     entry_points={
         'console_scripts': [
-            'dbdm = BioMetaDB.dbdm:run'
+            'dbdm = BioMetaDB:run'
         ]
     },
 )
