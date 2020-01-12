@@ -1,22 +1,8 @@
-# BioMetaDB v0.1.2
+# BioMetaDB v0.1.3
 
 ## Installation
-Clone this repository and add the project-level directory *BioMetaDB* to your path. Create an alias to access `dbdm`.
-<pre><code>cd /path/to/BioMetaDB
-pip3 install -r requirements.txt
-python3 setup.py build_ext --inplace
-alias dbdm="python3 /path/to/BioMetaDB/dbdm.py"</code></pre>
-Adding the last line of the above code to a user's `.bashrc` file will maintain these settings on next log-in.
 
-### Dependencies
-
-- Python &ge; 3.5
-- Cython 0.29.2
-- Python packages
-    - SQLAlchemy 1.3.2
-    - BioPython 1.73
-    - ConfigParser
-    - ArgParse
+- `pip3 install wheel && pip3 install BioMetaDB`
 
 Such dependencies are best maintained within a separate Python virtual environment.
 
@@ -169,7 +155,7 @@ values or columns.
 <pre><code>usage: dbdm.py [-h] [-n DB_NAME] [-t TABLE_NAME] [-d DIRECTORY_NAME]
                [-f DATA_FILE] [-l LIST_FILE] [-c CONFIG_FILE] [-a ALIAS] [-s]
                [-v VIEW] [-q QUERY] [-u UNIQUE] [-i] [-w WRITE] [-x WRITE_TSV]
-               [-p PATH]
+               [-p PATH] [-r]
                program
 
 dbdm:	Manage BioMetaDB project
@@ -193,7 +179,7 @@ REMOVE: Remove table and all associated data from database
 REMOVECOL: Remove column list (including data) from table
 		(Req:  --config_file --table_name --list_file --alias --silent --integrity_cancel)
 SUMMARIZE: Summarize project and query data. Write records or metadata to file
-		(Req:  --config_file --view --query --table_name --alias --write --write_tsv --unique)
+		(Req:  --config_file --view --query --table_name --alias --write --write_tsv --unique --truncate)
 UPDATE: Update values in existing table or add new sequences
 		(Req:  --config_file --table_name --directory_name --data_file --alias --silent --integrity_cancel)
 
@@ -228,7 +214,8 @@ optional arguments:
                         Write fastx records from SUMMARIZE to outfile
   -x WRITE_TSV, --write_tsv WRITE_TSV
                         Write table record metadata from SUMMARIZE to outfile
-  -p PATH, --path PATH  New path for moving project in MOVE command</code></pre>
+  -p PATH, --path PATH  New path for moving project in MOVE command
+  -r, --truncate        Return only ID of annotation and not the complete description, excluding Prokka, default False</code></pre>
 
 The typical workflow for initializing **BioMetaDB** is straightforward. Many options exist for updating, adding to, 
 and removing from the existing project structure. You may also choose to assign an alternate name to a table within a
@@ -485,19 +472,6 @@ file for instructions on setting values.
         -  This command will replace the file locations for records with issues in the genomic table. It will replace
         the default fix value with a file location whose value is created using the ID field of that particular issue.
         Notice that the argument passed with `-r` is surrounded by double-quotes.
-
-### Other scripts
-
-#### ArgParse
-
-- `BioMetaBD/Accessories/arg_parse.py`
-- **ArgParse** is a simple wrapper script for the Python module `argparse` that reduces the amount of if/then checking.
-
-#### ProgramCaller
-
-- `BioMetaBD/Accessories/program_caller.py`
-- **ProgramCaller** is a script made for handling flags and errors in a moderately complex program (such as this one), 
-and is highly useful for fast script-making.
 
 ### Contact
 
