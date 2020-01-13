@@ -9,6 +9,9 @@ clean:
 dist:
 	./setup.py sdist
 
+install-local:
+	pip3 install . --upgrade
+
 publish:
 	twine upload dist/*
 

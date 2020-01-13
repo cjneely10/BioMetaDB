@@ -189,35 +189,36 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
                     annot_rl.summarize()
                 elif len(annot_rl) == 1:
                     print(annot_rl[0])
-        exit()
-    for tbl_name in tables_in_database:
-        sess, UserClass, cfg = load_table_metadata(config, tbl_name)
-        annot_rl = RecordList(sess, UserClass, cfg, truncate=truncate)
-        # Display column info for table
-        if view.lower()[0] == "c":
-            # Display queried info for single table and break
-            # Do not need to query since only displaying columns
-            annot_rl.columns_summary()
-        elif view.lower()[0] == "t":
-            # Display queried info for single table and break
-            # Do not need to query since only displaying columns
-            annot_rl.table_name_summary()
-        if write != "None" and table_name == tbl_name:
-            _handle_query(annot_rl, query)
-            annot_rl.write_records(write)
-        if write_tsv != "None" and table_name == tbl_name:
-            _handle_query(annot_rl, query)
-            annot_rl.write_tsv(write_tsv)
-        if unique != 'None' and table_name == tbl_name:
-            _handle_query(annot_rl)
-            col_vals = set()
-            for record in annot_rl:
-                val = getattr(record, unique, "None")
-                if val:
-                    col_vals.add(val)
-            col_vals = sorted(col_vals)
-            for val in col_vals:
-                print(val)
+    else:
+        for tbl_name in tables_in_database:
+            if table_name == tbl_name:
+                sess, UserClass, cfg = load_table_metadata(config, tbl_name)
+                annot_rl = RecordList(sess, UserClass, cfg, truncate=truncate)
+                # Display column info for table
+                if view.lower()[0] == "c":
+                    # Display queried info for single table and break
+                    # Do not need to query since only displaying columns
+                    annot_rl.columns_summary()
+                elif view.lower()[0] == "t":
+                    # Display queried info for single table and break
+                    # Do not need to query since only displaying columns
+                    annot_rl.table_name_summary()
+                if write != "None":
+                    _handle_query(annot_rl, query)
+                    annot_rl.write_records(write)
+                if write_tsv != "None":
+                    _handle_query(annot_rl, query)
+                    annot_rl.write_tsv(write_tsv)
+                if unique != 'None':
+                    _handle_query(annot_rl)
+                    col_vals = set()
+                    for record in annot_rl:
+                        val = getattr(record, unique, "None")
+                        if val:
+                            col_vals.add(val)
+                    col_vals = sorted(col_vals)
+                    for val in col_vals:
+                        print(val)
 
 
 def load_table_metadata(config, tbl_name):
