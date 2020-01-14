@@ -58,6 +58,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         if table_name != 'None':
             print("Query cannot contain '~>/->' statement with a table name")
             exit(1)
+        if "evaluation" not in tables_in_database or "functions" not in tables_in_database:
+            print("Table linker requires 'evaluation' and 'functions' tables to be present")
+            exit(1)
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
@@ -96,6 +99,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         if table_name != 'None':
             print("Query cannot contain '~>' statement with a table name")
             exit(1)
+        if "evaluation" not in tables_in_database:
+            print("Table linker requires 'evaluation' table to be present")
+            exit(1)
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
@@ -126,6 +132,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         if table_name != 'None':
             print("Query cannot contain '->' statement with a table name")
             exit(1)
+        if "functions" not in tables_in_database:
+            print("Table linker requires 'functions' table to be present")
+            exit(1)
         matching_records = []
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "functions")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
@@ -155,6 +164,9 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         # assert table_name == 'None', "Query cannot contain a '>>' statement with a table name"
         if table_name != 'None':
             print("Query cannot contain '>>' statement with a table name")
+            exit(1)
+        if "evaluation" not in tables_in_database or "functions" not in tables_in_database:
+            print("Table linker requires 'evaluation' and 'functions' tables to be present")
             exit(1)
         eval_sess, EvalClass, eval_cfg = load_table_metadata(config, "evaluation")
         eval_rl = RecordList(eval_sess, EvalClass, eval_cfg, compute_metadata=False, truncate=truncate)
