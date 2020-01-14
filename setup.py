@@ -3,7 +3,7 @@ import os
 import setuptools
 from setuptools import setup, Extension
 
-VERSION = '0.1.2.62'
+VERSION = '0.1.2.63'
 
 
 # https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#distributing-cython-modules
@@ -64,6 +64,10 @@ setup(
     ext_modules=extensions,
     packages=setuptools.find_packages(),
     include_package_data=True,
-    scripts=["BioMetaDB/dbdm"]
+    scripts=[
+        "BioMetaDB/dbdm",
+        "BioMetaDB/table",
+        "BioMetaDB/tsv-join",
+    ]
 )
 
