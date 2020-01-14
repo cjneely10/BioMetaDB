@@ -3,7 +3,7 @@ import os
 import setuptools
 from setuptools import setup, Extension
 
-VERSION = '0.1.2.61'
+VERSION = '0.1.2.62'
 
 
 # https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#distributing-cython-modules

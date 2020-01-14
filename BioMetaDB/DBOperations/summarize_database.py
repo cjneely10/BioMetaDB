@@ -6,7 +6,6 @@ from BioMetaDB.DBManagers.class_manager import ClassManager
 from BioMetaDB.Config.config_manager import ConfigManager, ConfigKeys
 from BioMetaDB.Exceptions.summarize_database_exceptions import SummarizeDBAssertString
 
-
 """
 Script will hold functionality to display to stdout a summary of key project details
 
@@ -51,7 +50,7 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
     if alias != "None":
         table_name = ConfigManager.get_name_by_alias(alias, config)
     if table_name != "None" or alias != "None":
-        tables_in_database = (table_name, )
+        tables_in_database = (table_name,)
     else:
         tables_in_database = config[ConfigKeys.TABLES_TO_DB].keys()
     if ("~>" in query) and ("->" in query):
@@ -77,6 +76,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
         for record in eval_rl:
             if record in fxn_rl:
                 record_id = record._id.split(".")[0]
+                if record_id not in tables_in_database:
+                    continue
                 sess, UserClass, cfg = load_table_metadata(config, record_id)
                 annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False, truncate=truncate)
                 _handle_query(annot_rl, annotation_query)
@@ -105,6 +106,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             eval_rl.query()
         for record in eval_rl:
             record_id = record._id.split(".")[0]
+            if record_id not in tables_in_database:
+                continue
             sess, UserClass, cfg = load_table_metadata(config, record_id)
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False, truncate=truncate)
             _handle_query(annot_rl, annotation_query)
@@ -133,6 +136,8 @@ def summarize_database(config_file, view, query, table_name, alias, write, write
             eval_rl.query()
         for record in eval_rl:
             record_id = record._id.split(".")[0]
+            if record_id not in tables_in_database:
+                continue
             sess, UserClass, cfg = load_table_metadata(config, record_id)
             annot_rl = RecordList(sess, UserClass, cfg, compute_metadata=False, truncate=truncate)
             _handle_query(annot_rl, annotation_query)
