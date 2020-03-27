@@ -87,7 +87,7 @@ cdef class RecordList(object):
         # return summary_string.getvalue()
 
     def columns(self):
-        """ Returns dict of columns
+        """ Returns list of columns
 
         :return:
         """
