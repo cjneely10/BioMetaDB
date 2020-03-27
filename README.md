@@ -94,7 +94,7 @@ documentation to come.
 - `RecordList` - returned by `get_table()`, a quasi list/dict data type for multiple records.
     - `__repr()__`:         returns a "pretty-print" summary of the table
     - `query("query string")`:   runs query through SQL database
-    - `columns()`:          returns a dict of column names for the database table
+    - `columns()`:          returns a list of column names for the database table
     - `columns_summary()`:  returns a "pretty-print" summary of all of the column names in the database table
     - `summarize()`:        returns a "pretty-print" summary (averages and std. devs) of the items in the list
     - `find_column("search string")`:     returns list of columns that are "like" the passed search_str
